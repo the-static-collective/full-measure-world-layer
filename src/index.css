@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #fbf8f3;
+    color: #2c2825;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom earthy & tactile card styles */
+.parchment-card {
+  background-color: #ffffff;
+  border: 1px solid #e8e2d8;
+  box-shadow: 0 3px 14px -3px rgba(44, 40, 37, 0.05);
+}
+
+.parchment-card-warm {
+  background-color: #f7f2ea;
+  border: 1px solid #e2d7c7;
+  box-shadow: 0 3px 14px -3px rgba(44, 40, 37, 0.05);
+}
+
+.garden-hero {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(214, 158, 76, 0.24), transparent 28%),
+    radial-gradient(circle at 18% 120%, rgba(71, 118, 81, 0.42), transparent 42%),
+    linear-gradient(135deg, #1d3329 0%, #17382a 46%, #552f26 140%);
+  box-shadow: 0 20px 45px -28px rgba(29, 51, 41, 0.9);
+}
+
+.bg-clay {
+  background-color: #c86d51;
+}
+
+.text-clay {
+  color: #c86d51;
+}
+
+.border-clay {
+  border-color: #c86d51;
+}
+
+.bg-sage {
+  background-color: #4a6b53;
+}
+
+.text-sage {
+  color: #4a6b53;
+}
+
+.border-sage {
+  border-color: #4a6b53;
+}
+
+/* Storybook Heading */
+.font-serif-warm {
+  font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+}

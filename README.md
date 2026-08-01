@@ -1,6 +1,18 @@
 # Full Measure — World Layer
 
-Full Measure is the D&D-style gamified life layer that combines relevant Static Collective systems into a participatory world people can inhabit, play through, and help shape.
+Full Measure is the D&D-style life layer for real participation: a world people can
+inhabit, play through, and help shape without turning human worth into points.
+
+The current vertical slice places a Garden and evidence-derived character sheet over
+Jubilee Campfire's causal loop:
+
+```text
+Tension → Pledge → Accept → Report → Human Witness → Harvest → Capacity
+```
+
+Only attributable events change the sheet. A model may propose a quest or narrate a
+chronicle, but it cannot award a Deed, establish truth, manufacture witness, or silently
+rewrite memory.
 
 ## Canonical identity
 
@@ -12,35 +24,57 @@ Use these names for this repository and project:
 
 An unqualified reference to **Full Measure** means this project.
 
-## Not The Haunted Toaster
+This repository is **not** the song-to-video renderer. That tool is
+[The Haunted Toaster — Video Receipt Renderer](https://github.com/the-static-collective/the-haunted-toaster).
+Legacy names such as `Full Measure Video Receipt` and `START_FULL_MEASURE.bat` belong
+only to that renderer's history and must not become this project's identity.
 
-This repository is **not** the song-to-video renderer.
+> Full Measure is the world you play inside. The Haunted Toaster is the machine that
+> turns a song into a witnessed video.
 
-The local-first audiovisual renderer formerly associated with the phrase `Full Measure Video Receipt` is canonically named:
+## The playable slice
 
-> **The Haunted Toaster — Video Receipt Renderer**
+The Garden is the first screen. It answers three questions about the next living
+object:
 
-Repository:
+1. How did this become what it is?
+2. What remains unresolved?
+3. Where can someone participate next?
 
-- `the-static-collective/the-haunted-toaster`
+The character sheet exposes six factual measures: Gifts, Quests, Deeds, Seeds,
+Witness, and Harvests. A self-report remains a proposal. A Deed grows only after a
+different authorized human confirms the returned report.
 
-Legacy references such as `START_FULL_MEASURE.bat` or `Full Measure Video Receipt` belong only to that renderer's naming history and must not be used as the identity of this project.
+Use **Pass the fire** to exercise the multi-human boundary in prototype mode:
 
-## One-line distinction
+1. A contributor pledges to a quest.
+2. The project opener accepts it.
+3. The contributor reports what happened.
+4. A different authorized human confirms it.
+5. The contributor's Deed measure grows and the project can be harvested.
 
-> Full Measure is the world you play inside. The Haunted Toaster is the machine that turns a song into a witnessed video.
+## Truth-state boundary
 
-## Initial purpose boundary
+This slice runs against a local Express JSON event store and simulated profile
+switching. The UI therefore says `Prototype · This device`. It must not claim `Shared`,
+`Chain verified`, or canonical Jubilee authority.
 
-Full Measure may integrate or project from systems such as TranchNode, Jubilee, BananaGram, NanaSpork, Autodisco, and other world-facing tools, but it must not silently replace their distinct authority or meaning.
+Production Shared mode belongs behind an authenticated authority plane. No browser or
+Android client may hold a service-role key, mutate canonical tables directly, or
+manufacture witness receipts. Models may propose; only people may harvest.
 
-Its role is the gamified life and participation layer:
+## Run it
 
-- quests and invitations;
-- roles and capacities;
-- Dungeon Master-like orchestration;
-- world state and consequences;
-- progression without reducing people to reputation scores;
-- visible links back to the underlying witnessed events, artifacts, and authorities.
+```bash
+npm install
+npm run check
+npm run dev
+```
 
-The repository is intentionally anchored with a meaning contract before implementation expands.
+## Architecture notes
+
+- [Project weave and authority boundaries](docs/PROJECT_WEAVE.md)
+- [Inherent Dungeon Master contract](docs/DUNGEON_MASTER.md)
+
+Full Measure integrates other systems by reference and adapter. It does not silently
+replace their distinct authority, meaning, privacy, or lineage contracts.
