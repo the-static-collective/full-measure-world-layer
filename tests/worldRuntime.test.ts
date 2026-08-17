@@ -192,7 +192,7 @@ test('Project0 validation failure never invokes the destination', async () => {
   assert.equal(calls.destination, 0);
 });
 
-test('refusal records attributable residue without constituting the destination', async () => {
+test('refusal records attributable residue without marking the destination admitted', async () => {
   const { ports } = makePorts({ destinationStatus: 'refused' });
   const runtime = createWorldRuntime({ doors, ...ports });
   const before = runtime.getField();
@@ -212,7 +212,7 @@ test('refusal records attributable residue without constituting the destination'
   assert.equal(result.worldChange.kind, 'boundary-scar');
 
   const after = runtime.getField();
-  assert.deepEqual(after.constitutedDestinationRefs, before.constitutedDestinationRefs);
+  assert.deepEqual(after.admittedDestinationRefs, before.admittedDestinationRefs);
   assert.equal(after.visibleResidueRefs.includes(result.residue.residueRef), true);
 });
 
