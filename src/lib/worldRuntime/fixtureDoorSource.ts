@@ -5,7 +5,7 @@ const FIELD: WorldFieldProjection = {
   projectionVersion: 'boot-the-house-fixture/v0.1',
   sourceMode: 'fixture',
   sourceRefs: [
-    'full-measure:main:798d39f84d11f3fdbbc6d06a5478279695d84dca',
+    'full-measure:main:c62275019c452a881565e3a6ce444b6a66968714',
   ],
   unresolvedRefs: [
     'founder-node:pollen-scout-live-adapter-pending',
@@ -24,7 +24,7 @@ const DOORS: WorldDoorProjection[] = [
     relation: 'constitutional-encounter',
     reachability: 'reachable',
     provenanceRefs: [
-      'tranchnode:main:a3dc7fa5155df93641f4f116eac1464b10342849',
+      'tranchnode:main:bf886c0b4938a1444a79afb7a7b384e91b5d5197',
       'project0:main:6341b0223f2b57148d617dcc98d1e0d0c68e14a5',
       'corpus-os:main:63c0be4cd49c383ae167ded99103b79ba4626416',
     ],
