@@ -77,47 +77,35 @@ const layout = {
   ],
 };
 
-test('Tranch port obtains the native layout hash before decoding', async () => {
+test('Tranch port uses the landed one-shot stdio contract without caller-owned hashing', async () => {
   const command = nodeJsonCommand(`(request, respond) => {
-    if (request.schema !== 'tranchnode.intent-stroke-process/v0.1') {
-      return respond({ status: 'error', code: 'BAD_SCHEMA' }, 1);
+    if (request.schema !== 'tranchnode/intent-stroke-stdio/v0.1') {
+      return respond({ schema: 'tranchnode/intent-stroke-stdio-response/v0.1', ok: false, error: { code: 'BAD_SCHEMA' } }, 1);
     }
-    if (request.operation === 'address-layout') {
-      if (request.layout.schema !== 'tranchnode/intent-stroke-layout/v0.1') {
-        return respond({ status: 'error', code: 'BAD_LAYOUT' }, 1);
-      }
-      return respond({
-        schema: 'tranchnode.intent-stroke-process-result/v0.1',
-        status: 'ok',
-        operation: 'address-layout',
-        addressed: { hash: 'hash-layout-native', value: request.layout },
-      });
+    if (request.stroke.fieldLayoutRef !== undefined) {
+      return respond({ schema: 'tranchnode/intent-stroke-stdio-response/v0.1', ok: false, error: { code: 'CALLER_PRECOMPUTED_LAYOUT_REF' } }, 1);
     }
-    if (request.operation === 'decode') {
-      if (request.stroke.fieldLayoutRef !== 'hash-layout-native') {
-        return respond({ status: 'error', code: 'LAYOUT_REF_MISMATCH' }, 1);
-      }
-      return respond({
-        schema: 'tranchnode.intent-stroke-process-result/v0.1',
-        status: 'ok',
-        operation: 'decode',
-        decoding: {
-          schema: 'tranchnode/intent-stroke-decoding/v0.1',
-          authority: 'none',
-          strokeHash: 'hash-stroke-native',
-          fieldLayoutRef: 'hash-layout-native',
-          decoder: request.decoder,
-          candidates: [
-            { templateId: 'door:corpus', anchorIds: ['garden', 'door:corpus'], pathCost: 1, endpointCost: 0, totalCost: 1 },
-            { templateId: 'door:upper-room', anchorIds: ['garden', 'door:upper-room'], pathCost: 7, endpointCost: 0, totalCost: 7 },
-            { templateId: 'door:band-runtime', anchorIds: ['garden', 'door:band-runtime'], pathCost: 9, endpointCost: 0, totalCost: 9 },
-          ],
-          ambiguity: { kind: 'none', leadingTemplateIds: ['door:corpus'] },
-          fingerprint: 'hash-decoding-native',
-        },
-      });
+    if (request.layout.schema !== 'tranchnode/intent-stroke-layout/v0.1') {
+      return respond({ schema: 'tranchnode/intent-stroke-stdio-response/v0.1', ok: false, error: { code: 'BAD_LAYOUT' } }, 1);
     }
-    return respond({ status: 'error', code: 'BAD_OPERATION' }, 1);
+    return respond({
+      schema: 'tranchnode/intent-stroke-stdio-response/v0.1',
+      ok: true,
+      decoding: {
+        schema: 'tranchnode/intent-stroke-decoding/v0.1',
+        authority: 'none',
+        strokeHash: 'sha256:' + '1'.repeat(64),
+        fieldLayoutRef: 'sha256:' + '2'.repeat(64),
+        decoder: request.decoder,
+        candidates: [
+          { templateId: 'door:corpus', anchorIds: ['garden', 'door:corpus'], pathCost: 1, endpointCost: 0, totalCost: 1 },
+          { templateId: 'door:upper-room', anchorIds: ['garden', 'door:upper-room'], pathCost: 7, endpointCost: 0, totalCost: 7 },
+          { templateId: 'door:band-runtime', anchorIds: ['garden', 'door:band-runtime'], pathCost: 9, endpointCost: 0, totalCost: 9 },
+        ],
+        ambiguity: { kind: 'none', leadingTemplateIds: ['door:corpus'] },
+        fingerprint: 'sha256:' + '3'.repeat(64),
+      },
+    });
   }`);
 
   const port = createTranchNodeTraversalPort({ command, layout });
@@ -133,23 +121,27 @@ test('Tranch port obtains the native layout hash before decoding', async () => {
   });
 
   assert.equal(result.authority, 'none');
-  assert.equal(result.decodingRef, 'hash-decoding-native');
+  assert.equal(result.decodingRef, 'sha256:' + '3'.repeat(64));
   assert.equal(result.candidates[0]?.doorRef, 'door:corpus');
   assert.deepEqual(result.ambiguity.leadingDoorRefs, ['door:corpus']);
 });
 
-test('Project0 port addresses then verifies one authority-free envelope', async () => {
+test('Project0 port consumes the landed address/verify stdio contract', async () => {
   const command = nodeJsonCommand(`(request, respond) => {
-    if (request.schema !== 'project0.world-encounter-process/v0.1') {
-      return respond({ status: 'error', code: 'BAD_SCHEMA' }, 1);
+    if (request.schema !== 'project0/world-encounter-stdio/v0.1') {
+      return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_SCHEMA' } }, 1);
+    }
+    if (request.recordType !== 'exchange_envelope') {
+      return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_RECORD_TYPE' } }, 1);
     }
     if (request.operation === 'address') {
-      if (request.body.protocolVersion !== 'p0.exchange/0.1') return respond({ status: 'error', code: 'BAD_PROTOCOL' }, 1);
-      if (request.body.sourceAuthorityRefs.length !== 0) return respond({ status: 'error', code: 'AUTHORITY_LEAK' }, 1);
+      if (request.body.protocolVersion !== 'p0.exchange/0.1') return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_PROTOCOL' } }, 1);
+      if (request.body.sourceAuthorityRefs.length !== 0) return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'AUTHORITY_LEAK' } }, 1);
       return respond({
-        schema: 'project0.world-encounter-process-result/v0.1',
-        status: 'ok',
-        addressed: {
+        schema: 'project0/world-encounter-stdio-response/v0.1',
+        ok: true,
+        operation: 'address',
+        record: {
           ref: 'enc-' + 'a'.repeat(64),
           digestHex: 'a'.repeat(64),
           recordType: 'exchange_envelope',
@@ -158,11 +150,12 @@ test('Project0 port addresses then verifies one authority-free envelope', async 
       });
     }
     if (request.operation === 'verify') {
-      if (request.expectedRef !== 'enc-' + 'a'.repeat(64)) return respond({ status: 'error', code: 'BAD_REF' }, 1);
+      if (request.expectedRef !== 'enc-' + 'a'.repeat(64)) return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_REF' } }, 1);
       return respond({
-        schema: 'project0.world-encounter-process-result/v0.1',
-        status: 'ok',
-        addressed: {
+        schema: 'project0/world-encounter-stdio-response/v0.1',
+        ok: true,
+        operation: 'verify',
+        record: {
           ref: request.expectedRef,
           digestHex: 'a'.repeat(64),
           recordType: 'exchange_envelope',
@@ -170,7 +163,7 @@ test('Project0 port addresses then verifies one authority-free envelope', async 
         },
       });
     }
-    return respond({ status: 'error', code: 'BAD_OPERATION' }, 1);
+    return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_OPERATION' } }, 1);
   }`);
 
   const port = createProject0EncounterPort({
@@ -205,13 +198,12 @@ test('Project0 port addresses then verifies one authority-free envelope', async 
     'github:the-static-collective/full-measure-world-layer@fixture:README.md');
 });
 
-test('Project0 structured validation error stays pre-destination validation failure', async () => {
+test('Project0 mainline structured validation error stays pre-destination validation failure', async () => {
   const command = nodeJsonCommand(`(_request, respond) => respond({
-    schema: 'project0.world-encounter-process-result/v0.1',
-    status: 'error',
-    code: 'ENCOUNTER_PROTOCOL_UNSUPPORTED',
-    message: 'unsupported',
-  })`);
+    schema: 'project0/world-encounter-stdio-response/v0.1',
+    ok: false,
+    error: { code: 'ENCOUNTER_PROTOCOL_UNSUPPORTED' },
+  }, 1)`);
 
   const port = createProject0EncounterPort({
     command,
