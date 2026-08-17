@@ -18,9 +18,12 @@ const TRANCH_RESPONSE_SCHEMA = 'tranchnode/intent-stroke-stdio-response/v0.1' as
 const PROJECT0_REQUEST_SCHEMA = 'project0/world-encounter-stdio/v0.1' as const;
 const PROJECT0_RESPONSE_SCHEMA = 'project0/world-encounter-stdio-response/v0.1' as const;
 const PROJECT0_EXCHANGE_PROTOCOL = 'p0.exchange/0.1' as const;
-const CORPUS_REQUEST_SCHEMA = 'corpus.world-encounter-destination/v0.1' as const;
-const CORPUS_RESULT_SCHEMA = 'corpus.world-encounter-disposition/v0.1' as const;
-const CORPUS_CAPABILITY = 'corpus.receive-public-source-ref/v0.1' as const;
+const CORPUS_REQUEST_SCHEMA = 'corpus-os/world-encounter-admission/v0.1' as const;
+const CORPUS_RESPONSE_SCHEMA = 'corpus-os/world-encounter-stdio-response/v0.1' as const;
+const CORPUS_RESULT_SCHEMA = 'corpus-os/world-encounter-result/v0.1' as const;
+const CORPUS_DESTINATION_FRAME = 'corpus-os:casework-v0.1' as const;
+const CORPUS_PROFILE = 'casework.synthetic-echo/v0.1' as const;
+const CORPUS_DESTINATION_SUBJECT = 'artifact:agreement-a' as const;
 
 export interface WorldTraversalLayout {
   anchors: Array<{ id: string; x: number; y: number }>;
@@ -333,11 +336,22 @@ export interface CorpusDestinationPortOptions {
 type CorpusProcessResult = {
   schema: typeof CORPUS_RESULT_SCHEMA;
   status: 'admitted' | 'refused' | 'indeterminate' | 'failed';
-  authority: 'none';
-  reasonCode?: string;
-  failureClass?: string;
-  destinationPolicyEvidenceRefs?: string[];
+  reasonCode: string;
+  envelopeRef: string;
+  destinationFrameRef: string;
+  profile: string;
+  callerAuthenticated: false;
+  authorityTransfer: 'none';
+  legalValidity: 'unclaimed';
+  receiptRequestId?: string;
+  outputRefs: string[];
   evidenceRefs: string[];
+};
+
+type CorpusProcessResponse = {
+  schema: typeof CORPUS_RESPONSE_SCHEMA;
+  ok: true;
+  result: CorpusProcessResult;
 };
 
 function assertStringArray(value: unknown, label: string): asserts value is string[] {
@@ -355,51 +369,50 @@ export function createCorpusDestinationPort(
         typeof input.encounter !== 'object'
         || input.encounter === null
         || !('ref' in input.encounter)
-        || !('body' in input.encounter)
       ) {
         throw new Error('Corpus destination requires a Project0-addressed encounter');
       }
 
-      const encounter = input.encounter as { ref: unknown; body: unknown };
+      const encounter = input.encounter as { ref: unknown };
       if (encounter.ref !== input.encounterRef || typeof encounter.ref !== 'string') {
         throw new Error('Corpus destination encounter identity is inconsistent');
       }
 
-      const result = await runJsonProcess<unknown, CorpusProcessResult>(options.command, {
+      const response = await runJsonProcess<unknown, CorpusProcessResponse>(options.command, {
         schema: CORPUS_REQUEST_SCHEMA,
-        capability: CORPUS_CAPABILITY,
-        encounter: {
-          ref: encounter.ref,
-          body: encounter.body,
-        },
+        envelopeRef: encounter.ref,
+        destinationFrameRef: CORPUS_DESTINATION_FRAME,
+        profile: CORPUS_PROFILE,
+        destinationSubjectRef: CORPUS_DESTINATION_SUBJECT,
+        input: `Boot the House encounter ${encounter.ref}`,
       });
+      const result = response.result;
 
       if (
-        result.schema !== CORPUS_RESULT_SCHEMA
-        || result.authority !== 'none'
-        || !Array.isArray(result.evidenceRefs)
+        response.schema !== CORPUS_RESPONSE_SCHEMA
+        || response.ok !== true
+        || !result
+        || result.schema !== CORPUS_RESULT_SCHEMA
+        || result.envelopeRef !== encounter.ref
+        || result.destinationFrameRef !== CORPUS_DESTINATION_FRAME
+        || result.profile !== CORPUS_PROFILE
+        || result.callerAuthenticated !== false
+        || result.authorityTransfer !== 'none'
+        || result.legalValidity !== 'unclaimed'
+        || typeof result.reasonCode !== 'string'
+        || result.reasonCode.length === 0
       ) {
         throw new Error('Corpus destination returned an incompatible response');
       }
       assertStringArray(result.evidenceRefs, 'evidence refs');
-      if (result.destinationPolicyEvidenceRefs !== undefined) {
-        assertStringArray(result.destinationPolicyEvidenceRefs, 'policy evidence refs');
-      }
-
-      const evidenceRefs = [
-        ...result.evidenceRefs,
-        ...(result.destinationPolicyEvidenceRefs ?? []),
-      ];
+      assertStringArray(result.outputRefs, 'output refs');
 
       if (result.status === 'failed') {
-        if (!result.failureClass) {
-          throw new Error('Corpus failed disposition lacks a failure class');
-        }
         return {
           status: 'failed',
           authority: 'none',
-          failureClass: result.failureClass,
-          evidenceRefs: [...new Set(evidenceRefs)],
+          failureClass: result.reasonCode,
+          evidenceRefs: [...new Set(result.evidenceRefs)],
         };
       }
 
@@ -410,15 +423,12 @@ export function createCorpusDestinationPort(
       ) {
         throw new Error('Corpus destination returned an unknown disposition');
       }
-      if (!result.reasonCode) {
-        throw new Error('Corpus constitutional disposition lacks a reason code');
-      }
 
       return {
         status: result.status,
         authority: 'none',
         reasonCode: result.reasonCode,
-        evidenceRefs: [...new Set(evidenceRefs)],
+        evidenceRefs: [...new Set(result.evidenceRefs)],
       };
     },
   };
