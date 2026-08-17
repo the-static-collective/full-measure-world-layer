@@ -31,6 +31,17 @@ test('bounded process adapter exchanges exactly one JSON request and response', 
   });
 });
 
+test('process adapter preserves a structured donor response even when the donor exits nonzero', async () => {
+  const result = await invokeJsonProcess(command, { mode: 'structured-exit' }, limits);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.deepEqual(result.value, {
+    schema: 'fixture/process-response/v0.1',
+    ok: false,
+    error: { code: 'DONOR_REFUSAL' },
+  });
+});
+
 test('process adapter rejects oversized input before spawning', async () => {
   const result = await invokeJsonProcess(command, { mode: 'echo', value: 'x'.repeat(2_000) }, limits);
   assert.equal(result.ok, false);
@@ -38,7 +49,7 @@ test('process adapter rejects oversized input before spawning', async () => {
   assert.equal(result.kind, 'input-too-large');
 });
 
-test('process adapter distinguishes timeout, nonzero exit, malformed output, oversized output, and unavailable command', async () => {
+test('process adapter distinguishes timeout, bare nonzero exit, malformed output, oversized output, and unavailable command', async () => {
   const timeout = await invokeJsonProcess(command, { mode: 'hang' }, limits);
   assert.equal(timeout.ok, false);
   if (!timeout.ok) assert.equal(timeout.kind, 'timeout');
