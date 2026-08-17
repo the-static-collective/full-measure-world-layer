@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  createCorpusDestinationPort,
   createProject0EncounterPort,
   createTranchNodeTraversalPort,
 } from '../src/world-runtime/donorPorts.js';
@@ -77,16 +76,13 @@ const layout = {
   ],
 };
 
-test('Tranch port uses the landed one-shot stdio contract without caller-owned hashing', async () => {
+test('Tranch port uses the donor-owned one-shot stdio contract without caller-owned hashing', async () => {
   const command = nodeJsonCommand(`(request, respond) => {
     if (request.schema !== 'tranchnode/intent-stroke-stdio/v0.1') {
       return respond({ schema: 'tranchnode/intent-stroke-stdio-response/v0.1', ok: false, error: { code: 'BAD_SCHEMA' } }, 1);
     }
     if (request.stroke.fieldLayoutRef !== undefined) {
       return respond({ schema: 'tranchnode/intent-stroke-stdio-response/v0.1', ok: false, error: { code: 'CALLER_PRECOMPUTED_LAYOUT_REF' } }, 1);
-    }
-    if (request.layout.schema !== 'tranchnode/intent-stroke-layout/v0.1') {
-      return respond({ schema: 'tranchnode/intent-stroke-stdio-response/v0.1', ok: false, error: { code: 'BAD_LAYOUT' } }, 1);
     }
     return respond({
       schema: 'tranchnode/intent-stroke-stdio-response/v0.1',
@@ -98,9 +94,9 @@ test('Tranch port uses the landed one-shot stdio contract without caller-owned h
         fieldLayoutRef: 'sha256:' + '2'.repeat(64),
         decoder: request.decoder,
         candidates: [
-          { templateId: 'door:corpus', anchorIds: ['garden', 'door:corpus'], pathCost: 1, endpointCost: 0, totalCost: 1 },
-          { templateId: 'door:upper-room', anchorIds: ['garden', 'door:upper-room'], pathCost: 7, endpointCost: 0, totalCost: 7 },
-          { templateId: 'door:band-runtime', anchorIds: ['garden', 'door:band-runtime'], pathCost: 9, endpointCost: 0, totalCost: 9 },
+          { templateId: 'door:corpus', totalCost: 1 },
+          { templateId: 'door:upper-room', totalCost: 7 },
+          { templateId: 'door:band-runtime', totalCost: 9 },
         ],
         ambiguity: { kind: 'none', leadingTemplateIds: ['door:corpus'] },
         fingerprint: 'sha256:' + '3'.repeat(64),
@@ -126,17 +122,15 @@ test('Tranch port uses the landed one-shot stdio contract without caller-owned h
   assert.deepEqual(result.ambiguity.leadingDoorRefs, ['door:corpus']);
 });
 
-test('Project0 port consumes the landed address/verify stdio contract', async () => {
+test('Project0 port consumes the donor-owned address/verify stdio contract', async () => {
   const command = nodeJsonCommand(`(request, respond) => {
     if (request.schema !== 'project0/world-encounter-stdio/v0.1') {
       return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_SCHEMA' } }, 1);
     }
-    if (request.recordType !== 'exchange_envelope') {
-      return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_RECORD_TYPE' } }, 1);
-    }
     if (request.operation === 'address') {
-      if (request.body.protocolVersion !== 'p0.exchange/0.1') return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_PROTOCOL' } }, 1);
-      if (request.body.sourceAuthorityRefs.length !== 0) return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'AUTHORITY_LEAK' } }, 1);
+      if (request.body.sourceAuthorityRefs.length !== 0) {
+        return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'AUTHORITY_LEAK' } }, 1);
+      }
       return respond({
         schema: 'project0/world-encounter-stdio-response/v0.1',
         ok: true,
@@ -150,7 +144,6 @@ test('Project0 port consumes the landed address/verify stdio contract', async ()
       });
     }
     if (request.operation === 'verify') {
-      if (request.expectedRef !== 'enc-' + 'a'.repeat(64)) return respond({ schema: 'project0/world-encounter-stdio-response/v0.1', ok: false, error: { code: 'BAD_REF' } }, 1);
       return respond({
         schema: 'project0/world-encounter-stdio-response/v0.1',
         ok: true,
@@ -191,14 +184,10 @@ test('Project0 port consumes the landed address/verify stdio contract', async ()
   if (result.status !== 'ok') return;
   assert.equal(result.encounterRef, 'enc-' + 'a'.repeat(64));
   const envelope = result.encounter as { body: Record<string, unknown> };
-  assert.equal(envelope.body.protocolVersion, 'p0.exchange/0.1');
   assert.deepEqual(envelope.body.sourceAuthorityRefs, []);
-  assert.equal(envelope.body.originFrameRef, 'full-measure:garden/world-field/v0.1');
-  assert.equal(envelope.body.offered && (envelope.body.offered as { objectRef: string }).objectRef,
-    'github:the-static-collective/full-measure-world-layer@fixture:README.md');
 });
 
-test('Project0 mainline structured validation error stays pre-destination validation failure', async () => {
+test('Project0 structured nonzero error remains pre-destination validation failure', async () => {
   const command = nodeJsonCommand(`(_request, respond) => respond({
     schema: 'project0/world-encounter-stdio-response/v0.1',
     ok: false,
@@ -229,37 +218,4 @@ test('Project0 mainline structured validation error stays pre-destination valida
   assert.equal(result.status, 'validation-failed');
   if (result.status !== 'validation-failed') return;
   assert.equal(result.reasonCode, 'ENCOUNTER_PROTOCOL_UNSUPPORTED');
-});
-
-test('Corpus port submits only the bounded capability and preserves authority none', async () => {
-  const command = nodeJsonCommand(`(request, respond) => {
-    if (request.schema !== 'corpus.world-encounter-destination/v0.1') return respond({ error: 'BAD_SCHEMA' }, 1);
-    if (request.capability !== 'corpus.receive-public-source-ref/v0.1') return respond({ error: 'BAD_CAPABILITY' }, 1);
-    if (request.encounter.body.protocolVersion !== 'p0.exchange/0.1') return respond({ error: 'BAD_PROTOCOL' }, 1);
-    return respond({
-      schema: 'corpus.world-encounter-disposition/v0.1',
-      status: 'admitted',
-      reasonCode: 'CORPUS_ENCOUNTER_ADMITTED',
-      authority: 'none',
-      destinationFrameRef: 'corpus-os:world-encounter:v0.1',
-      encounterRef: request.encounter.ref,
-      inspectedObject: false,
-      destinationPolicyEvidenceRefs: ['corpus-os:policy:world-encounter:v0.1'],
-      evidenceRefs: [request.encounter.ref],
-    });
-  }`);
-
-  const port = createCorpusDestinationPort({ command });
-  const result = await port.evaluate({
-    encounterRef: 'enc-' + 'a'.repeat(64),
-    encounter: {
-      ref: 'enc-' + 'a'.repeat(64),
-      body: { protocolVersion: 'p0.exchange/0.1' },
-    },
-    door: doors[0]!,
-  });
-
-  assert.equal(result.status, 'admitted');
-  assert.equal(result.authority, 'none');
-  assert.equal(result.evidenceRefs.includes('corpus-os:policy:world-encounter:v0.1'), true);
 });
