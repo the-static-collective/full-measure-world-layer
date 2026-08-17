@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - agent/boot-house-runtime-core
+  workflow_dispatch:
 
 permissions:
   contents: write
