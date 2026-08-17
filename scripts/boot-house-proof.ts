@@ -31,6 +31,7 @@ const CORPUS_DESTINATION_REF = 'corpus-os:casework-v0.1';
 const VALID_SUBJECT_REF = 'artifact:agreement-a';
 const FOREIGN_SUBJECT_REF = 'artifact:not-in-this-trust';
 const ZERO_ENCOUNTER_REF = `enc-${'0'.repeat(64)}`;
+const OVERSIZED_CORPUS_INPUT = 'x'.repeat(16_385);
 
 type Availability = {
   tranchnode: boolean;
@@ -86,10 +87,6 @@ type CrossingOutcome = {
   residue: WorldEncounterResidue;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 async function readJsonResponse<T>(response: Response): Promise<HttpResult<T>> {
   const text = await response.text();
   let body: unknown;
@@ -133,6 +130,30 @@ function assertNoConstitutedDestinationRefs(outcome: CrossingOutcome, label: str
     [],
     `${label} must not manufacture constituted destination refs`,
   );
+}
+
+async function readField(): Promise<{
+  field: WorldFieldProjection;
+  availability: Availability;
+}> {
+  const response = await getJson<{
+    field: WorldFieldProjection;
+    availability: Availability;
+  }>('/api/world/field');
+  assert.equal(response.status, 200);
+  return response.body;
+}
+
+async function readDoors(): Promise<{
+  doors: WorldDoorProjection[];
+  availability: Availability;
+}> {
+  const response = await getJson<{
+    doors: WorldDoorProjection[];
+    availability: Availability;
+  }>('/api/world/doors');
+  assert.equal(response.status, 200);
+  return response.body;
 }
 
 async function prepareEncounter(
@@ -209,27 +230,20 @@ async function confirmEncounter(input: {
 }
 
 async function main(): Promise<void> {
-  const fieldResponse = await getJson<{
-    field: WorldFieldProjection;
-    availability: Availability;
-  }>('/api/world/field');
-  assert.equal(fieldResponse.status, 200);
-  assert.equal(fieldResponse.body.field.fieldRef, 'full-measure:garden:v0.1');
-  assert.equal(fieldResponse.body.field.sourceMode, 'fixture');
-  assert.deepEqual(fieldResponse.body.availability, {
+  const initialFieldState = await readField();
+  assert.equal(initialFieldState.field.fieldRef, 'full-measure:garden:v0.1');
+  assert.equal(initialFieldState.field.sourceMode, 'fixture');
+  assert.deepEqual(initialFieldState.availability, {
     tranchnode: true,
     project0: true,
     corpusOs: true,
   });
-  const field = fieldResponse.body.field;
+  const field = initialFieldState.field;
 
-  const doorsResponse = await getJson<{
-    doors: WorldDoorProjection[];
-    availability: Availability;
-  }>('/api/world/doors');
-  assert.equal(doorsResponse.status, 200);
-  assert.equal(doorsResponse.body.doors.length, 3);
-  const corpusDoor = doorsResponse.body.doors.find(
+  const initialDoorState = await readDoors();
+  assert.equal(initialDoorState.doors.length, 3);
+  assert.deepEqual(initialDoorState.availability, initialFieldState.availability);
+  const corpusDoor = initialDoorState.doors.find(
     (door) => door.doorRef === CORPUS_DOOR_REF,
   );
   assert.ok(corpusDoor, 'Corpus door must be declared');
@@ -289,6 +303,19 @@ async function main(): Promise<void> {
   assert.equal(refused.outcome.residue.outcomeClass, 'refused');
   assertNoConstitutedDestinationRefs(refused.outcome, 'refused branch');
 
+  const fieldAfterRefusal = await readField();
+  const doorsAfterRefusal = await readDoors();
+  assert.deepEqual(
+    fieldAfterRefusal.field,
+    initialFieldState.field,
+    'refusal may append residue but must not rewrite the constituted source field projection',
+  );
+  assert.deepEqual(
+    doorsAfterRefusal.doors,
+    initialDoorState.doors,
+    'refusal may append residue but must not rewrite declared door projection',
+  );
+
   const indeterminate = await confirmEncounter({
     field,
     door: corpusDoor,
@@ -301,11 +328,25 @@ async function main(): Promise<void> {
   assert.equal(indeterminate.outcome.residue.outcomeClass, 'indeterminate');
   assertNoConstitutedDestinationRefs(indeterminate.outcome, 'indeterminate branch');
 
-  const validationFailed = await confirmEncounter({
+  const failed = await confirmEncounter({
     field,
     door: corpusDoor,
     traversal,
     sequence: 4,
+    destinationSubjectRef: VALID_SUBJECT_REF,
+    testimony: OVERSIZED_CORPUS_INPUT,
+  });
+  assert.equal(failed.outcome.status, 'failed');
+  assert.equal(failed.outcome.destinationInvoked, true);
+  assert.equal(failed.outcome.residue.outcomeClass, 'failed');
+  assertNoConstitutedDestinationRefs(failed.outcome, 'failed branch');
+  assert.ok(failed.outcome.residue.unresolvedRefs.includes('ADAPTER_INVALID_OPERATION_INPUT'));
+
+  const validationFailed = await confirmEncounter({
+    field,
+    door: corpusDoor,
+    traversal,
+    sequence: 5,
     destinationSubjectRef: VALID_SUBJECT_REF,
     expectedEncounterRef: ZERO_ENCOUNTER_REF,
     testimony: 'Boot the House CI composed witness: validation failure branch.',
@@ -329,6 +370,11 @@ async function main(): Promise<void> {
     proofKind: 'synthetic-composed-ci',
     humanWitness: false,
     generatedAt: new Date().toISOString(),
+    workflow: {
+      repository: process.env.GITHUB_REPOSITORY ?? null,
+      runId: process.env.GITHUB_RUN_ID ?? null,
+      runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? null,
+    },
     fullMeasureRef: FULL_MEASURE_REF,
     donors: DONOR_REFS,
     fieldRef: field.fieldRef,
@@ -357,6 +403,8 @@ async function main(): Promise<void> {
         residueRef: refused.outcome.residue.residueRef,
         constitutedDestinationRefs: refused.outcome.residue.constitutedDestinationRefs,
         unresolvedRefs: refused.outcome.residue.unresolvedRefs,
+        sourceFieldProjectionUnchanged: true,
+        declaredDoorProjectionUnchanged: true,
       },
       indeterminate: {
         encounterRef: indeterminate.encounterRef,
@@ -365,6 +413,14 @@ async function main(): Promise<void> {
         residueRef: indeterminate.outcome.residue.residueRef,
         constitutedDestinationRefs: indeterminate.outcome.residue.constitutedDestinationRefs,
         unresolvedRefs: indeterminate.outcome.residue.unresolvedRefs,
+      },
+      failed: {
+        encounterRef: failed.encounterRef,
+        status: failed.outcome.status,
+        destinationInvoked: failed.outcome.destinationInvoked,
+        residueRef: failed.outcome.residue.residueRef,
+        constitutedDestinationRefs: failed.outcome.residue.constitutedDestinationRefs,
+        unresolvedRefs: failed.outcome.residue.unresolvedRefs,
       },
       validationFailed: {
         preparedEncounterRef: validationFailed.encounterRef,
@@ -376,15 +432,23 @@ async function main(): Promise<void> {
         unresolvedRefs: validationFailed.outcome.residue.unresolvedRefs,
       },
     },
-    residueReplay: {
+    reconstruction: {
+      completeness: 'partial',
+      scope: 'full-measure-local-residue',
       residueRef: residueLookup.body.residue.residueRef,
-      exactMatch: true,
+      exactResidueReplay: true,
+      omittedByDesign: [
+        'destination-private-state',
+        'destination-warrant-body',
+        'master-world-graph',
+      ],
     },
     limitations: [
       'not-human-witness',
       'fixture-door-source',
       'no-network-federation',
-      'host-failure-branch-proven-in-corpus-native-tests-not-forced-in-composed-proof',
+      'composed-failed-branch-is-destination-input-boundary-failure-not-host-failure',
+      'host-failure-branch-proven-in-corpus-native-tests',
     ],
   };
 
@@ -392,7 +456,9 @@ async function main(): Promise<void> {
   assert.equal(proof.encounters.admitted.status, 'admitted');
   assert.equal(proof.encounters.refused.status, 'refused');
   assert.equal(proof.encounters.indeterminate.status, 'indeterminate');
+  assert.equal(proof.encounters.failed.status, 'failed');
   assert.equal(proof.encounters.validationFailed.destinationInvoked, false);
+  assert.equal(proof.reconstruction.completeness, 'partial');
 
   await mkdir('artifacts', { recursive: true });
   await writeFile(
@@ -410,8 +476,10 @@ async function main(): Promise<void> {
       admitted: proof.encounters.admitted.status,
       refused: proof.encounters.refused.status,
       indeterminate: proof.encounters.indeterminate.status,
+      failed: proof.encounters.failed.status,
       validationFailed: proof.encounters.validationFailed.status,
     },
+    reconstruction: proof.reconstruction.completeness,
     receipt: 'artifacts/boot-house-proof.json',
   }, null, 2));
 }
@@ -423,6 +491,11 @@ main().catch(async (error: unknown) => {
     proofKind: 'synthetic-composed-ci',
     humanWitness: false,
     generatedAt: new Date().toISOString(),
+    workflow: {
+      repository: process.env.GITHUB_REPOSITORY ?? null,
+      runId: process.env.GITHUB_RUN_ID ?? null,
+      runAttempt: process.env.GITHUB_RUN_ATTEMPT ?? null,
+    },
     fullMeasureRef: FULL_MEASURE_REF,
     donors: DONOR_REFS,
     error: error instanceof Error
