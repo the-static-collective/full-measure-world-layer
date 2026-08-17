@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: the-static-collective/corpus-os
-          ref: f7163e262200a4bcb5a3f1cdc273dc069d908d29
+          ref: 63c0be4cd49c383ae167ded99103b79ba4626416
           path: .boot-house/corpus-os
 
       - uses: actions/setup-node@v4
@@ -62,7 +62,7 @@ jobs:
           BOOT_HOUSE_FULL_MEASURE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           BOOT_HOUSE_TRANCH_SHA: 4566ec8960448e5dbca3f41058d9990f52e88052
           BOOT_HOUSE_PROJECT0_SHA: 6341b0223f2b57148d617dcc98d1e0d0c68e14a5
-          BOOT_HOUSE_CORPUS_SHA: f7163e262200a4bcb5a3f1cdc273dc069d908d29
+          BOOT_HOUSE_CORPUS_SHA: 63c0be4cd49c383ae167ded99103b79ba4626416
         run: node --import tsx scripts/boot-house-witness.ts
 
       - name: Upload witness receipt
