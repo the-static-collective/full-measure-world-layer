@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const file = 'server.ts';
 let source = await readFile(file, 'utf8');
 
-const importAnchor = "import { ensureStoreSeeded, resetStoreToSeed } from './src/server/seed.js';";
+const importAnchor = "import { authorizePledgeTransition } from './src/lib/pledgeAuthority.js';";
 const importLine = "import { createWorldRuntimeApi } from './src/world-runtime/bootstrap.js';";
 if (!source.includes(importLine)) {
   if (!source.includes(importAnchor)) throw new Error('server import anchor not found');
