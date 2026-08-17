@@ -1,6 +1,8 @@
 import { Router, type Request } from 'express';
 
 import type { WorldRuntime } from './orchestrator.js';
+import type { WorldDoorProjection } from './contracts.js';
+import type { WorldRuntimeUnavailableReason } from './config.js';
 
 const MAX_COORDINATE = 1_000_000;
 const MAX_POINTS = 512;
@@ -9,6 +11,11 @@ export interface WorldRuntimeRouterOptions {
   runtime: WorldRuntime;
   offeredWitnessRef: string;
   resolveActorId(request: Request): string;
+}
+
+export interface UnavailableWorldRuntimeRouterOptions {
+  reasonCode: WorldRuntimeUnavailableReason;
+  doors: WorldDoorProjection[];
 }
 
 interface ClientPoint {
@@ -43,6 +50,40 @@ function parseClientPoints(value: unknown): ClientPoint[] | undefined {
 function errorClass(error: unknown): string {
   if (error instanceof Error && error.message.trim()) return error.message;
   return 'WORLD_RUNTIME_ADAPTER_FAILURE';
+}
+
+export function createUnavailableWorldRuntimeRouter(
+  options: UnavailableWorldRuntimeRouterOptions,
+): Router {
+  const router = Router();
+  const field = {
+    fieldRef: 'full-measure:garden/world-field/v0.1',
+    projectionVersion: 'full-measure.world-field/v0.1',
+    doors: options.doors.map((door) => ({
+      ...door,
+      provenanceRefs: [...door.provenanceRefs],
+      relevanceReasons: [...door.relevanceReasons],
+    })),
+    admittedDestinationRefs: [],
+    visibleResidueRefs: [],
+  };
+
+  router.get('/field', (_req, res) => {
+    res.json({
+      available: false,
+      reasonCode: options.reasonCode,
+      field,
+    });
+  });
+
+  router.use((_req, res) => {
+    return res.status(503).json({
+      kind: 'world-runtime-unavailable',
+      reasonCode: options.reasonCode,
+    });
+  });
+
+  return router;
 }
 
 export function createWorldRuntimeRouter(options: WorldRuntimeRouterOptions): Router {
