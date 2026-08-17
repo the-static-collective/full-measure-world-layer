@@ -12,10 +12,9 @@ function project0ValidationFailureCommand(): JsonProcessCommand {
     process.stdin.on('end', () => {
       JSON.parse(input);
       process.stdout.write(JSON.stringify({
-        schema: 'project0.world-encounter-process-result/v0.1',
-        status: 'error',
-        code: 'ENCOUNTER_PROTOCOL_UNSUPPORTED',
-        message: 'unsupported'
+        schema: 'project0/world-encounter-stdio-response/v0.1',
+        ok: false,
+        error: { code: 'ENCOUNTER_PROTOCOL_UNSUPPORTED' }
       }));
       process.exitCode = 1;
     });
@@ -29,7 +28,7 @@ function project0ValidationFailureCommand(): JsonProcessCommand {
   };
 }
 
-test('Project0 structured validation remains validation-failed even when CLI exits nonzero', async () => {
+test('Project0 mainline structured validation remains validation-failed when CLI exits nonzero', async () => {
   const port = createProject0EncounterPort({
     command: project0ValidationFailureCommand(),
     source: {
