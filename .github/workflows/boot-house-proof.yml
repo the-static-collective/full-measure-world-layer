@@ -82,10 +82,16 @@ jobs:
 
           node --import tsx scripts/boot-house-proof.ts
 
+      - name: Bind proof receipt digest
+        if: always() && hashFiles('artifacts/boot-house-proof.json') != ''
+        run: sha256sum artifacts/boot-house-proof.json | tee artifacts/boot-house-proof.sha256
+
       - name: Upload proof receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: boot-house-proof
-          path: artifacts/boot-house-proof.json
+          path: |
+            artifacts/boot-house-proof.json
+            artifacts/boot-house-proof.sha256
           if-no-files-found: ignore
