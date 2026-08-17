@@ -185,6 +185,9 @@ export function createWorldRuntime(options: WorldRuntimeOptions): WorldRuntime {
       if (!traversal.decoding.ambiguity.leadingDoorRefs.includes(request.doorRef)) {
         throw new Error('confirmed door is not a leading traversal candidate');
       }
+      if (door.reachability !== 'reachable') {
+        throw new Error('confirmed door is not currently reachable');
+      }
       if (!request.confirmedBy.trim()) {
         throw new Error('crossing confirmation requires an actor');
       }
