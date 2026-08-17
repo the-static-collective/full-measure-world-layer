@@ -54,7 +54,7 @@ export function createBootHouseOrchestrator(deps: {
       ];
 
       const verification = await deps.project0.verify(input.encounterRef, input.encounterBody);
-      if (!verification.ok) {
+      if (verification.ok === false) {
         const residue = deps.residueStore.append({
           sourceFieldRef: input.sourceFieldRef,
           doorRef: input.doorRef,
@@ -79,7 +79,7 @@ export function createBootHouseOrchestrator(deps: {
         input: input.input,
       });
 
-      if (!destination.ok) {
+      if (destination.ok === false) {
         const residue = deps.residueStore.append({
           sourceFieldRef: input.sourceFieldRef,
           doorRef: input.doorRef,
