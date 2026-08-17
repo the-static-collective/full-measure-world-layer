@@ -58,25 +58,27 @@ interface RuntimeCommands {
   destination: JsonProcessCommand;
 }
 
+export interface UnavailableWorldRuntimeConfiguration {
+  available: false;
+  reasonCode: WorldRuntimeUnavailableReason;
+  doors: WorldDoorProjection[];
+}
+
+export interface AvailableWorldRuntimeConfiguration {
+  available: true;
+  doors: WorldDoorProjection[];
+  commands: RuntimeCommands;
+  source: Project0EncounterSourceProfile;
+  offeredWitnessRef: string;
+}
+
 export type ResolvedWorldRuntimeConfiguration =
-  | {
-      available: false;
-      reasonCode: WorldRuntimeUnavailableReason;
-      doors: WorldDoorProjection[];
-    }
-  | {
-      available: true;
-      doors: WorldDoorProjection[];
-      commands: RuntimeCommands;
-      source: Project0EncounterSourceProfile;
-      offeredWitnessRef: string;
-    };
+  | UnavailableWorldRuntimeConfiguration
+  | AvailableWorldRuntimeConfiguration;
 
 export type ConfiguredWorldRuntime =
-  | Exclude<ResolvedWorldRuntimeConfiguration, { available: true }>
-  | (Extract<ResolvedWorldRuntimeConfiguration, { available: true }> & {
-      runtime: WorldRuntime;
-    });
+  | UnavailableWorldRuntimeConfiguration
+  | (AvailableWorldRuntimeConfiguration & { runtime: WorldRuntime });
 
 function cloneDoors(): WorldDoorProjection[] {
   return BOOT_HOUSE_DOORS.map((door) => ({
@@ -160,7 +162,7 @@ export function createConfiguredWorldRuntime(
   env: Record<string, string | undefined>,
 ): ConfiguredWorldRuntime {
   const config = resolveWorldRuntimeConfiguration(env);
-  if (!config.available) return config;
+  if (config.available === false) return config;
 
   const traversal = createTranchNodeTraversalPort({
     command: config.commands.traversal,
