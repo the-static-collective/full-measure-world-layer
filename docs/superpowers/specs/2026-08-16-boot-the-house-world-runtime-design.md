@@ -8,26 +8,22 @@
 
 ## Purpose
 
-The Static Collective now has several independently proven organs that are beginning to meet at the same seam:
+The Static Collective now has enough independently proven organs to attempt one complete cross-project heartbeat:
 
-- **Full Measure** already owns the playable World Layer and the human-facing Garden.
-- **Founder Node / Authority Kit** can project nearby ecosystem capabilities without converting relevance into authority.
-- **TranchNode** now has deterministic Intent Stroke / Swype NAV decoding while keeping raw gesture evidence, ambiguity, and `authority: none` distinct.
-- **Project0** has NAV frame/crossing witnesses and is advancing the World Encounter Envelope boundary for source testimony that may cross without transporting sovereignty.
-- **Corpus OS** has the execution/admission side of the ecosystem: local authority, one-shot warrants, admitted/refused execution, receipts, and constituted-world reconstruction.
+- **Full Measure** owns the playable World Layer and Garden.
+- **Authority Kit / Founder Node** describe ecosystem capabilities and evidenced nearby growth without turning relevance into authority.
+- **TranchNode** has deterministic Intent Stroke / Swype NAV decoding with preserved raw evidence, ambiguity, and `authority: none`.
+- **Project0** has NAV crossing witnesses and is advancing the World Encounter Envelope boundary: testimony may cross while sovereignty stays local.
+- **Corpus OS** owns destination-local admission/execution semantics, refusals, failures, receipts, and constituted-world reconstruction.
 - **GitBook** preserves portable laws, evidence, frontier, and re-entry context without becoming runtime authority.
 
-The next useful proof is therefore not another isolated application and not a master integration service. It is one complete, inhabited cross-project heartbeat.
-
-This design deliberately makes the move large in architectural reach and narrow in proof surface.
+The next proof should therefore not be another isolated application or a new master integration service. It should be one inhabited loop that exercises those boundaries together.
 
 ## Core claim under test
 
-The v0.1 experiment asks one falsifiable question:
-
 > Can the Collective behave like one inhabitable world while remaining a federation of sovereign organs?
 
-A successful run must look approximately like this:
+The v0.1 heartbeat is:
 
 ```text
 human
@@ -41,92 +37,62 @@ human
   -> admitted | refused | indeterminate | failed
   -> attributable return residue
   -> Full Measure projects a changed field
-  -> exact return path remains inspectable
+  -> declared return / reconstruction path remains inspectable
 ```
 
-The experiment succeeds only if the visible continuity feels like one world **and** the evidence proves that no central runtime silently became sovereign over the participating systems.
+The visible continuity should feel like one world. The evidence must prove that no central runtime became sovereign over the participating systems.
 
 ## Architectural decision
 
-### Decision: Full Measure owns orchestration as a world projection, not as constitutional authority
+### Full Measure owns orchestration as world projection, not constitutional authority
 
-Full Measure is the correct home for the v0.1 design and human interaction because it already defines itself as the world people play inside and already has a project-weave contract for integrating other systems by reference and adapter.
+Full Measure is the correct home for v0.1 because it already owns the human-facing world and already defines integrations by reference and adapter.
 
-Full Measure may:
+Full Measure may project the current field, request bounded door metadata, collect a gesture, delegate decoding, require human confirmation, request a Project0 encounter envelope, submit the encounter to a destination adapter, and render the returned disposition and evidence.
 
-- project the current inhabited field;
-- request bounded nearby-door metadata;
-- collect a traversal gesture;
-- ask TranchNode to decode that gesture;
-- require a human confirmation before crossing;
-- construct or request a Project0-compatible encounter envelope;
-- submit the offered encounter to a destination adapter;
-- render the destination's returned disposition and evidence;
-- project resulting scars, residue, illumination, or unresolved fog into the Garden.
+Full Measure may not define Project0 identity, mint destination authority, overwrite TranchNode lineage, treat Founder Node relevance as permission, execute Corpus OS operations without Corpus OS admission, reinterpret refusal as success, use UI state as canonical constitutional state, or make GitBook narrative authoritative over repository evidence.
 
-Full Measure may **not**:
+### Rejected: a new central orchestrator repository
 
-- define canonical identity for Project0;
-- mint destination authority;
-- overwrite TranchNode lineage;
-- treat Founder Node relevance as permission;
-- execute a Corpus OS operation without Corpus OS admission;
-- reinterpret a refusal as success;
-- use UI state as canonical constitutional state;
-- make GitBook narrative authoritative over repository-owned evidence.
-
-### Rejected option: a new central orchestrator repository
-
-A new `world-runtime` repository would appear clean but would immediately create pressure to become the canonical registry, transport, policy engine, identity resolver, and integration owner. That duplicates responsibilities already held elsewhere and creates a de facto sovereign center.
+A new `world-runtime` repository would immediately be tempted to become the canonical registry, policy engine, identity resolver, transport, and integration owner. That would create the sovereign center this experiment is meant to avoid.
 
 Do not create a new repository for v0.1.
 
-### Rejected option: absorb donor logic into Full Measure
+### Rejected: absorb donor logic into Full Measure
 
-Copying Project0, TranchNode, Corpus OS, or Founder Node semantics into Full Measure would make the demo easier and the architecture false. The proof requires actual boundaries, not simulated constitutional diversity hidden inside one codebase.
+Copying Project0, TranchNode, Corpus OS, or Founder Node semantics into Full Measure would make the demo easier and the architecture false. The proof requires real boundaries.
 
-## Repository ownership map
+## Ownership map
 
 | Concern | Canonical owner | Full Measure relationship |
 |---|---|---|
-| Inhabited world, Garden, human crossing experience | Full Measure | owns product projection |
-| Ecosystem capability / invariant registry | Authority Kit | observes declared metadata only |
-| Nearby-growth / nearby-door projection | Founder Node | consumes through adapter; relevance remains advisory |
-| Gesture evidence and traversal-candidate decoding | TranchNode | delegates decoding; never treats rank as authority |
-| Canonical identity, frame comparison, encounter-envelope law | Project0 | consumes versioned contracts / witnesses |
-| Destination-local admission and execution | Corpus OS | invokes through explicit destination adapter |
-| Portable patterns, evidence summaries, public re-entry map | GitBook | publishes evidence after the runtime proof; never runtime authority |
+| Inhabited world / Garden / crossing UX | Full Measure | product owner |
+| Capability and invariant registry | Authority Kit | observed metadata only |
+| Nearby-door projection | Founder Node | advisory adapter |
+| Gesture evidence / traversal decoding | TranchNode | delegated decoder |
+| Identity / NAV / encounter-envelope law | Project0 | versioned contract adapter |
+| Destination-local admission / execution | Corpus OS | destination adapter |
+| Portable patterns / public evidence / re-entry | GitBook | post-proof documentation only |
 
-No row transfers ownership merely because Full Measure composes the experience.
+Composition does not transfer ownership.
 
-## The first world heartbeat
+## First world heartbeat
 
-The first acceptance specimen is intentionally one route.
+### 1. Enter one field
 
-### 1. Enter one inhabited field
+The user begins in the existing Full Measure Garden. Full Measure constructs a bounded `WorldFieldProjection` from Full Measure-owned state plus explicitly admitted references. It does not crawl the ecosystem.
 
-The user begins in the existing Full Measure Garden.
+The projection records its field id, projection version, source snapshot/receipt refs, visible unresolved refs, and excluded source classes.
 
-The Garden constructs a bounded `WorldFieldProjection` from Full Measure-owned state plus explicitly admitted references. It does not crawl the ecosystem.
+### 2. Reveal three nearby doors
 
-The projection must state:
+The Garden requests at most three candidates through `NearbyDoorSource`.
 
-- current field id;
-- field projection version;
-- exact source snapshot / receipt refs used;
-- unresolved items currently visible;
-- capability to request nearby-door metadata;
-- what private or unavailable sources were excluded.
+Preferred live source: Founder Node Pollen Scout over Authority Kit once the relevant implementation is landed and compatible.
 
-### 2. Reveal exactly three bounded nearby doors
+CI fallback: a pinned fixture snapshot using the same adapter contract. A fixture must be visibly identified as fixture/prototype evidence; it may not be represented as a live Founder Node observation.
 
-The Garden requests up to three candidate doors through a `NearbyDoorSource` adapter.
-
-Preferred live source: Founder Node Pollen Scout over the Authority Kit registry once the relevant branch has landed and is compatible.
-
-CI fallback: a pinned fixture snapshot with the same public adapter contract. The fixture is test evidence, not a second registry.
-
-Each door exposes only boundary metadata:
+Each door exposes boundary metadata only:
 
 ```ts
 interface WorldDoorProjection {
@@ -143,125 +109,83 @@ interface WorldDoorProjection {
 
 No destination payload is loaded during the scan.
 
-For the first human proof, one of the three doors must lead to a Corpus OS destination fixture or live local Corpus OS adapter that can actually evaluate an encounter. The other two may remain visible but uncrossed.
+One door in the first human proof leads to a Corpus OS destination capable of evaluating the encounter. The other two remain visible but uncrossed.
 
-### 3. Traversal itself becomes input
+### 3. Traversal becomes input
 
-The three doors are projected into a fixed local field layout.
+The doors are projected into a fixed local field layout. The user swipes or drags approximately through the desired route. Full Measure records the raw gesture and delegates decoding to TranchNode Intent Stroke.
 
-The user swipes or drags approximately through the desired route. Full Measure records the raw gesture and delegates decoding to TranchNode Intent Stroke v0.1 or a compatible later version.
-
-The decoder may return ranked candidates and collisions. It may not choose the crossing.
-
-Required distinction:
+The decoder returns candidates and collisions; it does not choose the crossing.
 
 ```text
-human stroke
-  != selected destination
-ranked traversal
-  != accepted crossing
+human stroke != selected destination
+ranked traversal != accepted crossing
 ```
 
-Full Measure renders the best-ranked candidate plus ambiguity. The user must perform a separate explicit confirmation such as **Cross this door**.
+Full Measure renders the candidate result and any ambiguity. The user performs a separate explicit **Cross this door** confirmation. Exact collisions remain unresolved until the user chooses or redraws.
 
-Exact collisions remain unresolved until the human chooses or redraws.
+The confirmation receipt is a **Full Measure-local evidence event** proving that the human selected a proposed crossing. It is not destination authority.
 
 ### 4. Construct one authority-preserving encounter
 
-After explicit confirmation, Full Measure creates a `ConfirmedCrossingIntent` containing the selected door, gesture/decoding evidence refs, source field ref, and the bounded witness or object being offered.
+After confirmation, Full Measure creates a local `ConfirmedCrossingIntent` containing the selected door, source field, offered bounded witness refs, and traversal evidence refs.
 
-A Project0 adapter then produces or validates the versioned World Encounter Envelope profile.
+A Project0 adapter then produces or validates the compatible World Encounter Envelope.
 
-This step must inherit these laws:
+Required laws:
 
 - crossing is not authority transfer;
 - receiving is not canonizing;
-- source verification state remains separate from authority;
+- verification state stays separate from authority;
 - disclosure precedes payload inspection;
 - source history is immutable;
 - foreign vocabulary may remain foreign;
-- exact replay uses Project0's existing canonicalization / addressing floor.
+- exact replay uses Project0's existing canonicalization/addressing floor.
 
-If the required Project0 World Encounter Envelope implementation is not landed on a compatible mainline, the live-crossing adapter remains unavailable. Full Measure must report the dependency honestly rather than ship a local clone of the contract.
+If the required Project0 implementation is not landed on a compatible mainline, the live adapter is unavailable. Full Measure reports the dependency rather than cloning the contract locally.
+
+Malformed, tampered, or incompatible encounter envelopes are **validation/compatibility failures**. They do not become destination constitutional refusals, and the destination is not invoked.
 
 ### 5. Destination decides locally
 
-The first destination is Corpus OS because it already has the strongest distinct execution/admission semantics.
+The first destination is Corpus OS because it provides a materially distinct authority and execution domain.
 
-Full Measure sends the encounter through a `WorldDestinationAdapter`. The adapter does not accept arbitrary shell text or permit Full Measure to name executable authority directly.
-
-Candidate destination result:
+Full Measure sends the valid encounter through `WorldDestinationAdapter`. The adapter accepts only declared bounded capabilities; UI text cannot become arbitrary executable command.
 
 ```ts
 type WorldDestinationDisposition =
-  | {
-      status: "admitted";
-      destinationFrameRef: string;
-      receiptRefs: string[];
-      outputRefs: string[];
-      authorityRefs: string[];
-    }
-  | {
-      status: "refused";
-      destinationFrameRef: string;
-      reasonCodes: string[];
-      receiptRefs: string[];
-    }
-  | {
-      status: "indeterminate";
-      destinationFrameRef: string;
-      unresolved: string[];
-      receiptRefs: string[];
-    }
-  | {
-      status: "failed";
-      destinationFrameRef?: string;
-      failureClass: string;
-      evidenceRefs: string[];
-    };
+  | { status: "admitted"; destinationFrameRef: string; receiptRefs: string[]; outputRefs: string[]; authorityRefs: string[] }
+  | { status: "refused"; destinationFrameRef: string; reasonCodes: string[]; receiptRefs: string[] }
+  | { status: "indeterminate"; destinationFrameRef: string; unresolved: string[]; receiptRefs: string[] }
+  | { status: "failed"; destinationFrameRef?: string; failureClass: string; evidenceRefs: string[] };
 ```
 
-`failed` is operational failure, not constitutional refusal.
+`refused` means the destination evaluated the encounter and constitutionally declined it. `failed` means an operational/runtime failure. They must never be interchangeable.
 
-The destination must cite only authority valid in its own frame.
+The destination cites only authority valid in its own frame.
 
-### 6. Return residue without rewriting the crossing
+### 6. Return residue without rewriting history
 
-Full Measure receives the destination result and builds a local `WorldEncounterResidue` projection.
+Full Measure builds a local `WorldEncounterResidue` containing references to the source field, door, raw gesture, decoding, human confirmation, Project0 encounter, destination disposition, NAV witness where available, unresolved remainder, and return/reconstruction evidence.
 
-The residue must preserve:
+The Full Measure residue store holds only local projection history and foreign evidence references. It is not a competing immutable artifact store or a second canonical identity law.
 
-- source field ref;
-- selected door ref;
-- raw gesture ref;
-- traversal decoding ref;
-- confirmed crossing intent ref;
-- encounter envelope ref;
-- destination disposition and receipt refs;
-- NAV before/crossing/after witness where available;
-- unresolved remainder;
-- return / reconstruction refs.
+### 7. Reproject the world
 
-The residue is historical and attributable. It is not executable authority.
+The Garden changes according to the actual outcome:
 
-### 7. The world changes visibly
+- **admitted:** destination or returned artifact may become newly illuminated/reachable under ordinary Full Measure law;
+- **refused:** constituted source state remains unchanged, but an attributable boundary scar/refusal residue may be visible;
+- **indeterminate:** the frontier remains fogged/contested rather than coerced into success or refusal;
+- **failed:** an operational failure marker may appear, explicitly outside constitutional topology.
 
-The Garden reprojects after the encounter.
+History may change the visible world. A failed or refused transition must never be rendered as though the attempted destination state became constituted.
 
-The change must depend on the actual result class:
+This gives Refusal Topology its first possible product surface without promoting that incubating pattern into universal law.
 
-- **admitted:** the new destination or returned artifact may become newly illuminated or reachable according to ordinary Full Measure rules;
-- **refused:** the source field remains unchanged constitutionally, but an attributable boundary scar / refusal residue may become visible;
-- **indeterminate:** the frontier remains fogged or contested rather than coerced into refusal or success;
-- **failed:** an operational failure marker may appear, clearly distinct from constitutional topology.
+## Full Measure-local application seams
 
-The visible world may change because history changed. It must not pretend that a failed or refused transition constituted the attempted destination state.
-
-This is the first practical bridge to later Refusal Topology without declaring that incubating pattern universal law in v0.1.
-
-## Full Measure application contracts
-
-The following names are local application seams, not proposed Project0 or TranchNode ontology:
+These names are application contracts, not proposed Project0 or TranchNode ontology:
 
 ```ts
 interface WorldFieldProjection {
@@ -301,243 +225,152 @@ interface WorldEncounterResidue {
 }
 ```
 
-These contracts exist to keep Full Measure understandable. They must not become a hidden universal schema.
-
 ## Adapter boundaries
 
-### `NearbyDoorSource`
+**`NearbyDoorSource`** returns explainable nearby doors. It cannot cross a door, grant permission, use hidden model preference as authority, or inspect destination bodies during threshold scan.
 
-Responsibility: return a bounded list of explainable nearby doors.
+**`TraversalDecoder`** delegates raw stroke + layout + candidate templates to TranchNode. It cannot hide collisions or confirm a crossing.
 
-Must not:
+**`EncounterEnvelopePort`** delegates Project0 encounter construction/validation. It cannot introduce another canonicalizer, translate source authority into destination authority, or inspect undisclosed payload.
 
-- cross a door;
-- rank by hidden model preference;
-- grant permission;
-- inspect destination content merely to improve relevance.
+**`WorldDestinationAdapter`** offers one valid encounter to one destination and returns the destination's own result. It cannot silently retry a refusal as a changed operation or translate host failure into refusal/success.
 
-### `TraversalDecoder`
+**`WorldResidueStore`** keeps Full Measure-local projection history and references needed for reconstruction. Donor evidence stays under donor identity/durability law.
 
-Responsibility: submit raw stroke + declared layout + candidate templates to TranchNode and return the addressed decoding.
-
-Must not:
-
-- hide collisions;
-- turn cost/rank into confidence-as-truth;
-- confirm a crossing.
-
-### `EncounterEnvelopePort`
-
-Responsibility: produce / validate the Project0 encounter object using the exact compatible contract.
-
-Must not:
-
-- implement a second canonicalizer;
-- translate source authority into destination authority;
-- inspect undisclosed payload.
-
-### `WorldDestinationAdapter`
-
-Responsibility: offer the encounter to one destination and return the destination's own disposition/evidence.
-
-Must not:
-
-- allow UI text to become arbitrary executable command;
-- silently retry a constitutional refusal as another operation;
-- translate host failure into refusal or success.
-
-### `WorldResidueStore`
-
-Responsibility: keep Full Measure's projection-level encounter history and refs required to reconstruct the world experience.
-
-It may reference TranchNode-addressed evidence. It must not become a competing immutable artifact law.
-
-## Error and refusal behavior
-
-The v0.1 implementation must make the following cases visibly distinct:
+## Failure matrix
 
 | Case | Required result |
 |---|---|
-| Nearby-door source unavailable | current world still renders; nearby doors report unavailable |
+| Nearby-door source unavailable | Garden still renders; doors report unavailable |
 | Registry/projection version unsupported | fail closed before door display |
-| Intent Stroke decoder unavailable | doors may remain visible; gesture crossing disabled |
-| Exact gesture collision | unresolved candidates shown; no implicit choice |
-| User declines confirmation | no crossing object emitted |
-| Encounter envelope invalid/tampered | crossing refused before destination evaluation |
-| Disclosure insufficient | destination payload is not inspected |
+| Intent Stroke unavailable | doors may remain visible; gesture crossing disabled |
+| Gesture collision | unresolved candidates; no implicit choice |
+| User declines confirmation | no crossing emitted |
+| Envelope invalid/tampered/incompatible | validation failure; destination not invoked |
+| Disclosure insufficient | destination payload not inspected |
 | Destination refuses | source constituted state unchanged; refusal residue preserved |
-| Destination indeterminate | unresolved frontier preserved distinctly |
-| Destination host/runtime fails | explicit operational failure; not a refusal |
+| Destination indeterminate | unresolved frontier preserved |
+| Destination runtime fails | explicit operational failure, not refusal |
 | Return evidence incomplete | reconstruction marked partial; no invented lineage |
-| Adapter version drifts | compatibility refusal until explicitly upgraded |
+| Adapter version drifts | compatibility failure until explicitly upgraded |
 
 ## Security and authority constraints
 
-1. **No central credentials plane.** Full Measure does not collect reusable credentials for donor systems.
-2. **No ambient arbitrary execution.** Crossing into Corpus OS must select an already declared bounded operation/capability.
-3. **No hidden retrieval.** Door discovery and gesture decoding cannot load undisclosed destination material.
-4. **No source mutation by destination.** Destination result cannot rewrite the source frame or gesture evidence.
-5. **No UI authority.** A rendered button or door never implies permission.
-6. **No relevance authority.** Founder Node / Pollen Scout evidence may affect visibility only.
-7. **No gesture authority.** TranchNode decoding may affect traversal candidates only.
-8. **No transport authority.** Project0 envelope validity proves a crossing object is well formed; it does not grant destination execution rights.
-9. **No receipt inflation.** A receipt proves the recorded event or evaluation occurred under its declared law; it does not make every payload claim true.
-10. **No narrative authority.** GitBook or generative narration may describe a witnessed run only after the repository evidence exists.
+1. No central credentials plane in Full Measure.
+2. No ambient arbitrary execution.
+3. No destination-content retrieval during boundary scan.
+4. No destination mutation of source frame or gesture evidence.
+5. No UI affordance implies permission.
+6. Founder Node relevance affects visibility only.
+7. TranchNode gesture decoding affects candidates only.
+8. Project0 envelope validity does not grant destination execution authority.
+9. Receipts prove bounded events/evaluations, not every payload claim.
+10. GitBook narration is downstream of repository evidence.
 
 ## Testing strategy
 
-### Full Measure unit tests
+### Unit and adversarial proof
 
-Prove:
+Full Measure tests must prove:
 
-- door projections never imply authority;
+- door projection never implies authority;
 - collision cannot auto-select;
-- crossing confirmation is required independently from decoding;
-- each destination result maps to a distinct Garden projection state;
-- operational failure cannot be displayed as refusal;
-- a refused encounter cannot produce an admitted-world consequence;
-- adapter version incompatibility fails closed;
-- private/held material stays absent from source-field construction.
+- human confirmation is independent from decoding;
+- admitted/refused/indeterminate/failed produce distinct projections;
+- envelope validation failure remains distinct from destination refusal;
+- refused encounters cannot produce admitted-world consequence;
+- version incompatibility fails closed;
+- private/held material stays absent from field construction.
 
-### Contract / adversarial fixtures
-
-Pin fixture vectors for:
-
-- three bounded doors;
-- intended, perturbed, reversed, and collision strokes;
-- valid, malformed, tampered, and disclosure-blocked encounter envelopes;
-- admitted, refused, indeterminate, and failed destination responses;
-- partial return / missing evidence.
-
-Fixtures must record their source project, contract version, and source commit/ref. They are conformance evidence, not copied authority.
+Pinned fixtures cover three doors; intended, perturbed, reversed, and collision strokes; valid/tampered/disclosure-blocked envelopes; all destination result classes; and incomplete return evidence. Every fixture records source project, contract version, and source commit/ref.
 
 ### Cross-repository integration proof
 
-The implementation is not complete with mocks alone.
-
-At least one developer-run or CI-composed proof must exercise compatible real implementations from:
+Mocks alone are insufficient. At least one composed proof must exercise compatible real implementations from:
 
 - TranchNode Intent Stroke;
 - Project0 encounter-envelope / NAV boundary;
-- Corpus OS destination-local admission or a repository-owned bounded adapter;
+- Corpus OS destination-local admission or a Corpus-owned bounded adapter;
 - Full Measure orchestration.
 
-Founder Node / Authority Kit should join the proof when the relevant nearby-growth implementation is landed and compatible; until then, its adapter may remain fixture-backed without blocking the constitutional crossing proof.
+Founder Node / Authority Kit joins the live proof when its relevant implementation is landed and compatible. Until then, the nearby-door adapter may be fixture-backed if the UI and receipt truthfully say so.
 
 ### Human witness
 
-The final v0.1 proof requires one hands-on Garden session in which a person:
+One person must:
 
-1. sees three evidence-backed doors;
-2. gestures toward one;
-3. sees the decoded candidate / ambiguity state;
-4. explicitly confirms the crossing;
-5. witnesses one real destination-local disposition;
-6. returns to a visibly changed Garden;
-7. can inspect the evidence chain explaining why it changed.
+1. see three bounded doors;
+2. gesture toward one;
+3. see the decoded candidate/ambiguity;
+4. explicitly confirm;
+5. witness one real destination-local disposition;
+6. return to a visibly changed Garden;
+7. inspect the evidence chain explaining the change.
 
 Machine-green integration is necessary but insufficient for the claim that the House is inhabitable.
 
 ## Acceptance criteria
 
-Boot the House v0.1 succeeds when all of the following are true:
+Boot the House v0.1 succeeds when:
 
-- [ ] Full Measure remains the playable shell and does not become canonical authority for donor projects.
-- [ ] Exactly one complete source-field -> door -> gesture -> confirmation -> encounter -> destination disposition -> return-residue -> changed-field loop works.
-- [ ] At least three nearby doors are visible in the acceptance specimen, with boundary metadata only during scan.
-- [ ] TranchNode decodes the gesture without selecting or authorizing the crossing.
-- [ ] A separate human confirmation is required.
-- [ ] Project0's compatible encounter-envelope law is used without a second canonicalizer or authority-transfer shortcut.
-- [ ] Corpus OS or another explicitly approved destination-owned adapter makes the destination-local admission/refusal/indeterminate decision.
-- [ ] `admitted`, `refused`, `indeterminate`, and `failed` remain mechanically and visually distinct.
+- [ ] Full Measure remains the playable shell, not donor authority.
+- [ ] One complete field -> door -> gesture -> confirmation -> encounter -> destination disposition -> residue -> changed-field loop works.
+- [ ] Three bounded doors are visible with metadata-only threshold scanning.
+- [ ] Live vs fixture-backed doors are truthfully distinguished.
+- [ ] TranchNode decodes without selecting or authorizing.
+- [ ] Separate human confirmation is required.
+- [ ] Project0's compatible encounter law is consumed without a second canonicalizer.
+- [ ] Corpus OS or another explicitly approved destination-owned adapter makes the destination-local decision.
+- [ ] `admitted`, `refused`, `indeterminate`, `failed`, and pre-destination validation failure remain distinct.
 - [ ] Refusal does not mutate constituted source state.
-- [ ] Residue is durable and attributable but cannot itself authorize a later crossing.
-- [ ] A return/reconstruction path can explain the encounter without claiming unrecovered context.
-- [ ] One human session proves that the world visibly changes from actual recorded history.
-- [ ] No new universal ontology, global world id, master graph, central authority service, or new canonicalization floor is introduced.
+- [ ] Residue is durable/attributable but non-authoritative.
+- [ ] Return/reconstruction states what was and was not recovered.
+- [ ] One human session proves visible world change from recorded history.
+- [ ] No universal world node, master graph, central authority service, or new canonicalization floor appears.
 
-## Explicit non-goals
+## Non-goals
 
-Do not add in v0.1:
-
-- a universal `World` node;
-- global route search;
-- autonomous traversal;
-- recursive scouts;
-- cross-internet federation;
-- remote account federation / SSO;
-- a general plugin marketplace;
-- VR / 3D rendering;
-- MMO presence;
-- automatic door creation;
-- automatic promotion of refusal residue into constitutional law;
-- a master Multiverse NAV graph;
-- a new central event bus;
-- a new repository solely to host orchestration;
-- an attempt to integrate every Static Collective project.
-
-Those may become later consequences. They are not prerequisites for proving the House can boot.
+Do not add in v0.1: global route search, autonomous traversal, recursive scouts, internet federation, SSO, plugin marketplace, VR/3D, MMO presence, automatic door creation, automatic Refusal Topology promotion, master Multiverse NAV graph, central event bus, a new orchestration repository, or integration of every project.
 
 ## Stop conditions
 
-Stop and return to design if implementation appears to require any of the following:
+Return to design if implementation requires:
 
-- duplicating Project0 canonicalization or encounter semantics inside Full Measure;
-- importing donor repository state directly instead of using an explicit adapter/contract;
-- treating a gesture-decoder rank as permission;
-- treating Founder Node relevance as permission;
-- inspecting destination content before disclosure permits it;
-- letting Full Measure decide the destination's authority;
-- translating destination refusal into a retry that changes the requested action without a new human decision;
-- hiding a missing donor implementation behind a fixture while claiming the live donor participated;
-- storing reusable external credentials in Full Measure solely to make the demo work;
-- inventing one global graph so the Garden can render three doors;
-- requiring every future project to adopt Full Measure-specific domain types in order to participate.
+- duplicating Project0 canonicalization or encounter law;
+- importing donor state directly rather than using an explicit adapter;
+- treating gesture rank or Founder Node relevance as permission;
+- inspecting destination content before disclosure;
+- letting Full Measure decide destination authority;
+- silently changing an operation after refusal;
+- presenting fixture participation as live donor participation;
+- storing reusable external credentials merely to make the demo work;
+- inventing one global graph to render three doors;
+- requiring future projects to adopt Full Measure domain types to participate.
 
 ## Evolution after v0.1
 
-Only after the first heartbeat is witnessed should the architecture consider adding a second materially different destination.
+Only after the first heartbeat is witnessed should a second materially different destination be added.
 
-The most useful sequence is likely:
+Likely sequence:
 
 ```text
-v0.1
-Full Measure -> Corpus OS
-constitutional / execution crossing
+v0.1  Full Measure -> Corpus OS
+      constitutional / execution crossing
 
-v0.2 candidate
-Full Measure -> Band Runtime
-live sovereign participant encounter
+v0.2  Full Measure -> Band Runtime
+      live sovereign-participant encounter
 
-v0.3 candidate
-Full Measure -> Upper Room
-shared reading / witness-channel encounter
+v0.3  Full Measure -> Upper Room
+      shared reading / witness-channel encounter
 ```
 
-A second and third domain would test whether the adapter model actually preserves sovereignty across materially different kinds of rooms.
-
-Only after multiple real rooms are easier to traverse without collapse should Multiverse NAV graduate from instrument hypothesis toward a product surface.
+Multiple real rooms must become easier to traverse without collapse before Multiverse NAV graduates from instrument hypothesis toward a product surface.
 
 ## Consequences
 
-### What becomes possible
+The gain is large: the ecosystem can become one inhabitable world without merging into one application; new projects can join by declaring bounded surfaces; Project0, TranchNode, Corpus OS, and Founder Node gain real product proofs; refusal and indeterminate residue can begin accumulating meaningful negative-space evidence.
 
-- The ecosystem can be experienced as one world without being merged into one application.
-- New projects can become rooms/capabilities by declaring bounded surfaces rather than inventing bespoke global integration doctrine.
-- Refusals and indeterminate crossings can begin accumulating useful, attributable negative-space evidence.
-- Full Measure gains a concrete path from prototype Garden to genuine ecosystem World Layer.
-- Corpus OS gains a human-facing encounter source without needing to own the world UI.
-- TranchNode gesture/navigation work gets a real product surface.
-- Project0 adapter-boundary work gets an inhabited proof rather than only fixture-level evidence.
-
-### What becomes harder
-
-- Integration must respect exact contract versions instead of copying convenient logic.
-- Development spans multiple repositories and must tolerate donor availability/version drift.
-- Product UX must preserve distinctions that ordinary apps often collapse: relevance/permission, intent/choice, receiving/admission, refusal/failure, residue/authority.
-- Cross-repo verification becomes part of release truth.
-
-Those costs are intentional. If they are removed by centralizing authority, the experiment has failed.
+The cost is also real: cross-repo version discipline, explicit adapter compatibility, more demanding verification, and UX that preserves distinctions ordinary apps usually collapse. Those costs are intentional. Removing them by centralizing authority would falsify the experiment.
 
 ## Governing compression
 
