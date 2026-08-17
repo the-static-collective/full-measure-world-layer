@@ -3,22 +3,24 @@ import test from 'node:test';
 
 import {
   GARDEN_DECODER,
+  GARDEN_HEIGHT,
   GARDEN_LAYOUT,
   GARDEN_TEMPLATES,
+  GARDEN_WIDTH,
   doorRefForTemplate,
   normalizePointerStroke,
 } from '../src/lib/worldRuntime/gardenTraversal.js';
 
 test('Garden declares one bounded field with three door traversal templates and no authority', () => {
-  assert.equal(GARDEN_LAYOUT.schema, 'tranchnode/intent-stroke-field/v0.1');
-  assert.equal(GARDEN_LAYOUT.width, 360);
-  assert.equal(GARDEN_LAYOUT.height, 220);
+  assert.equal(GARDEN_LAYOUT.schema, 'tranchnode/intent-stroke-layout/v0.1');
+  assert.equal(GARDEN_WIDTH, 360);
+  assert.equal(GARDEN_HEIGHT, 220);
   assert.deepEqual(GARDEN_TEMPLATES.map((template) => template.id), [
     'garden-to-corpus',
     'garden-to-band-runtime',
     'garden-to-upper-room',
   ]);
-  assert.equal(GARDEN_DECODER.id, 'full-measure-garden');
+  assert.equal(GARDEN_DECODER.id, 'tranchnode/intent-stroke-dtw');
   assert.equal(doorRefForTemplate('garden-to-corpus'), 'world-door:corpus-casework-v0.1');
   assert.equal(doorRefForTemplate('garden-to-band-runtime'), 'world-door:band-runtime-fixture-v0.1');
   assert.equal(doorRefForTemplate('garden-to-upper-room'), 'world-door:upper-room-fixture-v0.1');
