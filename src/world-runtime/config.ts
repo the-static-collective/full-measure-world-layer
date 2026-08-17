@@ -99,6 +99,7 @@ function command(cwd: string, script: string, timeoutMs: number): JsonProcessCom
     args: ['--silent', 'run', script],
     cwd,
     timeoutMs,
+    maxInputBytes: 1_048_576,
     maxOutputBytes: 1_048_576,
   };
 }
