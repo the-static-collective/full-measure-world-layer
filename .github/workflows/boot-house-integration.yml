@@ -1,0 +1,74 @@
+name: boot-house-integration
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Full Measure
+        uses: actions/checkout@v4
+
+      - name: Checkout TranchNode donor
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/tranchnode
+          ref: 6cd2f28501b25ff7def1fac22a7184b4229e51dd
+          path: .boot-house/tranchnode
+
+      - name: Checkout Project0 donor
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/project0
+          ref: 0004017ab04df428ec7c20b43fd956299cdf1210
+          path: .boot-house/project0
+
+      - name: Checkout Corpus OS donor
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/corpus-os
+          ref: f7163e262200a4bcb5a3f1cdc273dc069d908d29
+          path: .boot-house/corpus-os
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Full Measure
+        run: npm ci
+
+      - name: Install TranchNode
+        working-directory: .boot-house/tranchnode
+        run: npm ci
+
+      - name: Install Project0
+        working-directory: .boot-house/project0
+        run: npm ci && npm run build
+
+      - name: Install Corpus OS kernel
+        working-directory: .boot-house/corpus-os
+        run: npm ci && npm run build:kernel
+
+      - name: Run composed witness
+        env:
+          BOOT_HOUSE_TRANCH_DIR: ${{ github.workspace }}/.boot-house/tranchnode
+          BOOT_HOUSE_PROJECT0_DIR: ${{ github.workspace }}/.boot-house/project0
+          BOOT_HOUSE_CORPUS_DIR: ${{ github.workspace }}/.boot-house/corpus-os
+          BOOT_HOUSE_FULL_MEASURE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          BOOT_HOUSE_TRANCH_SHA: 6cd2f28501b25ff7def1fac22a7184b4229e51dd
+          BOOT_HOUSE_PROJECT0_SHA: 0004017ab04df428ec7c20b43fd956299cdf1210
+          BOOT_HOUSE_CORPUS_SHA: f7163e262200a4bcb5a3f1cdc273dc069d908d29
+        run: node --import tsx scripts/boot-house-witness.ts
+
+      - name: Upload witness receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-house-witness
+          path: artifacts/boot-house/
+          if-no-files-found: ignore
