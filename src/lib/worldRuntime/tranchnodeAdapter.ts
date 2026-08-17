@@ -15,14 +15,14 @@ export function createTranchNodeAdapter(
 ) {
   return {
     async decode(input: {
-      stroke: unknown;
+      points: unknown[];
       layout: unknown;
       templates: unknown[];
       decoder: unknown;
     }): Promise<WorldAdapterResult<unknown>> {
       const response = await invoke(command, {
-        schema: 'tranchnode/intent-stroke-stdio/v0.1',
-        stroke: input.stroke,
+        schema: 'tranchnode/intent-stroke-stdio/v0.2',
+        points: input.points,
         layout: input.layout,
         templates: input.templates,
         decoder: input.decoder,
@@ -34,7 +34,7 @@ export function createTranchNodeAdapter(
       if (!isRecord(response.value)) {
         return { ok: false, kind: 'contract', code: 'TRANCHNODE_RESPONSE_NOT_OBJECT' };
       }
-      if (response.value.schema !== 'tranchnode/intent-stroke-stdio-response/v0.1') {
+      if (response.value.schema !== 'tranchnode/intent-stroke-stdio-response/v0.2') {
         return { ok: false, kind: 'contract', code: 'TRANCHNODE_RESPONSE_SCHEMA_MISMATCH' };
       }
       if (response.value.ok === false) {
