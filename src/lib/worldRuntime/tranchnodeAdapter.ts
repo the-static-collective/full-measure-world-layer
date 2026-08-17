@@ -9,10 +9,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function transportFailure(result: Exclude<Awaited<ReturnType<JsonProcessInvoker>>, { ok: true }>): WorldAdapterResult<never> {
-  return { ok: false, kind: 'transport', code: result.kind };
-}
-
 export function createTranchNodeAdapter(
   command: ProcessAdapterCommand,
   invoke: JsonProcessInvoker = invokeJsonProcess,
@@ -32,7 +28,9 @@ export function createTranchNodeAdapter(
         decoder: input.decoder,
       });
 
-      if (!response.ok) return transportFailure(response);
+      if (response.ok === false) {
+        return { ok: false, kind: 'transport', code: response.kind };
+      }
       if (!isRecord(response.value)) {
         return { ok: false, kind: 'contract', code: 'TRANCHNODE_RESPONSE_NOT_OBJECT' };
       }
