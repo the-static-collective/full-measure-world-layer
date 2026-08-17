@@ -13,11 +13,12 @@ function donorInvoker(): JsonProcessInvoker {
       return {
         ok: true,
         value: {
-          schema: 'tranchnode/intent-stroke-stdio-response/v0.1',
+          schema: 'tranchnode/intent-stroke-stdio-response/v0.2',
           ok: true,
           decoding: {
             authority: 'none',
             fingerprint: 'sha256:fixture',
+            fieldLayoutRef: 'sha256:layout',
             candidates: [],
             ambiguity: { kind: 'none' },
           },
@@ -74,7 +75,7 @@ test('fixture field and doors remain available when every live donor is unconfig
     corpusOs: false,
   });
 
-  const decode = await services.decodeStroke({ stroke: {}, layout: {}, templates: [], decoder: {} });
+  const decode = await services.decodeStroke({ points: [], layout: {}, templates: [], decoder: {} });
   assert.deepEqual(decode, { ok: false, kind: 'unavailable', donor: 'tranchnode' });
   const prepare = await services.prepareEncounter({ offered: 'witness' });
   assert.deepEqual(prepare, { ok: false, kind: 'unavailable', donor: 'project0' });
@@ -93,7 +94,7 @@ test('configured services compose the three donor clients without changing their
     corpusOs: true,
   });
 
-  const decode = await services.decodeStroke({ stroke: {}, layout: {}, templates: [], decoder: {} });
+  const decode = await services.decodeStroke({ points: [], layout: {}, templates: [], decoder: {} });
   assert.equal(decode.ok, true);
   if (decode.ok) assert.equal((decode.value as any).authority, 'none');
 

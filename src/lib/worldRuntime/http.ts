@@ -48,7 +48,7 @@ export function createWorldRuntimeHttpHandlers(services: WorldRuntimeServices) {
     },
 
     async decode(body: {
-      stroke: unknown;
+      points: unknown[];
       layout: unknown;
       templates: unknown[];
       decoder: unknown;

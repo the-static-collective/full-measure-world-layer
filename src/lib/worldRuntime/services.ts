@@ -11,7 +11,7 @@ import { createWorldResidueStore } from './residue.js';
 import { createTranchNodeAdapter } from './tranchnodeAdapter.js';
 
 interface StrokeDecodeInput {
-  stroke: unknown;
+  points: unknown[];
   layout: unknown;
   templates: unknown[];
   decoder: unknown;

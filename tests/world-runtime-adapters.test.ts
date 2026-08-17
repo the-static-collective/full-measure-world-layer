@@ -24,24 +24,25 @@ function recordingInvoker(value: unknown) {
   return { invoke, requests };
 }
 
-test('TranchNode client adds only its donor wrapper and preserves foreign decoding as non-authoritative evidence', async () => {
+test('TranchNode client sends raw points through stdio v0.2 and preserves foreign decoding as non-authoritative evidence', async () => {
   const fixture = {
-    schema: 'tranchnode/intent-stroke-stdio-response/v0.1',
+    schema: 'tranchnode/intent-stroke-stdio-response/v0.2',
     ok: true,
-    decoding: { authority: 'none', fingerprint: 'sha256:abc', candidates: [], ambiguity: { kind: 'none' } },
+    decoding: { authority: 'none', fingerprint: 'sha256:abc', fieldLayoutRef: 'sha256:layout', candidates: [], ambiguity: { kind: 'none' } },
   };
   const recorder = recordingInvoker(fixture);
   const adapter = createTranchNodeAdapter(command, recorder.invoke);
-  const result = await adapter.decode({ stroke: { raw: true }, layout: { field: true }, templates: [], decoder: { version: 'v' } });
+  const result = await adapter.decode({ points: [{ sequence: 0, x: 10, y: 10 }], layout: { field: true }, templates: [], decoder: { version: 'v' } });
 
   assert.equal(result.ok, true);
   assert.deepEqual(recorder.requests, [{
-    schema: 'tranchnode/intent-stroke-stdio/v0.1',
-    stroke: { raw: true },
+    schema: 'tranchnode/intent-stroke-stdio/v0.2',
+    points: [{ sequence: 0, x: 10, y: 10 }],
     layout: { field: true },
     templates: [],
     decoder: { version: 'v' },
   }]);
+  assert.equal('fieldLayoutRef' in (recorder.requests[0] as any), false);
   if (result.ok) assert.equal((result.value as any).authority, 'none');
 });
 
@@ -133,7 +134,7 @@ test('donor clients distinguish donor refusal from malformed local wrapper contr
 
   const malformed = recordingInvoker({ schema: 'wrong/schema', ok: true });
   const invalid = await createTranchNodeAdapter(command, malformed.invoke).decode({
-    stroke: {}, layout: {}, templates: [], decoder: {},
+    points: [], layout: {}, templates: [], decoder: {},
   });
   assert.equal(invalid.ok, false);
   if (!invalid.ok) assert.equal(invalid.kind, 'contract');

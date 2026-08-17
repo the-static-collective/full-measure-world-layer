@@ -24,7 +24,7 @@ test('field and fixture doors remain HTTP-visible without live donor configurati
 });
 
 test('donor-dependent HTTP operations report explicit service unavailability', async () => {
-  const decode = await handlers.decode({ stroke: {}, layout: {}, templates: [], decoder: {} });
+  const decode = await handlers.decode({ points: [], layout: {}, templates: [], decoder: {} });
   assert.equal(decode.status, 503);
   assert.deepEqual(decode.body, { ok: false, kind: 'unavailable', donor: 'tranchnode' });
 

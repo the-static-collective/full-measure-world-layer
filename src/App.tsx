@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, NavTab } from './components/Navbar';
 import { FullMeasureView } from './components/FullMeasureView';
+import { WorldEncounterPanel } from './components/WorldEncounterPanel';
 import { BasketView } from './components/BasketView';
 import { ProjectsView } from './components/ProjectsView';
 import { ProjectDetailView } from './components/ProjectDetailView';
@@ -150,17 +151,20 @@ export default function App() {
         ) : (
           <>
             {activeTab === 'campfire' && (
-              <FullMeasureView
-                offers={offers}
-                projects={projects}
-                receipts={receipts}
-                capacities={capacities}
-                events={events}
-                onNavigate={handleTabChange}
-                onSelectProject={(id) => setSelectedProjectId(id)}
-                onOpenUserSwitcher={() => setIsUserSwitcherOpen(true)}
-                currentUser={currentUser}
-              />
+              <>
+                <WorldEncounterPanel />
+                <FullMeasureView
+                  offers={offers}
+                  projects={projects}
+                  receipts={receipts}
+                  capacities={capacities}
+                  events={events}
+                  onNavigate={handleTabChange}
+                  onSelectProject={(id) => setSelectedProjectId(id)}
+                  onOpenUserSwitcher={() => setIsUserSwitcherOpen(true)}
+                  currentUser={currentUser}
+                />
+              </>
             )}
 
             {activeTab === 'basket' && (
