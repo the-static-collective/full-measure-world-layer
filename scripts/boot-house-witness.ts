@@ -1,29 +1,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import {
-  createCorpusDestinationPort,
-  createProject0EncounterPort,
-  createTranchNodeTraversalPort,
-} from '../src/world-runtime/donorPorts.js';
-import { createWorldRuntime } from '../src/world-runtime/orchestrator.js';
-import type { JsonProcessCommand } from '../src/world-runtime/processPort.js';
-import type { WorldDoorProjection } from '../src/world-runtime/contracts.js';
+import { createConfiguredWorldRuntime } from '../src/world-runtime/config.js';
 
 function requiredEnv(name: string): string {
   const value = process.env[name]?.trim();
   if (!value) throw new Error(`missing required environment variable ${name}`);
   return value;
-}
-
-function nodeCommand(cwd: string, args: string[], timeoutMs = 10_000): JsonProcessCommand {
-  return {
-    command: process.execPath,
-    args,
-    cwd,
-    timeoutMs,
-    maxOutputBytes: 1_048_576,
-  };
 }
 
 const fullMeasureSha = requiredEnv('BOOT_HOUSE_FULL_MEASURE_SHA');
@@ -34,83 +17,22 @@ const tranchDir = requiredEnv('BOOT_HOUSE_TRANCH_DIR');
 const project0Dir = requiredEnv('BOOT_HOUSE_PROJECT0_DIR');
 const corpusDir = requiredEnv('BOOT_HOUSE_CORPUS_DIR');
 
-const doors: WorldDoorProjection[] = [
-  {
-    doorRef: 'door:corpus',
-    destinationRef: 'corpus-os:world-encounter:v0.1',
-    relation: 'project-backed crossing specimen',
-    reachability: 'reachable',
-    provenanceRefs: [
-      `github:the-static-collective/corpus-os@${corpusSha}`,
-      'fixture:boot-house/nearby-doors/v0.1',
-    ],
-    relevanceReasons: ['selected v0.1 constitutional destination'],
-    requiredCrossingProfile: 'p0.exchange/0.1',
-    evidenceMode: 'fixture',
-    authority: 'none',
-  },
-  {
-    doorRef: 'door:upper-room',
-    destinationRef: 'upper-room:scripture-room',
-    relation: 'declared neighboring room',
-    reachability: 'unknown',
-    provenanceRefs: ['fixture:boot-house/nearby-doors/v0.1'],
-    relevanceReasons: ['future inhabited room'],
-    requiredCrossingProfile: 'not-yet-live',
-    evidenceMode: 'fixture',
-    authority: 'none',
-  },
-  {
-    doorRef: 'door:band-runtime',
-    destinationRef: 'band-runtime:groove-room',
-    relation: 'declared neighboring room',
-    reachability: 'unknown',
-    provenanceRefs: ['fixture:boot-house/nearby-doors/v0.1'],
-    relevanceReasons: ['future inhabited room'],
-    requiredCrossingProfile: 'not-yet-live',
-    evidenceMode: 'fixture',
-    authority: 'none',
-  },
-];
-
-const traversal = createTranchNodeTraversalPort({
-  command: nodeCommand(tranchDir, ['--import', 'tsx', 'scripts/intent-stroke-stdio.ts']),
-  layout: {
-    anchors: [
-      { id: 'garden', x: 100_000, y: 500_000 },
-      { id: 'door:corpus', x: 900_000, y: 500_000 },
-      { id: 'door:upper-room', x: 500_000, y: 100_000 },
-      { id: 'door:band-runtime', x: 500_000, y: 900_000 },
-    ],
-  },
-});
-
 const sourceVersionRef = `github:the-static-collective/full-measure-world-layer@${fullMeasureSha}`;
-const offeredSourceRef = `${sourceVersionRef}:README.md`;
-
-const encounter = createProject0EncounterPort({
-  command: nodeCommand(project0Dir, ['.build/scripts/world-encounter-stdio.js']),
-  source: {
-    originNodeRef: 'full-measure-world-layer',
-    originVersionRef: sourceVersionRef,
-    disclosureClass: 'public',
-    sourceEpistemicKind: 'source',
-    sourceVerificationState: 'verified',
-  },
+const configured = createConfiguredWorldRuntime({
+  BOOT_HOUSE_TRANCH_DIR: tranchDir,
+  BOOT_HOUSE_PROJECT0_DIR: project0Dir,
+  BOOT_HOUSE_CORPUS_DIR: corpusDir,
+  BOOT_HOUSE_SOURCE_VERSION_REF: sourceVersionRef,
 });
 
-const destination = createCorpusDestinationPort({
-  command: nodeCommand(corpusDir, ['.kernel-dist/scripts/world-encounter-destination.js']),
-});
+if (!configured.available) {
+  throw new Error(`configured Full Measure world runtime is unavailable: ${configured.reasonCode}`);
+}
 
-const runtime = createWorldRuntime({
-  doors,
-  traversal,
-  encounter,
-  destination,
-});
-
+const runtime = configured.runtime;
+const offeredSourceRef = configured.offeredWitnessRef;
 const fieldBefore = runtime.getField();
+
 if (fieldBefore.doors.length !== 3) {
   throw new Error('composed witness must begin with exactly three doors');
 }
@@ -168,7 +90,7 @@ const receipt = {
   schema: 'full-measure.boot-house-witness/v0.1',
   witnessKind: 'ci-composed-proof',
   humanWitness: false,
-  claim: 'one real donor-composed federated heartbeat completed without authority transfer',
+  claim: 'one real configured Full Measure heartbeat completed across donor repositories without authority transfer',
   repositories: {
     fullMeasure: {
       repository: 'the-static-collective/full-measure-world-layer',
@@ -189,6 +111,12 @@ const receipt = {
       commit: corpusSha,
       processSchema: 'corpus.world-encounter-destination/v0.1',
     },
+  },
+  runtimeBootstrap: {
+    sourceVersionRef,
+    offeredSourceRef,
+    commandMode: 'configured-local-process',
+    noCentralCredentials: true,
   },
   doorDiscovery: {
     evidenceMode: 'fixture',
@@ -248,6 +176,7 @@ await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 process.stdout.write(`${JSON.stringify({
   status: 'PASS',
   witness: receipt.schema,
+  commandMode: receipt.runtimeBootstrap.commandMode,
   destinationStatus: result.residue.destinationStatus,
   worldChange: result.worldChange.kind,
   encounterRef: result.residue.encounterRef,
