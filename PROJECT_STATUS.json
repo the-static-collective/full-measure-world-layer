@@ -1,0 +1,24 @@
+{
+  "schema": "static-collective.project-status.v1",
+  "asOf": "2026-08-17",
+  "repository": "the-static-collective/full-measure-world-layer",
+  "defaultBranch": "main",
+  "project": "Full Measure — World Layer",
+  "state": "active",
+  "phase": "Boot the House v0.1 inhabited Garden encounter loop",
+  "canonicalAuthority": "project-owned repository",
+  "observedMainCommit": "534f6eb4520371f877af78a85429fe7d64c9fb05",
+  "executableSurface": [
+    {"id": "garden-causal-loop", "status": "landed", "interface": "local Express + React prototype"},
+    {"id": "boot-the-house-server-composition", "status": "landed", "evidence": {"commit": "c62275019c452a881565e3a6ce444b6a66968714", "pullRequest": 12}},
+    {"id": "inhabited-world-encounter-panel", "status": "landed", "evidence": {"commit": "cb99bfd7ca240d031ba33da96211e35cdb579f80", "pullRequest": 14}},
+    {"id": "composed-proof-receipt", "status": "landed", "evidence": {"commit": "05cdfd61780eba41cb9ddb314a814013ccb48a7c", "pullRequest": 16}},
+    {"id": "federated-world-encounter-loop-design", "status": "landed-design", "evidence": {"commit": "534f6eb4520371f877af78a85429fe7d64c9fb05"}}
+  ],
+  "nonClaims": [
+    "gesture recognition does not authorize crossing",
+    "human confirmation is required before a candidate crossing is attempted",
+    "fixture-only mode does not pretend donor repositories are configured",
+    "world encounter transport does not collapse donor authority boundaries"
+  ]
+}
