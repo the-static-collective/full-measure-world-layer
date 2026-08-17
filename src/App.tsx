@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, NavTab } from './components/Navbar';
 import { FullMeasureView } from './components/FullMeasureView';
+import WorldDoors from './components/WorldDoors';
 import { BasketView } from './components/BasketView';
 import { ProjectsView } from './components/ProjectsView';
 import { ProjectDetailView } from './components/ProjectDetailView';
@@ -26,7 +27,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('campfire');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
-  // Store data
   const [circle, setCircle] = useState<Circle | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [offers, setOffers] = useState<Array<Offer & { author?: Profile }>>([]);
@@ -45,15 +45,13 @@ export default function App() {
         author?: Profile;
         confirmedPledges: Array<any>;
       }
-    >
-  >([]);
+    >([]);
   const [capacities, setCapacities] = useState<
     Array<Capacity & { receipt?: Receipt; project?: Project }>
   >([]);
   const [events, setEvents] = useState<Array<DomainEvent & { actor?: Profile }>>([]);
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
 
-  // Modal flags
   const [isUserSwitcherOpen, setIsUserSwitcherOpen] = useState(false);
   const [isArrivalModalOpen, setIsArrivalModalOpen] = useState(false);
   const [isNewOfferModalOpen, setIsNewOfferModalOpen] = useState(false);
@@ -93,7 +91,6 @@ export default function App() {
   useEffect(() => {
     loadAllData();
 
-    // Check URL query parameters for invite link (e.g. ?invite=CAMPFIRE1)
     const urlParams = new URLSearchParams(window.location.search);
     const codeParam = urlParams.get('invite') || urlParams.get('code');
     if (codeParam) {
@@ -101,7 +98,6 @@ export default function App() {
       setIsJoinCircleOpen(true);
     }
 
-    // Real-time polling every 3 seconds for multi-device sync
     const interval = setInterval(loadAllData, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -127,7 +123,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#fbf8f3] text-[#2c2825] flex flex-col font-sans selection:bg-amber-200">
-      {/* Navigation Header & Bottom Mobile Bar */}
       <Navbar
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -138,7 +133,6 @@ export default function App() {
         onOpenJoinCircle={() => setIsJoinCircleOpen(true)}
       />
 
-      {/* Main Content Viewport */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 pt-6 pb-20">
         {selectedProjectId ? (
           <ProjectDetailView
@@ -150,17 +144,20 @@ export default function App() {
         ) : (
           <>
             {activeTab === 'campfire' && (
-              <FullMeasureView
-                offers={offers}
-                projects={projects}
-                receipts={receipts}
-                capacities={capacities}
-                events={events}
-                onNavigate={handleTabChange}
-                onSelectProject={(id) => setSelectedProjectId(id)}
-                onOpenUserSwitcher={() => setIsUserSwitcherOpen(true)}
-                currentUser={currentUser}
-              />
+              <>
+                <WorldDoors />
+                <FullMeasureView
+                  offers={offers}
+                  projects={projects}
+                  receipts={receipts}
+                  capacities={capacities}
+                  events={events}
+                  onNavigate={handleTabChange}
+                  onSelectProject={(id) => setSelectedProjectId(id)}
+                  onOpenUserSwitcher={() => setIsUserSwitcherOpen(true)}
+                  currentUser={currentUser}
+                />
+              </>
             )}
 
             {activeTab === 'basket' && (
@@ -202,7 +199,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Bring a Friend Modal */}
       <BringAFriendModal
         isOpen={isBringAFriendOpen}
         onClose={() => setIsBringAFriendOpen(false)}
@@ -211,7 +207,6 @@ export default function App() {
         onInvitationCreated={loadAllData}
       />
 
-      {/* Join Circle Modal */}
       <JoinCircleModal
         isOpen={isJoinCircleOpen}
         onClose={() => setIsJoinCircleOpen(false)}
@@ -222,7 +217,6 @@ export default function App() {
         }}
       />
 
-      {/* Identity & User Switcher Modal */}
       <UserSwitcherModal
         isOpen={isUserSwitcherOpen}
         onClose={() => setIsUserSwitcherOpen(false)}
@@ -231,7 +225,6 @@ export default function App() {
         onResetSeed={handleResetSeed}
       />
 
-      {/* Arrival & Onboarding Modal */}
       <ArrivalModal
         isOpen={isArrivalModalOpen}
         onClose={() => setIsArrivalModalOpen(false)}
