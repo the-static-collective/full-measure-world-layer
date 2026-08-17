@@ -29,15 +29,19 @@ const doors: WorldDoorProjection[] = [
   },
 ];
 
-async function withServer(run: (baseUrl: string, observed: { witnessRefs: string[]; actor: string }) => Promise<void>) {
+async function withServer(
+  run: (baseUrl: string, observed: { witnessRefs: string[]; actor: string }) => Promise<void>,
+  options: { leadingDoorRef?: string } = {},
+) {
   const observed = { witnessRefs: [] as string[], actor: '' };
+  const leadingDoorRef = options.leadingDoorRef ?? 'door:corpus';
   const traversal: TraversalPort = {
     async decode() {
       return {
         authority: 'none',
         decodingRef: 'tranchnode:decoding:http-test',
-        candidates: [{ doorRef: 'door:corpus', totalCost: 1 }],
-        ambiguity: { kind: 'none', leadingDoorRefs: ['door:corpus'] },
+        candidates: [{ doorRef: leadingDoorRef, totalCost: 1 }],
+        ambiguity: { kind: 'none', leadingDoorRefs: [leadingDoorRef] },
       };
     },
   };
@@ -141,6 +145,33 @@ test('cross ignores browser-supplied witness/actor fields and uses server author
     assert.deepEqual(observed.witnessRefs, ['github:full-measure@server-pinned:README.md']);
     assert.equal(observed.actor, 'user_real');
   });
+});
+
+test('unreachable leading door is crossing-unavailable, not an adapter failure', async () => {
+  await withServer(async (baseUrl, observed) => {
+    const decodedResponse = await fetch(`${baseUrl}/api/world/decode`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ points: [{ x: 100000, y: 500000 }, { x: 500000, y: 100000 }] }),
+    });
+    const decoded = await decodedResponse.json() as any;
+
+    const response = await fetch(`${baseUrl}/api/world/cross`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        pendingId: decoded.pendingId,
+        doorRef: 'door:upper-room',
+        confirmed: true,
+      }),
+    });
+
+    assert.equal(response.status, 409);
+    const body = await response.json() as any;
+    assert.equal(body.kind, 'crossing-unavailable');
+    assert.equal(body.reasonCode, 'WORLD_CONFIRMED_DOOR_NOT_AVAILABLE');
+    assert.deepEqual(observed.witnessRefs, []);
+  }, { leadingDoorRef: 'door:upper-room' });
 });
 
 test('terminal residue is retrievable and confirmation ids are one-use', async () => {
