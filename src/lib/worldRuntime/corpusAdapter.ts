@@ -68,7 +68,7 @@ export function createCorpusAdapter(
         input: input.input,
       });
 
-      if (!response.ok) {
+      if (response.ok === false) {
         return { ok: false, kind: 'transport', code: response.kind };
       }
       if (!isRecord(response.value)) {
