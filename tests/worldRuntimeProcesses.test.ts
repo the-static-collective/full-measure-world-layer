@@ -11,6 +11,7 @@ const nodeCommand = (script: string, overrides: Partial<JsonProcessCommand> = {}
   command: process.execPath,
   args: ['-e', script],
   timeoutMs: 1_000,
+  maxInputBytes: 16_384,
   maxOutputBytes: 16_384,
   ...overrides,
 });
@@ -105,13 +106,11 @@ test('stdout larger than the declared bound is killed and rejected', async () =>
 });
 
 test('serialized stdin larger than the declared bound is rejected before child execution', async () => {
-  const command = {
-    ...nodeCommand(`process.stdout.write(JSON.stringify({ shouldNotRun: true }));`),
-    maxInputBytes: 64,
-  } as JsonProcessCommand & { maxInputBytes: number };
-
   await assert.rejects(
-    runJsonProcess(command, { payload: 'x'.repeat(256) }),
+    runJsonProcess(
+      nodeCommand(`process.stdout.write(JSON.stringify({ shouldNotRun: true }));`, { maxInputBytes: 64 }),
+      { payload: 'x'.repeat(256) },
+    ),
     (error: unknown) => {
       assert.equal(error instanceof JsonProcessError, true);
       assert.equal((error as JsonProcessError).code, 'PROCESS_INPUT_TOO_LARGE');
