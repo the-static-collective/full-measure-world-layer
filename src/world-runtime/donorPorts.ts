@@ -13,10 +13,10 @@ import {
   type JsonProcessCommand,
 } from './processPort.js';
 
-const TRANCH_PROCESS_SCHEMA = 'tranchnode.intent-stroke-process/v0.1' as const;
-const TRANCH_RESULT_SCHEMA = 'tranchnode.intent-stroke-process-result/v0.1' as const;
-const PROJECT0_PROCESS_SCHEMA = 'project0.world-encounter-process/v0.1' as const;
-const PROJECT0_RESULT_SCHEMA = 'project0.world-encounter-process-result/v0.1' as const;
+const TRANCH_REQUEST_SCHEMA = 'tranchnode/intent-stroke-stdio/v0.1' as const;
+const TRANCH_RESPONSE_SCHEMA = 'tranchnode/intent-stroke-stdio-response/v0.1' as const;
+const PROJECT0_REQUEST_SCHEMA = 'project0/world-encounter-stdio/v0.1' as const;
+const PROJECT0_RESPONSE_SCHEMA = 'project0/world-encounter-stdio-response/v0.1' as const;
 const PROJECT0_EXCHANGE_PROTOCOL = 'p0.exchange/0.1' as const;
 const CORPUS_REQUEST_SCHEMA = 'corpus.world-encounter-destination/v0.1' as const;
 const CORPUS_RESULT_SCHEMA = 'corpus.world-encounter-disposition/v0.1' as const;
@@ -37,20 +37,9 @@ export interface TranchNodeTraversalPortOptions {
   };
 }
 
-type TranchAddressLayoutResult = {
-  schema: typeof TRANCH_RESULT_SCHEMA;
-  status: 'ok';
-  operation: 'address-layout';
-  addressed: {
-    hash: string;
-    value: unknown;
-  };
-};
-
 type TranchDecodeResult = {
-  schema: typeof TRANCH_RESULT_SCHEMA;
-  status: 'ok';
-  operation: 'decode';
+  schema: typeof TRANCH_RESPONSE_SCHEMA;
+  ok: true;
   decoding: {
     authority: 'none';
     fingerprint: string;
@@ -92,26 +81,10 @@ export function createTranchNodeTraversalPort(
         anchors: options.layout.anchors.map((anchor) => ({ ...anchor })),
       };
 
-      const addressed = await runJsonProcess<unknown, TranchAddressLayoutResult>(options.command, {
-        schema: TRANCH_PROCESS_SCHEMA,
-        operation: 'address-layout',
-        layout,
-      });
-      if (
-        addressed.schema !== TRANCH_RESULT_SCHEMA
-        || addressed.status !== 'ok'
-        || addressed.operation !== 'address-layout'
-        || typeof addressed.addressed?.hash !== 'string'
-      ) {
-        throw new Error('TranchNode address-layout returned an incompatible response');
-      }
-
       const decoded = await runJsonProcess<unknown, TranchDecodeResult>(options.command, {
-        schema: TRANCH_PROCESS_SCHEMA,
-        operation: 'decode',
+        schema: TRANCH_REQUEST_SCHEMA,
         stroke: {
           schema: 'tranchnode/intent-stroke/v0.1',
-          fieldLayoutRef: addressed.addressed.hash,
           points: stroke.points.map((point) => ({ ...point })),
         },
         layout,
@@ -123,21 +96,24 @@ export function createTranchNodeTraversalPort(
       });
 
       if (
-        decoded.schema !== TRANCH_RESULT_SCHEMA
-        || decoded.status !== 'ok'
-        || decoded.operation !== 'decode'
+        decoded.schema !== TRANCH_RESPONSE_SCHEMA
+        || decoded.ok !== true
         || decoded.decoding?.authority !== 'none'
         || typeof decoded.decoding.fingerprint !== 'string'
         || !Array.isArray(decoded.decoding.candidates)
         || !Array.isArray(decoded.decoding.ambiguity?.leadingTemplateIds)
+        || (
+          decoded.decoding.ambiguity.kind !== 'none'
+          && decoded.decoding.ambiguity.kind !== 'collision'
+        )
       ) {
         throw new Error('TranchNode decode returned an incompatible response');
       }
 
       const doorRefs = new Set(doors.map((door) => door.doorRef));
       const candidates = decoded.decoding.candidates.map((candidate) => {
-        if (!doorRefs.has(candidate.templateId)) {
-          throw new Error(`TranchNode returned unknown traversal template ${candidate.templateId}`);
+        if (typeof candidate?.templateId !== 'string' || !doorRefs.has(candidate.templateId)) {
+          throw new Error(`TranchNode returned unknown traversal template ${String(candidate?.templateId)}`);
         }
         if (!Number.isFinite(candidate.totalCost) || candidate.totalCost < 0) {
           throw new Error('TranchNode returned an invalid traversal cost');
@@ -148,8 +124,8 @@ export function createTranchNodeTraversalPort(
         };
       });
       for (const doorRef of decoded.decoding.ambiguity.leadingTemplateIds) {
-        if (!doorRefs.has(doorRef)) {
-          throw new Error(`TranchNode returned unknown leading template ${doorRef}`);
+        if (typeof doorRef !== 'string' || !doorRefs.has(doorRef)) {
+          throw new Error(`TranchNode returned unknown leading template ${String(doorRef)}`);
         }
       }
 
@@ -180,9 +156,10 @@ export interface Project0EncounterPortOptions {
 }
 
 type Project0OkResult = {
-  schema: typeof PROJECT0_RESULT_SCHEMA;
-  status: 'ok';
-  addressed: {
+  schema: typeof PROJECT0_RESPONSE_SCHEMA;
+  ok: true;
+  operation: 'address' | 'verify';
+  record: {
     ref: string;
     digestHex: string;
     recordType: 'exchange_envelope';
@@ -191,10 +168,9 @@ type Project0OkResult = {
 };
 
 type Project0ErrorResult = {
-  schema: typeof PROJECT0_RESULT_SCHEMA;
-  status: 'error';
-  code: string;
-  message?: string;
+  schema: typeof PROJECT0_RESPONSE_SCHEMA;
+  ok: false;
+  error: { code: string };
 };
 
 type Project0Result = Project0OkResult | Project0ErrorResult;
@@ -202,9 +178,13 @@ type Project0Result = Project0OkResult | Project0ErrorResult;
 function isProject0ErrorResult(value: unknown): value is Project0ErrorResult {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
-  return record.schema === PROJECT0_RESULT_SCHEMA
-    && record.status === 'error'
-    && typeof record.code === 'string';
+  const error = record.error;
+  return record.schema === PROJECT0_RESPONSE_SCHEMA
+    && record.ok === false
+    && typeof error === 'object'
+    && error !== null
+    && !Array.isArray(error)
+    && typeof (error as Record<string, unknown>).code === 'string';
 }
 
 async function runProject0Process(
@@ -286,55 +266,60 @@ export function createProject0EncounterPort(
       };
 
       const addressResult = await runProject0Process(options.command, {
-        schema: PROJECT0_PROCESS_SCHEMA,
+        schema: PROJECT0_REQUEST_SCHEMA,
         operation: 'address',
         recordType: 'exchange_envelope',
         body: envelope,
       });
-      if (addressResult.schema !== PROJECT0_RESULT_SCHEMA) {
+      if (addressResult.schema !== PROJECT0_RESPONSE_SCHEMA) {
         throw new Error('Project0 address returned an incompatible response schema');
       }
-      if (addressResult.status === 'error') {
-        return validationFailure(addressResult.code, [input.confirmationReceiptRef]);
+      if (addressResult.ok === false) {
+        return validationFailure(addressResult.error.code, [input.confirmationReceiptRef]);
       }
       if (
-        addressResult.addressed.recordType !== 'exchange_envelope'
-        || typeof addressResult.addressed.ref !== 'string'
+        addressResult.operation !== 'address'
+        || addressResult.record.recordType !== 'exchange_envelope'
+        || typeof addressResult.record.ref !== 'string'
       ) {
         throw new Error('Project0 address returned an incompatible encounter record');
       }
 
       const verifyResult = await runProject0Process(options.command, {
-        schema: PROJECT0_PROCESS_SCHEMA,
+        schema: PROJECT0_REQUEST_SCHEMA,
         operation: 'verify',
         recordType: 'exchange_envelope',
-        expectedRef: addressResult.addressed.ref,
+        expectedRef: addressResult.record.ref,
         body: envelope,
       });
-      if (verifyResult.schema !== PROJECT0_RESULT_SCHEMA) {
+      if (verifyResult.schema !== PROJECT0_RESPONSE_SCHEMA) {
         throw new Error('Project0 verify returned an incompatible response schema');
       }
-      if (verifyResult.status === 'error') {
-        return validationFailure(verifyResult.code, [
+      if (verifyResult.ok === false) {
+        return validationFailure(verifyResult.error.code, [
           input.confirmationReceiptRef,
-          addressResult.addressed.ref,
+          addressResult.record.ref,
         ]);
       }
-      if (verifyResult.addressed.ref !== addressResult.addressed.ref) {
+      if (
+        verifyResult.operation !== 'verify'
+        || verifyResult.record.recordType !== 'exchange_envelope'
+        || verifyResult.record.ref !== addressResult.record.ref
+      ) {
         throw new Error('Project0 verification changed the encounter identity');
       }
 
       return {
         status: 'ok',
-        encounterRef: verifyResult.addressed.ref,
+        encounterRef: verifyResult.record.ref,
         encounter: {
-          ref: verifyResult.addressed.ref,
+          ref: verifyResult.record.ref,
           body: envelope,
         },
         evidenceRefs: [
           input.confirmationReceiptRef,
           ...input.traversalEvidenceRefs,
-          verifyResult.addressed.ref,
+          verifyResult.record.ref,
         ],
       };
     },
@@ -354,6 +339,12 @@ type CorpusProcessResult = {
   destinationPolicyEvidenceRefs?: string[];
   evidenceRefs: string[];
 };
+
+function assertStringArray(value: unknown, label: string): asserts value is string[] {
+  if (!Array.isArray(value) || !value.every((entry) => typeof entry === 'string')) {
+    throw new Error(`Corpus destination returned invalid ${label}`);
+  }
+}
 
 export function createCorpusDestinationPort(
   options: CorpusDestinationPortOptions,
@@ -390,12 +381,14 @@ export function createCorpusDestinationPort(
       ) {
         throw new Error('Corpus destination returned an incompatible response');
       }
+      assertStringArray(result.evidenceRefs, 'evidence refs');
+      if (result.destinationPolicyEvidenceRefs !== undefined) {
+        assertStringArray(result.destinationPolicyEvidenceRefs, 'policy evidence refs');
+      }
 
       const evidenceRefs = [
         ...result.evidenceRefs,
-        ...(Array.isArray(result.destinationPolicyEvidenceRefs)
-          ? result.destinationPolicyEvidenceRefs
-          : []),
+        ...(result.destinationPolicyEvidenceRefs ?? []),
       ];
 
       if (result.status === 'failed') {
