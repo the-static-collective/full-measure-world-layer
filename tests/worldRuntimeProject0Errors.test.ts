@@ -24,6 +24,7 @@ function project0ValidationFailureCommand(): JsonProcessCommand {
     command: process.execPath,
     args: ['-e', script],
     timeoutMs: 1_000,
+    maxInputBytes: 64_000,
     maxOutputBytes: 64_000,
   };
 }
