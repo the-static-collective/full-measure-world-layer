@@ -7,7 +7,11 @@ import type {
   TraversalPort,
   WorldDoorProjection,
 } from './contracts.js';
-import { runJsonProcess, type JsonProcessCommand } from './processPort.js';
+import {
+  JsonProcessError,
+  runJsonProcess,
+  type JsonProcessCommand,
+} from './processPort.js';
 
 const TRANCH_PROCESS_SCHEMA = 'tranchnode.intent-stroke-process/v0.1' as const;
 const TRANCH_RESULT_SCHEMA = 'tranchnode.intent-stroke-process-result/v0.1' as const;
@@ -195,6 +199,32 @@ type Project0ErrorResult = {
 
 type Project0Result = Project0OkResult | Project0ErrorResult;
 
+function isProject0ErrorResult(value: unknown): value is Project0ErrorResult {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return record.schema === PROJECT0_RESULT_SCHEMA
+    && record.status === 'error'
+    && typeof record.code === 'string';
+}
+
+async function runProject0Process(
+  command: JsonProcessCommand,
+  request: unknown,
+): Promise<Project0Result> {
+  try {
+    return await runJsonProcess<unknown, Project0Result>(command, request);
+  } catch (error: unknown) {
+    if (
+      error instanceof JsonProcessError
+      && error.code === 'PROCESS_EXIT_NONZERO'
+      && isProject0ErrorResult(error.response)
+    ) {
+      return error.response;
+    }
+    throw error;
+  }
+}
+
 function validationFailure(
   reasonCode: string,
   evidenceRefs: readonly string[],
@@ -255,7 +285,7 @@ export function createProject0EncounterPort(
         ],
       };
 
-      const addressResult = await runJsonProcess<unknown, Project0Result>(options.command, {
+      const addressResult = await runProject0Process(options.command, {
         schema: PROJECT0_PROCESS_SCHEMA,
         operation: 'address',
         recordType: 'exchange_envelope',
@@ -274,7 +304,7 @@ export function createProject0EncounterPort(
         throw new Error('Project0 address returned an incompatible encounter record');
       }
 
-      const verifyResult = await runJsonProcess<unknown, Project0Result>(options.command, {
+      const verifyResult = await runProject0Process(options.command, {
         schema: PROJECT0_PROCESS_SCHEMA,
         operation: 'verify',
         recordType: 'exchange_envelope',
