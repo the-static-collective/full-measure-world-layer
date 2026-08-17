@@ -8,8 +8,12 @@ import {
   Profile,
   Circle,
   OfferCategory,
-  PledgeStatus,
 } from '../types.js';
+import type {
+  ConfirmCrossingResult,
+  WorldEncounterResidue,
+  WorldFieldProjection,
+} from '../world-runtime/contracts.js';
 
 let currentUserId = localStorage.getItem('jubilee_user_id') || 'user_lu';
 
@@ -20,6 +24,26 @@ export function setCurrentUserId(userId: string) {
 
 export function getCurrentUserId(): string {
   return currentUserId;
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+  readonly body: unknown;
+
+  constructor(status: number, body: unknown) {
+    const record = typeof body === 'object' && body !== null ? body as Record<string, unknown> : {};
+    const message = typeof record.error === 'string'
+      ? record.error
+      : typeof record.reasonCode === 'string'
+        ? record.reasonCode
+        : typeof record.failureClass === 'string'
+          ? record.failureClass
+          : `HTTP error! status: ${status}`;
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.body = body;
+  }
 }
 
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -36,10 +60,28 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    throw new ApiError(response.status, errorData);
   }
 
   return response.json();
+}
+
+export type WorldFieldResponse =
+  | { available: true; field: WorldFieldProjection }
+  | { available: false; reasonCode: string; field: WorldFieldProjection };
+
+export interface WorldDecodeResult {
+  kind: 'confirmation-required';
+  pendingId: string;
+  decoding: {
+    authority: 'none';
+    decodingRef: string;
+    candidates: Array<{ doorRef: string; totalCost: number }>;
+    ambiguity: {
+      kind: 'none' | 'collision';
+      leadingDoorRefs: string[];
+    };
+  };
 }
 
 export const api = {
@@ -138,9 +180,7 @@ export const api = {
 
   // Projects
   getProjects: () =>
-    apiFetch<
-      Array<Project & { opener?: Profile; pledges: Array<Pledge & { pledger?: Profile }> }>
-    >('/api/projects'),
+    apiFetch<Array<Project & { opener?: Profile; pledges: Array<Pledge & { pledger?: Profile }> }>>('/api/projects'),
   getProject: (id: string) =>
     apiFetch<
       Project & {
@@ -202,23 +242,12 @@ export const api = {
   ) =>
     apiFetch<{ project: Project; receipt: Receipt; capacity?: Capacity }>(
       `/api/projects/${projectId}/complete`,
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }
+      { method: 'POST', body: JSON.stringify(data) }
     ),
 
   // Remember Tab
   getReceipts: () =>
-    apiFetch<
-      Array<
-        Receipt & {
-          project?: Project;
-          author?: Profile;
-          confirmedPledges: Array<Pledge & { pledger?: Profile }>;
-        }
-      >
-    >('/api/receipts'),
+    apiFetch<Array<Receipt & { project?: Project; author?: Profile; confirmedPledges: Array<Pledge & { pledger?: Profile }> }>>('/api/receipts'),
   getCapacities: () =>
     apiFetch<Array<Capacity & { receipt?: Receipt; project?: Project }>>('/api/capacities'),
   getEvents: () => apiFetch<Array<DomainEvent & { actor?: Profile }>>('/api/events'),
@@ -233,4 +262,19 @@ export const api = {
       confirmedContributions: Array<Pledge & { project?: Project }>;
       capacitiesHelped: Capacity[];
     }>(`/api/participants/${id}`),
+
+  // Boot the House world threshold
+  getWorldField: () => apiFetch<WorldFieldResponse>('/api/world/field'),
+  decodeWorldStroke: (points: Array<{ x: number; y: number }>) =>
+    apiFetch<WorldDecodeResult>('/api/world/decode', {
+      method: 'POST',
+      body: JSON.stringify({ points }),
+    }),
+  crossWorldDoor: (pendingId: string, doorRef: string) =>
+    apiFetch<ConfirmCrossingResult>('/api/world/cross', {
+      method: 'POST',
+      body: JSON.stringify({ pendingId, doorRef, confirmed: true }),
+    }),
+  getWorldResidue: (residueRef: string) =>
+    apiFetch<WorldEncounterResidue>(`/api/world/residue/${encodeURIComponent(residueRef)}`),
 };
