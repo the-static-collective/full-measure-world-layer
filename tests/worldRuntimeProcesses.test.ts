@@ -104,6 +104,22 @@ test('stdout larger than the declared bound is killed and rejected', async () =>
   );
 });
 
+test('serialized stdin larger than the declared bound is rejected before child execution', async () => {
+  const command = {
+    ...nodeCommand(`process.stdout.write(JSON.stringify({ shouldNotRun: true }));`),
+    maxInputBytes: 64,
+  } as JsonProcessCommand & { maxInputBytes: number };
+
+  await assert.rejects(
+    runJsonProcess(command, { payload: 'x'.repeat(256) }),
+    (error: unknown) => {
+      assert.equal(error instanceof JsonProcessError, true);
+      assert.equal((error as JsonProcessError).code, 'PROCESS_INPUT_TOO_LARGE');
+      return true;
+    },
+  );
+});
+
 test('invalid donor stdout never becomes a runtime disposition', async () => {
   await assert.rejects(
     runJsonProcess(nodeCommand(`process.stdout.write('not-json');`), { hello: 'house' }),
