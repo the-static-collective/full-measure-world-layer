@@ -1,0 +1,97 @@
+name: boot-house-proof
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  composed-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Full Measure
+        uses: actions/checkout@v4
+
+      - name: Checkout TranchNode proof floor
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/tranchnode
+          ref: bf886c0b4938a1444a79afb7a7b384e91b5d5197
+          path: donors/tranchnode
+
+      - name: Checkout Project0 proof floor
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/project0
+          ref: 6341b0223f2b57148d617dcc98d1e0d0c68e14a5
+          path: donors/project0
+
+      - name: Checkout Corpus OS proof floor
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/corpus-os
+          ref: 63c0be4cd49c383ae167ded99103b79ba4626416
+          path: donors/corpus-os
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Full Measure
+        run: npm ci
+
+      - name: Install TranchNode
+        working-directory: donors/tranchnode
+        run: npm install
+
+      - name: Install Project0
+        working-directory: donors/project0
+        run: npm install
+
+      - name: Install Corpus OS
+        working-directory: donors/corpus-os
+        run: npm run install:ci
+
+      - name: Run real composed federation proof
+        env:
+          BOOT_HOUSE_TRANCHNODE_REPO: ${{ github.workspace }}/donors/tranchnode
+          BOOT_HOUSE_PROJECT0_REPO: ${{ github.workspace }}/donors/project0
+          BOOT_HOUSE_CORPUS_OS_REPO: ${{ github.workspace }}/donors/corpus-os
+          FULL_MEASURE_PROOF_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          FULL_MEASURE_PROOF_BASE_URL: http://127.0.0.1:3000
+        run: |
+          npm run dev > /tmp/full-measure-proof-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS "$FULL_MEASURE_PROOF_BASE_URL/api/health" >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              cat /tmp/full-measure-proof-server.log
+              exit 1
+            fi
+            sleep 1
+          done
+
+          node --import tsx scripts/boot-house-proof.ts
+
+      - name: Bind proof receipt digest
+        if: always() && hashFiles('artifacts/boot-house-proof.json') != ''
+        run: sha256sum artifacts/boot-house-proof.json | tee artifacts/boot-house-proof.sha256
+
+      - name: Upload proof receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-house-proof
+          path: |
+            artifacts/boot-house-proof.json
+            artifacts/boot-house-proof.sha256
+          if-no-files-found: ignore
