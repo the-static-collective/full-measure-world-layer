@@ -25,7 +25,7 @@ const configured = createConfiguredWorldRuntime({
   BOOT_HOUSE_SOURCE_VERSION_REF: sourceVersionRef,
 });
 
-if (!configured.available) {
+if (configured.available === false) {
   throw new Error(`configured Full Measure world runtime is unavailable: ${configured.reasonCode}`);
 }
 
