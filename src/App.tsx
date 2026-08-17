@@ -45,7 +45,8 @@ export default function App() {
         author?: Profile;
         confirmedPledges: Array<any>;
       }
-    >([]);
+    >
+  >([]);
   const [capacities, setCapacities] = useState<
     Array<Capacity & { receipt?: Receipt; project?: Project }>
   >([]);
