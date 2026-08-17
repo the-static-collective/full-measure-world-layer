@@ -146,7 +146,7 @@ export function resolveWorldRuntimeConfiguration(
     commands: {
       traversal: command(tranchDir, 'intent-stroke:stdio', 15_000),
       encounter: command(project0Dir, 'world-encounter:stdio', 60_000),
-      destination: command(corpusDir, 'world:encounter', 60_000),
+      destination: command(corpusDir, 'world-encounter:stdio', 60_000),
     },
     source: {
       originNodeRef: 'full-measure-world-layer',
