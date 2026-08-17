@@ -19,17 +19,33 @@ export class JsonProcessError extends Error {
   readonly code: JsonProcessErrorCode;
   readonly exitCode?: number | null;
   readonly stderr?: string;
+  readonly response?: unknown;
 
   constructor(
     code: JsonProcessErrorCode,
     message: string,
-    options: { exitCode?: number | null; stderr?: string; cause?: unknown } = {},
+    options: {
+      exitCode?: number | null;
+      stderr?: string;
+      response?: unknown;
+      cause?: unknown;
+    } = {},
   ) {
     super(message, options.cause === undefined ? undefined : { cause: options.cause });
     this.name = 'JsonProcessError';
     this.code = code;
     this.exitCode = options.exitCode;
     this.stderr = options.stderr;
+    this.response = options.response;
+  }
+}
+
+function parseJsonEvidence(stdout: string): unknown | undefined {
+  if (!stdout.trim()) return undefined;
+  try {
+    return JSON.parse(stdout);
+  } catch {
+    return undefined;
   }
 }
 
@@ -107,7 +123,11 @@ export async function runJsonProcess<TRequest, TResponse>(
         rejectOnce(new JsonProcessError(
           'PROCESS_EXIT_NONZERO',
           `donor process exited with code ${String(code)}`,
-          { exitCode: code, stderr },
+          {
+            exitCode: code,
+            stderr,
+            response: parseJsonEvidence(stdout),
+          },
         ));
         return;
       }
