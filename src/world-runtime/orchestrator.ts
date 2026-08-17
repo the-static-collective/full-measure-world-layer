@@ -7,6 +7,7 @@ import {
   type TraversalDecodingProjection,
   type TraversalPort,
   type WorldDoorProjection,
+  type WorldEncounterResidue,
   type WorldFieldProjection,
 } from './contracts.js';
 import { assertBoundedWorldDoors, cloneWorldDoors } from './doors.js';
@@ -39,6 +40,7 @@ export interface WorldRuntimeOptions {
 
 export interface WorldRuntime {
   getField(): WorldFieldProjection;
+  getResidue(residueRef: string): WorldEncounterResidue | undefined;
   decodeStroke(stroke: RawTraversalStroke): Promise<{
     kind: 'confirmation-required';
     pendingId: string;
@@ -53,6 +55,13 @@ function cloneField(field: WorldFieldProjection): WorldFieldProjection {
     doors: cloneWorldDoors(field.doors),
     admittedDestinationRefs: [...field.admittedDestinationRefs],
     visibleResidueRefs: [...field.visibleResidueRefs],
+  };
+}
+
+function cloneResidue(residue: WorldEncounterResidue): WorldEncounterResidue {
+  return {
+    ...residue,
+    evidenceRefs: [...residue.evidenceRefs],
   };
 }
 
@@ -104,6 +113,7 @@ export function createWorldRuntime(options: WorldRuntimeOptions): WorldRuntime {
   };
 
   const pending = new Map<string, PendingTraversal>();
+  const residues = new Map<string, WorldEncounterResidue>();
   let pendingSequence = 0;
   let confirmationSequence = 0;
   let residueSequence = 0;
@@ -111,6 +121,11 @@ export function createWorldRuntime(options: WorldRuntimeOptions): WorldRuntime {
   return {
     getField(): WorldFieldProjection {
       return cloneField(field);
+    },
+
+    getResidue(residueRef: string): WorldEncounterResidue | undefined {
+      const residue = residues.get(residueRef);
+      return residue ? cloneResidue(residue) : undefined;
     },
 
     async decodeStroke(stroke: RawTraversalStroke) {
@@ -226,6 +241,7 @@ export function createWorldRuntime(options: WorldRuntimeOptions): WorldRuntime {
       });
       const worldChange = projectWorldChange(residue);
 
+      residues.set(residue.residueRef, cloneResidue(residue));
       field.visibleResidueRefs = [...new Set([...field.visibleResidueRefs, residue.residueRef])];
       if (destination.status === 'admitted') {
         field.admittedDestinationRefs = [
@@ -235,7 +251,7 @@ export function createWorldRuntime(options: WorldRuntimeOptions): WorldRuntime {
 
       return {
         kind: 'terminal',
-        residue,
+        residue: cloneResidue(residue),
         worldChange,
       };
     },
