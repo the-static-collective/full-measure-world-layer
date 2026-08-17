@@ -174,6 +174,25 @@ test('collision stays unresolved until the human explicitly chooses a leading do
   assert.equal(calls.destination, 0);
 });
 
+test('a visible but unreachable leading door cannot be sent through the destination adapter', async () => {
+  const { ports, calls } = makePorts({ ambiguity: 'collision' });
+  const runtime = createWorldRuntime({ doors, ...ports });
+  const decoded = await runtime.decodeStroke(stroke);
+
+  await assert.rejects(
+    runtime.confirmCrossing({
+      pendingId: decoded.pendingId,
+      confirmed: true,
+      doorRef: 'door:upper-room',
+      offeredWitnessRefs: ['full-measure:witness:1'],
+      confirmedBy: 'user_lu',
+    }),
+    /confirmed door is not currently reachable/
+  );
+  assert.equal(calls.encounter, 0);
+  assert.equal(calls.destination, 0);
+});
+
 test('Project0 validation failure never invokes the destination', async () => {
   const { ports, calls } = makePorts({ encounterStatus: 'validation-failed' });
   const runtime = createWorldRuntime({ doors, ...ports });
