@@ -4,6 +4,7 @@ export type JsonProcessErrorCode =
   | 'PROCESS_SPAWN_FAILURE'
   | 'PROCESS_EXIT_NONZERO'
   | 'PROCESS_TIMEOUT'
+  | 'PROCESS_INPUT_TOO_LARGE'
   | 'PROCESS_OUTPUT_TOO_LARGE'
   | 'PROCESS_INVALID_JSON';
 
@@ -12,6 +13,7 @@ export interface JsonProcessCommand {
   args: string[];
   cwd?: string;
   timeoutMs: number;
+  maxInputBytes: number;
   maxOutputBytes: number;
 }
 
@@ -53,11 +55,19 @@ export async function runJsonProcess<TRequest, TResponse>(
   command: JsonProcessCommand,
   request: TRequest,
 ): Promise<TResponse> {
-  if (!command.command || command.timeoutMs <= 0 || command.maxOutputBytes <= 0) {
+  if (
+    !command.command
+    || command.timeoutMs <= 0
+    || command.maxInputBytes <= 0
+    || command.maxOutputBytes <= 0
+  ) {
     throw new JsonProcessError('PROCESS_SPAWN_FAILURE', 'invalid process command configuration');
   }
 
   const payload = JSON.stringify(request);
+  if (Buffer.byteLength(payload, 'utf8') > command.maxInputBytes) {
+    throw new JsonProcessError('PROCESS_INPUT_TOO_LARGE', 'donor process exceeded input bound');
+  }
 
   return await new Promise<TResponse>((resolve, reject) => {
     const child = spawn(command.command, [...command.args], {
