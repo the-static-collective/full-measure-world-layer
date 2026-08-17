@@ -166,6 +166,7 @@ export function createWorldRuntimeRouter(options: WorldRuntimeRouterOptions): Ro
         && (
           error.message === 'confirmed door is not part of the current field'
           || error.message === 'confirmed door is not a leading traversal candidate'
+          || error.message === 'confirmed door is not currently reachable'
         )
       ) {
         return res.status(409).json({
