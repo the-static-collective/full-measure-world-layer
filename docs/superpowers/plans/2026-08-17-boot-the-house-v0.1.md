@@ -1,213 +1,231 @@
 # Boot the House v0.1 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` when independent repo slices can be delegated safely; otherwise use `superpowers:executing-plans` and execute this plan task-by-task. Every behavior change follows RED → observed failure → minimal GREEN → repository gate.
+> **Status:** reconciled to live repository state after the first successful composed donor-owned heartbeat. This plan records what survived and the remaining landing / human-witness sequence. It does not grant merge authority.
 
-**Goal:** Prove one inhabited federated world heartbeat in which Full Measure composes real TranchNode, Project0, and Corpus OS boundaries without becoming their authority, then preserve the return evidence strongly enough for a human to inspect why the Garden changed.
+**Goal:** Prove one inhabited federated heartbeat in which Full Measure composes TranchNode, Project0, and Corpus OS without absorbing their identity, authority, or execution semantics, then complete one human Garden witness.
 
-**Architecture:** Full Measure remains the playable shell. Donor repositories expose repo-owned local process adapters with bounded, versioned JSON over stdin/stdout. The adapters wrap canonical donor logic rather than copying it. Full Measure invokes configured local commands, projects fixture-backed nearby doors until Founder Node is live, requires explicit human crossing confirmation, distinguishes pre-destination validation from destination disposition, and stores only local projection residue plus foreign evidence references.
+**Architecture:** Full Measure is the playable shell and local projection owner. Each donor owns one bounded local process surface. Full Measure sends structured data only, requires explicit human crossing confirmation, and stores local residue plus foreign evidence references. Donor process transport is mechanism, not sovereignty.
 
-**Tech Stack:** Node.js 22+, TypeScript, React 19, Vite, Express, Node child processes, GitHub Actions, repository-native test suites.
-
-## Global invariants
+## Governing invariants
 
 - Crossing never transports sovereignty.
-- Full Measure orchestration is projection, not constitutional authority.
-- No cross-repo source imports or copied donor canonicalizers.
-- No new world-runtime repository, daemon, network federation, or central credential plane.
-- Nearby relevance and gesture ranking may affect visibility/candidates only.
-- Human confirmation is separate from gesture decoding.
-- `validation failure`, `admitted`, `refused`, `indeterminate`, and `failed` remain distinct.
-- Refusal does not constitute the attempted destination state.
-- Fixture-backed participation is visibly labeled as fixture/prototype evidence.
-- Every adapter has a raw transport bound as well as donor semantic bounds.
+- Door visibility, nearby relevance, and gesture ranking are not permission.
+- Human confirmation is separate from gesture decoding and destination authority.
+- Project0 validation failure is pre-destination failure, not Corpus refusal.
+- `admitted`, `refused`, `indeterminate`, and `failed` remain distinct.
+- Unreachable doors cannot reach Project0 or Corpus.
+- Full Measure never imports donor canonicalizers or accepts browser-selected authority / witness refs.
+- Local donor stdin/stdout, time, and command identity are bounded.
+- Fixture-backed nearby doors remain visibly fixture-backed.
+- No central world daemon, master graph, network federation, or credential plane in v0.1.
 
 ---
 
-## Task 1: TranchNode — expose Intent Stroke v0.1 through a bounded stdio adapter
+## 1. TranchNode donor boundary
 
-**Issue:** `the-static-collective/tranchnode#43`  
-**Branch:** `agent/intent-stroke-stdio`  
-**PR:** `the-static-collective/tranchnode#50`
+### Landed base
 
-**Files:**
-- Create: `scripts/intent-stroke-stdio.ts`
-- Create: `test/intent-stroke-stdio.test.ts`
-- Modify: `package.json`
-- Reuse unchanged: `src/intent-stroke.ts`, `fixtures/intent-stroke-v0.1.json`
+PR #50 landed the donor-owned one-shot `intent-stroke:stdio` boundary on TranchNode main.
 
-- [x] Add executable tests that spawn the missing adapter and prove canonical decoding, collision preservation, malformed JSON handling, unsupported wrapper schema, and inability to manufacture authority.
-- [x] Observe GitHub Actions RED because the adapter does not exist.
-- [x] Add only the minimal adapter that addresses input through existing helpers and calls `decodeIntentStroke`.
-- [x] Add `npm run intent-stroke:stdio`.
-- [x] Observe repository GREEN.
-- [x] Add a second RED test proving oversized raw input must fail before unbounded retention.
-- [ ] Add a 1 MiB transport limit while reading stdin and return `INPUT_TOO_LARGE`.
-- [ ] Observe exact-head `npm run check` GREEN.
-- [ ] Run owner/Riqor review; repair only concrete correctness/security/test gaps.
-- [ ] Mark PR ready for review and stop at the landing gate until exact-head approval is given.
+Contract:
 
-Acceptance: Full Measure can invoke TranchNode as an independent local process and receives the canonical decoding, including `authority: "none"`, fingerprint, candidates, and ambiguity, without TranchNode performing traversal.
+- request: `tranchnode/intent-stroke-stdio/v0.1`
+- response: `tranchnode/intent-stroke-stdio-response/v0.1`
+- canonical decoder remains TranchNode-owned
+- result remains `authority: "none"`
+- exact ambiguity / collision remains visible
+- raw request bound: 1 MiB
 
----
+### Remaining narrow repair
 
-## Task 2: Project0 — land World Encounter v0.1, then expose its canonical boundary through stdio
+PR #52 — `fix: let Intent Stroke stdio bind raw strokes to its layout`
 
-**Dependency:** Full Measure #8  
-**Issue:** `the-static-collective/project0#43`
+Exact review-ready head at reconciliation time:
 
-**Expected files after dependency landing:**
-- Reuse: `src/world-encounter/index.ts`
-- Reuse: `src/world-encounter/address.ts`
-- Reuse: `src/world-encounter/validate.ts`
-- Reuse: `src/world-encounter/evaluate.ts`
-- Create: `scripts/world-encounter-stdio.ts`
-- Create: `tests/world-encounter-stdio.test.ts`
-- Modify: `package.json`
+`4566ec8960448e5dbca3f41058d9990f52e88052`
 
-- [ ] Land the already-designed compatible World Encounter Envelope implementation on Project0 main before writing the adapter.
-- [ ] Pin the exact landed Project0 commit in the adapter proof notes.
-- [ ] Write RED stdio tests for valid construct/validate, malformed JSON, unsupported wrapper/profile, tampered address/body, disclosure rejection, and raw input bound.
-- [ ] Observe the adapter tests fail for the missing process entrypoint.
-- [ ] Implement a thin wrapper around the canonical World Encounter functions; do not reimplement canonicalization.
-- [ ] Return pre-destination validation/compatibility failures as adapter results, never as destination refusals.
-- [ ] Add `npm run world-encounter:stdio`.
-- [ ] Run `npm run verify:all` and require GREEN.
-- [ ] Owner/Riqor review for disclosure bypass, authority leakage, duplicate canonicalization, and missing adversarial tests.
-- [ ] Open/ready PR and stop at its exact-head landing gate.
+Why it exists: an independent process consumer cannot be required to precompute TranchNode's canonical layout hash. When `stroke.fieldLayoutRef` is omitted, TranchNode now binds the raw stroke to the canonical supplied layout itself. An explicitly supplied conflicting ref still fails with `LAYOUT_REF_MISMATCH`.
 
-Acceptance: a valid bounded crossing object can be constructed/validated across a process boundary while Project0 remains the sole owner of its identity and encounter law.
+Evidence:
+
+- RED: run `32006634138`, 91/92 pass; only raw-layout bootstrap failed.
+- final exact-head GREEN: run `32006926263`, complete TranchNode check passed.
+- Full Measure composed proof is GREEN against this exact head.
+
+**Remaining:** separate exact-head landing approval for TranchNode #52.
+
+Parallel TranchNode PR #42 was closed unmerged because it represented a competing process protocol.
 
 ---
 
-## Task 3: Corpus OS — expose one bounded destination-local encounter admission profile
+## 2. Project0 donor boundary — complete on main
 
-**Issue:** `the-static-collective/corpus-os#27`
+Project0 World Encounter Envelope v0.1 landed through PRs #40/#41.
 
-**Files to inspect first:**
-- `package.json`
-- `scripts/corpus-session.*` or the source that builds `corpus:session`
-- session/admission kernel files exercised by `tests/corpus-session.test.mjs`
-- warrant/capability files exercised by `tests/mandatory-warrant-boundary.test.mjs` and `tests/capability-policy.test.mjs`
+PR #44 subsequently landed the canonical process surface on main:
 
-**Expected additions:**
-- one kernel-owned stdio command source under the existing script convention
-- one focused encounter-admission test file under `tests/`
-- one package script, e.g. `world-encounter:stdio`
+`6341b0223f2b57148d617dcc98d1e0d0c68e14a5`
 
-- [ ] Inspect the existing session command and select one already-declared bounded capability suitable for the specimen.
-- [ ] Write RED tests for `admitted`, `refused`, `indeterminate`, host/runtime failure, malformed input, caller-minted authority, unsupported profile, and raw input bound.
-- [ ] Observe failures before implementation.
-- [ ] Implement the smallest adapter that maps the valid encounter testimony into existing Corpus-owned admission/session machinery.
-- [ ] Never accept arbitrary shell text, arbitrary executable identifiers, or authority supplied by Full Measure.
-- [ ] Preserve destination-owned receipt/evidence refs and destination frame identity.
-- [ ] Run focused session tests, then `npm run check`.
-- [ ] Owner/Riqor review for warrant bypass, replay, failure/refusal conflation, and authority forgery.
-- [ ] Open/ready PR and stop at the exact-head landing gate.
+Contract:
 
-Acceptance: Corpus OS independently decides what a valid crossing is allowed to become and returns one of the declared result classes under Corpus-owned authority.
+- request: `project0/world-encounter-stdio/v0.1`
+- response: `project0/world-encounter-stdio-response/v0.1`
+- operations: `address | verify`
+- record type: `exchange_envelope`
+- Project0 remains sole owner of encounter addressing / verification
+- structured nonzero validation errors remain pre-destination failures
+
+Full Measure now consumes this landed contract directly.
+
+Parallel Project0 PR #42 was closed unmerged because #44 had already established the donor-owned mainline surface.
+
+**Remaining:** no Project0 donor landing required for Boot the House v0.1.
 
 ---
 
-## Task 4: Full Measure Phase A — process runner, donor clients, fixture doors, and residue kernel
+## 3. Corpus OS destination boundary — complete on main
 
-**Issue:** `the-static-collective/full-measure-world-layer#5`
+Corpus PR #28 landed the destination-local World Encounter admission surface on main:
 
-**Files:**
-- Create: `src/lib/worldRuntime/types.ts`
-- Create: `src/lib/worldRuntime/processAdapter.ts`
-- Create: `src/lib/worldRuntime/tranchnodeAdapter.ts`
-- Create: `src/lib/worldRuntime/project0Adapter.ts`
-- Create: `src/lib/worldRuntime/corpusAdapter.ts`
-- Create: `src/lib/worldRuntime/fixtureDoorSource.ts`
-- Create: `src/lib/worldRuntime/residue.ts`
-- Create: `tests/world-runtime-process.test.ts`
-- Create: `tests/world-runtime-residue.test.ts`
-- Modify: `server.ts`
-- Modify: `.env.example`
+`63c0be4cd49c383ae167ded99103b79ba4626416`
 
-- [ ] Write RED tests for command allowlisting/configuration, stdin/stdout JSON framing, timeout, nonzero exit, malformed donor output, output-size bound, unavailable command, and no shell interpolation.
-- [ ] Implement the process runner with executable + argv arrays, bounded stdin/stdout, timeout, and no `shell: true`.
-- [ ] Add donor-specific clients that validate only Full Measure-local adapter envelopes; donor semantic validation stays donor-owned.
-- [ ] Add a pinned exactly-three-door fixture with `sourceMode: "fixture"` and provenance refs.
-- [ ] Write RED residue tests proving all five outcome classes remain distinct and refusal cannot create admitted-world consequences.
-- [ ] Implement Full Measure-local `WorldEncounterResidue` projection store using foreign refs, not copied donor bodies as new authority.
-- [ ] Add server endpoints for field projection, door scan, stroke decode, confirmed encounter, and evidence inspection.
-- [ ] Run `npm run check`.
+Contract:
 
-Acceptance: server-side Full Measure can compose configured local donor processes safely before any Garden crossing UI exists.
+- request: `corpus-os/world-encounter-admission/v0.1`
+- response wrapper: `corpus-os/world-encounter-stdio-response/v0.1`
+- result: `corpus-os/world-encounter-result/v0.1`
+- fixed v0.1 destination frame: `corpus-os:casework-v0.1`
+- fixed v0.1 profile: `casework.synthetic-echo/v0.1`
+- Full Measure uses code-owned destination subject `artifact:agreement-a`
+- `callerAuthenticated: false`
+- `authorityTransfer: "none"`
+- `legalValidity: "unclaimed"`
+
+Full Measure sends no actor authority, warrant, free-form command, or browser-selected capability. Its bounded operation input is derived from the addressed Project0 encounter ref.
+
+Parallel Corpus PR #25 was closed unmerged because #28 had already established the stronger donor-owned mainline surface.
+
+**Remaining:** no Corpus donor landing required for Boot the House v0.1.
 
 ---
 
-## Task 5: Full Measure Phase B — inhabited Garden crossing UX
+## 4. Full Measure runtime core — implemented, owner-reviewed, composed GREEN
 
-**Issue:** `the-static-collective/full-measure-world-layer#6`
+PR #3 — `Build Boot the House federated world runtime core`
 
-**Files:**
-- Modify: `src/App.tsx`
-- Modify: `src/types.ts`
-- Modify: `src/lib/api.ts`
-- Create: `src/components/WorldDoors.tsx`
-- Create: `src/components/TraversalField.tsx`
-- Create: `src/components/EncounterEvidence.tsx`
-- Create: `tests/world-runtime-api.test.ts`
-- Add focused UI/state tests following the repository's available test pattern
+Implemented application seams include:
 
-- [ ] Render exactly three door projections and visibly distinguish fixture/live source mode.
-- [ ] Capture bounded pointer stroke points in a declared local layout.
-- [ ] Submit stroke for TranchNode decoding and render best candidate plus collision/ambiguity.
-- [ ] Require a separate `Cross this door` action; never cross on pointer-up or decoder rank alone.
-- [ ] Show Project0 validation failure before any destination result UI.
-- [ ] Render destination `admitted`, `refused`, `indeterminate`, and `failed` distinctly.
-- [ ] Reproject the Garden from recorded history: admission may illuminate; refusal may leave a scar; indeterminate stays fogged/contested; failure stays operational.
-- [ ] Add evidence inspector showing source refs, stroke/decoding ref, confirmation ref, envelope ref, destination refs, unresolved refs, and return refs.
-- [ ] Run `npm run check`.
+- exactly three metadata-only door projections;
+- fixture/live truth-state labeling;
+- TranchNode gesture decoding;
+- separate human confirmation;
+- Project0 address + verify boundary;
+- Corpus destination-local admission;
+- local encounter residue and Garden reprojection;
+- HTTP field/decode/cross/residue endpoints;
+- Garden crossing UI and evidence surface;
+- configured local donor process runner;
+- composed GitHub Actions witness.
 
-Acceptance: a human can complete the first full interaction without the UI implying permission that the donor systems did not grant.
+### Owner-review defects repaired test-first
+
+1. **Unavailable runtime narrowing** — exact TypeScript discriminant fix.
+2. **Unreachable door crossing leak** — an `unknown` door could previously reach the one Corpus adapter; now reachability is checked before Project0/Corpus.
+3. **Unbounded donor stdin** — Full Measure now rejects oversized serialized input before `spawn()` as well as bounding output and timeout.
+4. **HTTP semantic collapse** — unreachable door confirmation is now `409 crossing-unavailable`, not a `502 adapter-failed` lie.
+5. **Parallel donor protocol drift** — Full Measure was rewritten to consume donor-owned Tranch / Project0 / Corpus mainline contracts instead of merging duplicate adapters.
+6. **Tranch ambiguity response hardening** — only `none | collision` is accepted; unknown disposition vocabulary fails closed.
+7. **Corpus wrapper hardening** — Full Measure verifies fixed frame/profile, `callerAuthenticated:false`, `authorityTransfer:"none"`, `legalValidity:"unclaimed"`, reason code, and string evidence/output refs.
+
+### Current composed proof
+
+Full Measure exact head at reconciliation time:
+
+`a21944caa378d78e6701370f3f9e75762f9935ef`
+
+Native repository gate:
+
+- GitHub Actions `check` run `32007665042`: GREEN.
+
+Real composed donor-owned witness:
+
+- GitHub Actions `boot-house-integration` run `32007665048`: GREEN.
+- TranchNode: `4566ec8960448e5dbca3f41058d9990f52e88052` (PR #52 review-ready).
+- Project0: `6341b0223f2b57148d617dcc98d1e0d0c68e14a5` (landed mainline adapter).
+- Corpus OS: `63c0be4cd49c383ae167ded99103b79ba4626416` (landed mainline destination).
+- The witness completes an admitted Project0 -> Corpus crossing and writes a Full Measure residue / changed-field projection.
+
+Known inherited repository condition: Full Measure `npm ci` currently reports one high-severity dependency vulnerability from the existing dependency tree. This slice did not modify package dependencies and does not claim a zero-vulnerability baseline.
+
+### Remaining before Full Measure landing
+
+1. Land TranchNode #52 under a fresh exact-head approval.
+2. Replace Full Measure's temporary Tranch #52 PR-head pin with #52's landed main commit.
+3. Re-run Full Measure native `check` and composed witness on the repinned exact head.
+4. Update PR #3 evidence/body to that final head and mark ready for review.
+5. Obtain separate exact-head landing approval for Full Measure #3.
 
 ---
 
-## Task 6: Founder Node follow-on — replace fixture door discovery with live Pollen Scout
+## 5. Design PR landing
 
-**Issues:** `the-static-collective/founder-node#3`, Full Measure #11  
-**Dependency:** land the compatible Pollen Scout implementation first.
+Full Measure PR #2 remains the design/ADR authority for Boot the House v0.1.
 
-- [ ] RED tests: deterministic ≤3 doors, provenance/relevance reasons, unknown relation fail-closed, `authority: "none"`, raw input bound.
-- [ ] Implement Founder Node-owned stdio adapter around landed Pollen Scout logic.
-- [ ] Run Founder Node repository gate.
-- [ ] In Full Measure, add `NearbyDoorSource` live adapter behind the same application seam used by the fixture.
-- [ ] Prove switching source modes does not change Full Measure constitutional semantics.
-- [ ] Keep fixture mode available for deterministic development/tests and label it honestly.
+The implementation plan changed during reconciliation, but the approved design and transport ADR did not change semantically: Full Measure owns orchestration only; donors own law; local process transport remains the first mechanism.
 
-Acceptance: live nearby-door discovery improves perception without becoming permission or a master graph.
+Before #2 lands:
+
+- verify the current design PR head;
+- run its repository-required checks if any;
+- require a fresh explicit exact-head landing confirmation because the plan reconciliation changed the PR head after the original design approval.
 
 ---
 
-## Task 7: Phase C — composed proof, reconstruction, human witness, and downstream documentation
+## 6. Human Garden witness — still required
 
-**Issue:** `the-static-collective/full-measure-world-layer#7`
+Machine-green composition is necessary but does **not** satisfy the claim that the House is inhabitable.
 
-**Files:**
-- Create: `fixtures/boot-the-house-v0.1/manifest.json`
-- Create: `scripts/verify-boot-the-house.mjs`
-- Create: `tests/boot-the-house-integration.test.ts`
-- Modify: `README.md` only after proof is real
-- GitBook CR #63: update only after repository evidence exists
+After the landed runtime is available, one human witness must:
 
-- [ ] Pin exact repository, adapter profile, and commit for Full Measure, TranchNode, Project0, and Corpus OS.
-- [ ] Compose the real local commands; mocks alone do not satisfy this task.
-- [ ] Prove one admitted route end-to-end.
-- [ ] Prove refusal leaves constituted source state unchanged while preserving attributable residue.
-- [ ] Prove indeterminate and operational failure remain separately reconstructable.
-- [ ] Prove a pre-destination Project0 validation failure never invokes Corpus OS.
-- [ ] Prove exact replay reproduces the same addressed donor evidence for the pinned specimen.
-- [ ] Prove missing return evidence yields an explicitly partial reconstruction rather than invented continuity.
-- [ ] Run all participating repository gates on their pinned heads.
-- [ ] Conduct one human Garden session: three doors → gesture → candidate/ambiguity → explicit confirmation → real destination disposition → changed Garden → evidence inspection.
-- [ ] Record the human witness without upgrading subjective usability observations into constitutional facts.
-- [ ] Update GitBook CR #63 with project-backed evidence and exact refs, then merge GitBook only after the project proof is landed.
+1. enter the Garden;
+2. see exactly three bounded doors and their truth states;
+3. gesture toward the Corpus door;
+4. see the TranchNode decoding / ambiguity result;
+5. explicitly confirm `Cross this door` separately;
+6. receive one real Corpus destination-local disposition through Project0's envelope boundary;
+7. return to a visibly changed Garden;
+8. inspect the evidence chain explaining why it changed.
 
-Acceptance: the Collective has one evidenced inhabited heartbeat across sovereign repositories. This proves a federated runtime specimen; it does **not** prove universal Multiverse NAV, autonomous routing, or a master world graph.
+Record perceptual/usability observations as human witness, not constitutional fact.
+
+---
+
+## 7. GitBook reconciliation
+
+GitBook CR #63 — `Boot the House — Federated World Encounter Loop v0.1` — remains draft until the project proof is landed and the human Garden witness exists.
+
+After that witness:
+
+- replace design-future language with exact landed repository refs;
+- preserve the fact that nearby-door discovery is fixture-backed in v0.1;
+- record the real admitted/refused/indeterminate/failure distinctions actually supported;
+- do not graduate Multiverse NAV, Refusal Topology, or internet federation beyond their evidence;
+- merge GitBook only after project evidence outranks narrative.
+
+---
+
+## Landing order
+
+```text
+Full Measure #2 design          -> fresh exact-head approval -> land
+TranchNode #52 bootstrap       -> fresh exact-head approval -> land
+Full Measure #3 repin/reverify -> fresh exact-head approval -> land
+human Garden witness
+GitBook #63 reconcile/publish
+```
+
+Project0 #44 and Corpus #28 are already on main and require no Boot the House landing action.
 
 ## Landing discipline
 
-Every repository PR is independent. A green or review-ready PR is **not** authorization to merge. Before landing each PR, bind confirmation to that PR's current exact head SHA and use the repository's normal protected merge path. Any push invalidates earlier landing approval.
+Every PR remains an independent authority boundary. Review-ready and GREEN do not imply permission to merge. Any push changes the authorized head and invalidates prior landing approval.
