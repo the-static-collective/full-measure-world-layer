@@ -46,6 +46,12 @@ function boundedText(current: string, chunk: string, maxBytes: number): string {
   return current + bytes.subarray(0, remaining).toString('utf8');
 }
 
+function parseProtocolDocument(stdout: string): unknown {
+  const trimmed = stdout.trim();
+  if (!trimmed) throw new Error('empty protocol response');
+  return JSON.parse(trimmed) as unknown;
+}
+
 export const invokeJsonProcess: JsonProcessInvoker = async (
   command,
   request,
@@ -107,10 +113,6 @@ export const invokeJsonProcess: JsonProcessInvoker = async (
     });
 
     child.on('error', (error: NodeJS.ErrnoException) => {
-      if (error.code === 'ENOENT') {
-        finish({ ok: false, kind: 'unavailable', stderr: error.message });
-        return;
-      }
       finish({ ok: false, kind: 'unavailable', stderr: error.message });
     });
 
@@ -124,13 +126,19 @@ export const invokeJsonProcess: JsonProcessInvoker = async (
         finish({ ok: false, kind: 'output-too-large', exitCode: code, stderr });
         return;
       }
+
       if (code !== 0) {
-        finish({ ok: false, kind: 'process-exit', exitCode: code, stderr });
+        try {
+          const value = parseProtocolDocument(stdout);
+          finish({ ok: true, value });
+        } catch {
+          finish({ ok: false, kind: 'process-exit', exitCode: code, stderr });
+        }
         return;
       }
 
       try {
-        const value = JSON.parse(stdout.trim()) as unknown;
+        const value = parseProtocolDocument(stdout);
         finish({ ok: true, value });
       } catch {
         finish({ ok: false, kind: 'malformed-output', exitCode: code, stderr });
