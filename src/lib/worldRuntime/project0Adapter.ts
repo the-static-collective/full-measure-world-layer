@@ -16,14 +16,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-async function invokeProject0(
+async function invokeProject0<TOperation extends 'address' | 'verify'>(
   command: ProcessAdapterCommand,
   invoke: JsonProcessInvoker,
   request: Record<string, unknown>,
-  expectedOperation: 'address' | 'verify',
-): Promise<WorldAdapterResult<{ operation: 'address' | 'verify'; record: Project0Record }>> {
+  expectedOperation: TOperation,
+): Promise<WorldAdapterResult<{ operation: TOperation; record: Project0Record }>> {
   const response = await invoke(command, request);
-  if (!response.ok) {
+  if (response.ok === false) {
     return { ok: false, kind: 'transport', code: response.kind };
   }
   if (!isRecord(response.value)) {
@@ -73,29 +73,25 @@ export function createProject0Adapter(
 ) {
   return {
     async address(body: unknown): Promise<WorldAdapterResult<{ operation: 'address'; record: Project0Record }>> {
-      const result = await invokeProject0(command, invoke, {
+      return await invokeProject0(command, invoke, {
         schema: 'project0/world-encounter-stdio/v0.1',
         operation: 'address',
         recordType: 'exchange_envelope',
         body,
       }, 'address');
-      if (!result.ok) return result;
-      return { ok: true, value: { operation: 'address', record: result.value.record } };
     },
 
     async verify(
       expectedRef: string,
       body: unknown,
     ): Promise<WorldAdapterResult<{ operation: 'verify'; record: Project0Record }>> {
-      const result = await invokeProject0(command, invoke, {
+      return await invokeProject0(command, invoke, {
         schema: 'project0/world-encounter-stdio/v0.1',
         operation: 'verify',
         recordType: 'exchange_envelope',
         expectedRef,
         body,
       }, 'verify');
-      if (!result.ok) return result;
-      return { ok: true, value: { operation: 'verify', record: result.value.record } };
     },
   };
 }
