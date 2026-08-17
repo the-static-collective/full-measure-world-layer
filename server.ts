@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { initialSeedStore } from './src/lib/initialData.js';
 import { authorizePledgeTransition } from './src/lib/pledgeAuthority.js';
+import { createWorldRuntimeServices } from './src/lib/worldRuntime/services.js';
+import { createWorldRuntimeHttpHandlers } from './src/lib/worldRuntime/http.js';
+import { registerWorldRuntimeRoutes } from './src/lib/worldRuntime/routes.js';
 import {
   JubileeDataStore,
   Offer,
@@ -91,6 +94,10 @@ function getActorId(req: Request): string {
 async function startServer() {
   const app = express();
   app.use(express.json());
+
+  const worldRuntimeServices = createWorldRuntimeServices(process.env, process.platform);
+  const worldRuntimeHttp = createWorldRuntimeHttpHandlers(worldRuntimeServices);
+  registerWorldRuntimeRoutes(app, worldRuntimeHttp);
 
   // Log requests
   app.use((req, res, next) => {
