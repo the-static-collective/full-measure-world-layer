@@ -1,6 +1,5 @@
-import { createHash } from 'node:crypto';
-
 import type { WorldEncounterResidue } from '../worldRuntime/types.js';
+import { sha256Hex } from './sha256.js';
 
 const INFLUENCE_PROFILE = 'full-measure.residual-influence/v0.1' as const;
 const DESCENDANT_PROFILE = 'full-measure.declared-freedom-proposal/v0.1' as const;
@@ -145,12 +144,8 @@ function normalizedRefs(values: readonly string[]): string[] {
   );
 }
 
-function sha256(value: string): string {
-  return createHash('sha256').update(value).digest('hex');
-}
-
 function stableRef(prefix: string, tuple: readonly unknown[]): string {
-  return `${prefix}:sha256:${sha256(JSON.stringify(tuple))}`;
+  return `${prefix}:sha256:${sha256Hex(JSON.stringify(tuple))}`;
 }
 
 function bodyEntries(
@@ -214,7 +209,7 @@ function mutatePrimitive(
     return value + 1;
   }
   if (typeof value === 'string') {
-    return `${value}~${sha256(`${seed}:${key}`).slice(0, 6)}`;
+    return `${value}~${sha256Hex(`${seed}:${key}`).slice(0, 6)}`;
   }
   throw new CollisionSpecimenError(
     `unsupported ancestor value for dimension: ${key}`,
@@ -281,7 +276,7 @@ export function createDeclaredFreedomProposal(
     }
   }
 
-  const selector = sha256(
+  const selector = sha256Hex(
     `${request.seed}:${request.policyVersion}:${request.ancestor.proposalRef}:${request.parentResidueRef}`,
   );
   const selectedIndex =
