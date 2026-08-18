@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, NavTab } from './components/Navbar';
 import { FullMeasureView } from './components/FullMeasureView';
+import { HumanTerminalPanel } from './components/HumanTerminalPanel';
 import { WorldEncounterPanel } from './components/WorldEncounterPanel';
 import { BasketView } from './components/BasketView';
 import { ProjectsView } from './components/ProjectsView';
@@ -12,6 +13,7 @@ import { ArrivalModal } from './components/ArrivalModal';
 import { BringAFriendModal } from './components/BringAFriendModal';
 import { JoinCircleModal } from './components/JoinCircleModal';
 import { api, getCurrentUserId } from './lib/api';
+import type { WorldEncounterResidue } from './lib/worldRuntime/types';
 import {
   Profile,
   Offer,
@@ -26,6 +28,7 @@ import {
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('campfire');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [lastWorldResidue, setLastWorldResidue] = useState<WorldEncounterResidue | null>(null);
 
   // Store data
   const [circle, setCircle] = useState<Circle | null>(null);
@@ -126,6 +129,13 @@ export default function App() {
     setActiveTab(tab);
   };
 
+  const handleBeginWorldCrossing = () => {
+    document.getElementById('world-threshold')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#fbf8f3] text-[#2c2825] flex flex-col font-sans selection:bg-amber-200">
       {/* Navigation Header & Bottom Mobile Bar */}
@@ -152,7 +162,11 @@ export default function App() {
           <>
             {activeTab === 'campfire' && (
               <>
-                <WorldEncounterPanel />
+                <HumanTerminalPanel
+                  lastResidueRef={lastWorldResidue?.residueRef}
+                  onBeginCrossing={handleBeginWorldCrossing}
+                />
+                <WorldEncounterPanel onResidue={setLastWorldResidue} />
                 <FullMeasureView
                   offers={offers}
                   projects={projects}
