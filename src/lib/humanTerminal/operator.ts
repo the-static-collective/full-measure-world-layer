@@ -1,3 +1,4 @@
+import { deriveResidualInfluence } from '../collisionSpecimen/index.js';
 import {
   createWorldRuntimeClient,
   worldRuntimeClient,
@@ -61,6 +62,20 @@ function residueLines(residue: WorldEncounterResidue): string[] {
   if (residue.unresolvedRefs.length > 0) {
     lines.push(`Unresolved refs remain: ${residue.unresolvedRefs.join(', ')}.`);
   }
+
+  if (
+    residue.outcomeClass === 'refused' ||
+    residue.outcomeClass === 'indeterminate'
+  ) {
+    const influence = deriveResidualInfluence(residue);
+    lines.push(
+      influence.effect.kind === 'attention-cue'
+        ? 'Residual influence: historical attention cue.'
+        : 'Residual influence: unresolved frontier.',
+    );
+    lines.push('Authority: none; current reachability is unchanged.');
+  }
+
   return lines;
 }
 
