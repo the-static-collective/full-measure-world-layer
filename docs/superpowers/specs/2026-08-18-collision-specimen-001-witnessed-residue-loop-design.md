@@ -58,7 +58,9 @@ Residue is historical presence after the attempted crossing is no longer occurri
 
 ### Witness Session
 
-Attempt, confirmation, destination disposition, residue, later projection, optional descendant proposal, and re-entry remain separate lifecycle stages. Later stages do not rewrite earlier claims.
+Attempt, confirmation, destination disposition, residue, later projection, and optional descendant proposal remain separate lifecycle stages. Later stages do not rewrite earlier claims.
+
+Re-entry is deliberately **not** inserted back into the same witness session that it cites. The re-entry seed is derived from a finalized source session and names that `sourceSessionRef`; making the seed part of that same session would create a circular identity dependency. A later independent witness may attest to a re-entry event, but v0.1 keeps the source session and the reconstruction artifact distinct.
 
 ### Declared-Freedom Descendant
 
@@ -122,26 +124,17 @@ That absence is part of the proof. Residue cannot authorize through a module tha
 
 ## Proposed module boundary
 
-Use one Full Measure-local experimental module, initially:
+Use one Full Measure-local experimental module. The implementation may keep the public collision transforms together while isolating a browser-safe identity helper where transport compatibility requires it.
 
 ```text
 src/lib/collisionSpecimen/
-  types.ts
-  identity.ts
-  influence.ts
-  descendant.ts
-  witnessSession.ts
-  reentry.ts
   index.ts
+  sha256.ts
 ```
 
-The exact file split may collapse during implementation if smaller is clearer. The invariant is one module of pure deterministic transforms with no donor/process dependencies.
+The invariant is one local collision surface of pure deterministic transforms with no donor/process dependencies.
 
-Tests belong in the existing Node suite, for example:
-
-```text
-tests/collision-specimen.test.ts
-```
+Tests belong in the existing Node suite.
 
 No new persistence service is required in v0.1.
 
@@ -165,7 +158,7 @@ Eligibility is part of the semantic test, not incidental validation.
 
 The specimen needs deterministic **local** refs for replay testing. It does not need another global canonicalizer.
 
-Implementation should derive each local ref from an explicitly constructed fixed-order tuple rather than introducing a generic canonical JSON system. Set-like lists used in identities must be normalized by the local contract (deduplicated and lexically sorted) before tuple construction.
+Implementation derives each local ref from an explicitly constructed fixed-order tuple rather than introducing a generic canonical JSON system. Set-like lists used in identities are normalized by the local contract (deduplicated and lexically sorted) before tuple construction.
 
 Conceptually:
 
@@ -182,7 +175,7 @@ const tuple = [
 ] as const;
 ```
 
-SHA-256 over the fixed serialized tuple may yield a ref such as:
+SHA-256 over the fixed serialized tuple yields a ref such as:
 
 ```text
 collision-influence:sha256:<digest>
@@ -190,7 +183,7 @@ collision-influence:sha256:<digest>
 
 The meaning is intentionally narrow: **same declared Full Measure-local specimen input under the same versioned profile**. It is not a Project0 canonical address and must not be presented as one.
 
-Because the read-only influence projection is consumed by the browser-bundled Human Terminal, the implementation uses a small synchronous browser-safe SHA-256 helper rather than Node-only `node:crypto`. Standard UTF-8 SHA-256 vectors are pinned in repository tests. This changes transport compatibility only; the identity profile and digest algorithm remain SHA-256.
+Because the read-only influence projection is consumed by the browser-bundled Human Terminal, implementation uses a small synchronous browser-safe SHA-256 helper rather than Node-only `node:crypto`. Standard UTF-8 SHA-256 vectors are pinned in repository tests. This changes transport compatibility only; the identity profile and digest algorithm remain SHA-256.
 
 ## Residual influence projection
 
@@ -357,8 +350,7 @@ type CollisionWitnessStage =
   | 'disposed'
   | 'residue-recorded'
   | 'projection-derived'
-  | 'descendant-proposed'
-  | 'reentry-derived';
+  | 'descendant-proposed';
 
 interface CollisionWitnessEntry {
   stage: CollisionWitnessStage;
@@ -383,7 +375,7 @@ lifecycle stage
 claim/provenance class
 ```
 
-A proposal does not become evidence because it appears later. A refused disposition does not become authority because it produced durable residue. Re-entry does not become occurrence because it happened after the original session.
+A proposal does not become evidence because it appears later. A refused disposition does not become authority because it produced durable residue.
 
 The session is append-like: later entries do not rewrite earlier entries.
 
@@ -439,23 +431,9 @@ The test fails if reconstruction invents missing detail, requires undeclared amb
 
 Prefer the existing Human Terminal / residue-inspection seam because it already explains evidence without creating authority.
 
-A minimal application-facing result may add an optional experimental block:
+The v0.1 implementation keeps this even smaller than the earlier optional-block sketch: Human Terminal derives the eligible residue's influence locally and appends only two explanatory lines. It does not widen moves, evidence refs, reachability, authority, or crossing behavior.
 
-```ts
-{
-  residue: WorldEncounterResidue,
-  collisionSpecimen?: {
-    influence: ResidualInfluence,
-    witnessSession: CollisionWitnessSession,
-    reentrySeed: CollisionReentrySeed,
-    descendantProposal?: DeclaredFreedomProposal
-  }
-}
-```
-
-If changing the existing response creates unnecessary compatibility risk, a new **read-only** Full Measure route/operator intent scoped to the specimen is acceptable. It must reuse existing residue lookup and must not duplicate the crossing execution path.
-
-Human-facing status should remain explicit:
+Human-facing status remains explicit:
 
 ```text
 Prior encounter: refused
@@ -477,17 +455,15 @@ Current reachability: unchanged
 
 The collision module fails closed for malformed or ineligible input.
 
-Required distinguishable local errors:
+Distinguishable local errors include:
 
 - ineligible outcome (`admitted`, `validation-failed`, `failed`);
-- missing residue lineage required by the projection;
-- missing/invalid ancestor fixture for descendant generation;
-- descendant change outside `allowedDimensions`;
-- mismatch between declared and actual `changedDimensions`;
+- mismatched residue/influence lineage;
+- missing/invalid ancestor fixture dimensions for descendant generation;
+- descendant freedom-accounting failure;
 - empty/unknown policy version;
 - re-entry profile mismatch;
-- re-entry seed missing required relation refs;
-- unsupported value type in a deterministic identity tuple.
+- re-entry seed missing required relation refs.
 
 These are local contract errors. They must not be reclassified as destination refusal or Project0 validation failure.
 
@@ -519,7 +495,7 @@ Given one stable indeterminate residue:
 
 Same declared input under the same profile produces byte-equivalent derived projection data and identical local refs.
 
-Set-like input order differences that normalize to the same set produce the same identity.
+Set-like input order differences that normalize to the same set produce the same identity. Standard SHA-256 vectors guard the browser-safe digest implementation.
 
 ### 4. Descendant freedom accounting
 
@@ -534,9 +510,7 @@ Using a bounded synthetic ancestor fixture:
 
 ### 5. No-authority negative control
 
-The collision module exposes no execution/confirmation port. Application integration must still require the existing prepare -> explicit-confirm path for any later crossing.
-
-Tests should prove collision artifacts cannot be accepted where confirmation/capability/destination authority is expected merely because their object shape is available.
+The collision module exposes no execution/confirmation port. Application integration still requires the existing prepare -> explicit-confirm path for any later crossing. Human Terminal inspection returns no crossing moves from residue influence.
 
 ### 6. Witness-stage orthogonality
 
@@ -547,7 +521,6 @@ disposed             -> evidence
 residue-recorded     -> evidence
 projection-derived   -> evidence of derivation; projection authority none
 descendant-proposed  -> proposal
-reentry-derived      -> evidence of reconstruction, not occurrence
 ```
 
 An indeterminate disposition remains `uncertainty`.
@@ -578,15 +551,13 @@ Existing world-runtime, Garden, and Human Terminal tests must remain green.
 
 ## Riqor evidence plan
 
-Implementation should run under one repository-scoped Riqor evidence run with the goal:
+The intended Riqor goal is:
 
 ```text
 Prove Collision Specimen 001 derives deterministic non-authoritative influence, witness, fixture-descendant, and re-entry artifacts from refused/indeterminate Full Measure residue without mutating constituted state or authority.
 ```
 
-After the final mutation, verification must be fresh. Earlier passing tests do not remain completion evidence after later source changes.
-
-Riqor is evidence orchestration for repository state; it is not part of the application runtime contract and acquires no application authority.
+This ChatGPT harness could not establish a local repository checkout because outbound DNS is unavailable, so an actual local Riqor CLI run was not manufactured. Repository execution evidence is instead preserved by the PR's GitHub Actions RED/GREEN history and final repository checks. Riqor remains an evidence discipline here, not a falsely claimed runtime witness.
 
 ## GitBook boundary
 
@@ -605,7 +576,7 @@ The published evidence should record:
 
 Passing one Full Measure specimen does not automatically graduate Ghost, Witness Session, Declared Witness Channels, Declared-Freedom Descendant, Refusal Topology, or World Re-entry into shared law.
 
-A design-only GitBook projection before implementation, if created, must remain explicitly marked as frontier/design and point back to the repository-owned spec rather than claiming evidence.
+The existing GitBook CR #78 remains a frontier/design projection until the repository PR is landed and exact merge evidence exists.
 
 ## Google Drive role
 
