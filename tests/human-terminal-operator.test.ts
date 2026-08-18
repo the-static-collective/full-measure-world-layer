@@ -137,6 +137,65 @@ test('residue projection preserves exact outcome class and exact evidence refs',
   assert.equal(output.lines.join(' ').includes('refused'), false);
 });
 
+test('plain-human residue copy keeps all destination outcome classes distinct', async () => {
+  const cases = [
+    {
+      outcomeClass: 'admitted' as const,
+      constitutedDestinationRefs: ['corpus:output-a'],
+      expected: /Admitted destination refs: corpus:output-a/i,
+      forbidden: /refused|failed operationally|frontier remains unresolved/i,
+    },
+    {
+      outcomeClass: 'refused' as const,
+      constitutedDestinationRefs: [],
+      expected: /destination evaluated the encounter and refused it/i,
+      forbidden: /failed operationally|frontier remains unresolved|destination was not invoked/i,
+    },
+    {
+      outcomeClass: 'indeterminate' as const,
+      constitutedDestinationRefs: [],
+      expected: /frontier remains unresolved/i,
+      forbidden: /refused it|failed operationally|destination was not invoked/i,
+    },
+    {
+      outcomeClass: 'failed' as const,
+      constitutedDestinationRefs: [],
+      expected: /failed operationally/i,
+      forbidden: /refused it|frontier remains unresolved|destination was not invoked/i,
+    },
+  ];
+
+  for (const [index, scenario] of cases.entries()) {
+    const residueRef = `world-residue:${String(index + 2).padStart(6, '0')}`;
+    const fixture = fakeFetch([
+      {
+        status: 200,
+        body: {
+          residue: {
+            residueRef,
+            sourceFieldRef: FIELD.fieldRef,
+            doorRef: CORPUS_DOOR.doorRef,
+            crossingRef: `world-crossing:${String(index + 2).padStart(6, '0')}`,
+            outcomeClass: scenario.outcomeClass,
+            evidenceRefs: [`evidence:${scenario.outcomeClass}`],
+            unresolvedRefs: [],
+            returnRefs: [],
+            constitutedDestinationRefs: scenario.constitutedDestinationRefs,
+          },
+        },
+      },
+    ]);
+    const operator = createHumanTerminalOperator(createWorldRuntimeClient(fixture.fetcher));
+    const output = await operator.execute({ kind: 'inspect-residue', residueRef });
+    const copy = output.lines.join(' ');
+
+    assert.equal(output.outcomeClass, scenario.outcomeClass);
+    assert.match(copy, scenario.expected);
+    assert.doesNotMatch(copy, scenario.forbidden);
+    assert.deepEqual(output.evidenceRefs, [`evidence:${scenario.outcomeClass}`]);
+  }
+});
+
 test('begin-crossing is a handoff and performs zero HTTP calls', async () => {
   const fixture = fakeFetch([]);
   const operator = createHumanTerminalOperator(createWorldRuntimeClient(fixture.fetcher));
