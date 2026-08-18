@@ -2,8 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  createCollisionReentrySeed,
+  createCollisionWitnessSession,
   createDeclaredFreedomProposal,
   deriveResidualInfluence,
+  reconstructCollisionRelation,
 } from '../src/lib/collisionSpecimen/index.js';
 import type { WorldEncounterResidue } from '../src/lib/worldRuntime/types.js';
 
@@ -23,6 +26,20 @@ function residue(
     constitutedDestinationRefs: [],
     ...overrides,
   };
+}
+
+function descendant(parentResidueRef = 'world-residue:000021') {
+  return createDeclaredFreedomProposal({
+    parentResidueRef,
+    ancestor: {
+      proposalRef: 'proposal:ancestor:001',
+      body: { tone: 'quiet', count: 2, enabled: false },
+    },
+    invocationReason: 'human-requested-alternative',
+    policyVersion: 'full-measure.fixture-one-step/v0.1',
+    allowedDimensions: ['tone', 'enabled'],
+    seed: 'seed-001',
+  });
 }
 
 test('refused residue derives a non-authoritative attention cue without mutating history', () => {
@@ -146,4 +163,93 @@ test('declared-freedom descendant rejects empty freedom, unknown policy, and mis
       }),
     /ancestor dimension is missing/,
   );
+});
+
+test('witness session preserves lifecycle order and keeps descendant proposal non-authoritative', () => {
+  const refused = residue('refused');
+  const influence = deriveResidualInfluence(refused);
+  const proposal = descendant(refused.residueRef);
+
+  const session = createCollisionWitnessSession({
+    attemptRef: 'attempt:001',
+    confirmationRef: 'confirmation:001',
+    dispositionRef: 'disposition:001',
+    residue: refused,
+    influence,
+    descendantProposal: proposal,
+  });
+
+  assert.deepEqual(
+    session.entries.map((entry) => entry.stage),
+    [
+      'attempted',
+      'confirmed',
+      'disposed',
+      'residue-recorded',
+      'projection-derived',
+      'descendant-proposed',
+    ],
+  );
+  assert.equal(
+    session.entries.find((entry) => entry.stage === 'disposed')?.claimClass,
+    'evidence',
+  );
+  assert.equal(
+    session.entries.find((entry) => entry.stage === 'projection-derived')?.authority,
+    'none',
+  );
+  assert.equal(
+    session.entries.find((entry) => entry.stage === 'descendant-proposed')?.claimClass,
+    'proposal',
+  );
+  assert.equal(
+    session.entries.find((entry) => entry.stage === 'descendant-proposed')?.authority,
+    'none',
+  );
+});
+
+test('indeterminate witness disposition remains uncertainty', () => {
+  const unresolved = residue('indeterminate');
+  const session = createCollisionWitnessSession({
+    attemptRef: 'attempt:002',
+    confirmationRef: 'confirmation:002',
+    dispositionRef: 'disposition:002',
+    residue: unresolved,
+    influence: deriveResidualInfluence(unresolved),
+  });
+
+  assert.equal(
+    session.entries.find((entry) => entry.stage === 'disposed')?.claimClass,
+    'uncertainty',
+  );
+});
+
+test('re-entry reconstructs only the surviving relation graph and never impersonates occurrence', () => {
+  const refused = residue('refused');
+  const influence = deriveResidualInfluence(refused);
+  const proposal = descendant(refused.residueRef);
+  const session = createCollisionWitnessSession({
+    attemptRef: 'attempt:001',
+    confirmationRef: 'confirmation:001',
+    dispositionRef: 'disposition:001',
+    residue: refused,
+    influence,
+    descendantProposal: proposal,
+  });
+
+  const seed = createCollisionReentrySeed({
+    session,
+    residue: refused,
+    influence,
+    descendantProposal: proposal,
+  });
+  const reconstructed = reconstructCollisionRelation(seed);
+
+  assert.equal(seed.reconstructionClaim, 'reentry-not-occurrence');
+  assert.equal(reconstructed.reconstructionClaim, 'reentry-not-occurrence');
+  assert.deepEqual(reconstructed.relationRefs, seed.relationRefs);
+  assert.equal(reconstructed.outcomeClass, 'refused');
+  assert.equal(reconstructed.authority, 'none');
+  assert.equal('proposalBody' in reconstructed, false);
+  assert.equal('destinationBody' in reconstructed, false);
 });
