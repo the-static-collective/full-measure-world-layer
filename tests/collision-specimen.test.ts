@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  createDeclaredFreedomProposal,
   deriveResidualInfluence,
 } from '../src/lib/collisionSpecimen/index.js';
 import type { WorldEncounterResidue } from '../src/lib/worldRuntime/types.js';
@@ -74,4 +75,75 @@ test('admitted, validation-failed, and failed residue are ineligible collision i
       /ineligible collision outcome/,
     );
   }
+});
+
+test('declared-freedom descendant changes exactly one allowed ancestor dimension deterministically', () => {
+  const ancestor = {
+    proposalRef: 'proposal:ancestor:001',
+    body: { tone: 'quiet', count: 2, enabled: false },
+  } as const;
+  const ancestorSnapshot = structuredClone(ancestor);
+  const request = {
+    parentResidueRef: 'world-residue:000021',
+    ancestor,
+    invocationReason: 'human-requested-alternative',
+    policyVersion: 'full-measure.fixture-one-step/v0.1',
+    allowedDimensions: ['tone', 'enabled'],
+    seed: 'seed-001',
+  } as const;
+
+  const first = createDeclaredFreedomProposal(request);
+  const second = createDeclaredFreedomProposal(request);
+
+  assert.equal(first.authority, 'none');
+  assert.equal(first.admission, 'required');
+  assert.equal(first.changedDimensions.length, 1);
+  assert.ok(first.allowedDimensions.includes(first.changedDimensions[0]));
+  assert.equal(first.ancestorProposalRef, ancestor.proposalRef);
+  assert.equal(first.parentResidueRef, request.parentResidueRef);
+  assert.deepEqual(ancestor, ancestorSnapshot);
+  assert.deepEqual(first, second);
+
+  const changedKeys = Object.keys(ancestor.body).filter(
+    (key) =>
+      first.proposal[key] !==
+      ancestor.body[key as keyof typeof ancestor.body],
+  );
+  assert.deepEqual(changedKeys, first.changedDimensions);
+});
+
+test('declared-freedom descendant rejects empty freedom, unknown policy, and missing ancestor dimensions', () => {
+  const ancestor = {
+    proposalRef: 'proposal:ancestor:001',
+    body: { tone: 'quiet', count: 2, enabled: false },
+  };
+  const base = {
+    parentResidueRef: 'world-residue:000021',
+    ancestor,
+    invocationReason: 'human-requested-alternative',
+    policyVersion: 'full-measure.fixture-one-step/v0.1',
+    seed: 'seed-001',
+  };
+
+  assert.throws(
+    () => createDeclaredFreedomProposal({ ...base, allowedDimensions: [] }),
+    /allowed dimensions are required/,
+  );
+  assert.throws(
+    () =>
+      createDeclaredFreedomProposal({
+        ...base,
+        policyVersion: 'unknown/v0.1',
+        allowedDimensions: ['tone'],
+      }),
+    /unknown descendant policy/,
+  );
+  assert.throws(
+    () =>
+      createDeclaredFreedomProposal({
+        ...base,
+        allowedDimensions: ['missing'],
+      }),
+    /ancestor dimension is missing/,
+  );
 });
