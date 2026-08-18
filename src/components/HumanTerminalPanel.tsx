@@ -50,7 +50,7 @@ export function HumanTerminalPanel({ lastResidueRef, onBeginCrossing }: Props = 
       lastResidueRef,
       evidenceRefs: output?.evidenceRefs,
     });
-    if (!interpretation.recognized) {
+    if (interpretation.recognized === false) {
       setUnknownInput(interpretation.normalizedInput);
       return;
     }
