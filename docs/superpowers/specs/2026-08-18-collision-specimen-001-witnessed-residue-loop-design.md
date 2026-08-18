@@ -6,9 +6,9 @@
 
 ## Design sentence
 
-> Prove that a refused or indeterminate Full Measure encounter may leave deterministic, attributable residue that influences a later projection and may seed one explicitly declared neighboring proposal, while changing neither constituted state nor authority.
+> Prove that a refused or indeterminate Full Measure encounter may leave deterministic, attributable residue that influences a later read-only projection and may seed one explicitly declared neighboring proposal, while changing neither constituted state nor authority.
 
-## Why this belongs in Full Measure
+## Existing floor
 
 Full Measure already owns the inhabited world projection and the application-level composition seam around Boot the House:
 
@@ -23,74 +23,72 @@ human
   -> Full Measure residue / changed projection
 ```
 
-That existing runtime already preserves the distinctions this specimen needs:
+The current runtime already preserves the distinctions this specimen needs:
 
 - validation failure is not destination refusal;
 - refusal is not indeterminate;
 - host/donor failure is not refusal;
 - only an admitted encounter may carry constituted destination refs;
 - residue is inspectable after an encounter without becoming destination authority;
-- Human Terminal is already a read-only/operator projection over Full Measure contracts rather than a second execution plane.
+- Human Terminal is a projection over existing Full Measure contracts rather than a second execution plane.
 
-The experiment therefore belongs next to the existing world-runtime and operator projections. Creating another repository, global memory layer, or shared primitive package would make the experiment less trustworthy because it would introduce a new authority surface before the local law has been proven.
+The experiment therefore belongs downstream of existing `WorldEncounterResidue` and upstream of read-only explanation. No donor contract needs to change.
 
 ## Question under test
 
-The current runtime proves that failed or refused history can be remembered without being constituted as destination state.
+The current runtime proves that non-success can be remembered without being constituted as destination state.
 
-This specimen tests the stronger claim:
+Collision Specimen 001 tests the stronger claim:
 
 > **Can remembered non-success affect what becomes visible or thinkable next without becoming permission, truth, reachability, or authority?**
 
-A successful specimen must make that claim mechanically falsifiable.
+The claim must be mechanically falsifiable.
 
 ## Primitive collision
 
-The experiment deliberately places several incubating ideas in one bounded field without declaring them equivalent:
+The specimen places several incubating ideas in one bounded field without declaring them equivalent.
 
 ### Refusal Topology / Influence Without Authority
 
-A refused or indeterminate encounter may remain queryable and may shape later attention. Its residue cannot mutate constituted state, grant a capability, or inherit the authority of the constitutional boundary that produced it.
+A refused or indeterminate encounter may remain queryable and shape later attention. Its residue cannot mutate constituted state, grant capability, or inherit the authority of the boundary that produced it.
 
 ### Ghost
 
-The residue is historical presence after the attempted crossing is no longer occurring. It may remain perceptible. It must not counterfeit current presence or current authority.
+Residue is historical presence after the attempted crossing is no longer occurring. It may remain perceptible without counterfeiting current presence or current authority.
 
 ### Witness Session
 
-The experiment preserves multiple lifecycle claims rather than flattening them into one result. Attempt, confirmation, destination disposition, residue, later projection, and optional descendant proposal remain separately attributable stages.
+Attempt, confirmation, destination disposition, residue, later projection, optional descendant proposal, and re-entry remain separate lifecycle stages. Later stages do not rewrite earlier claims.
 
 ### Declared-Freedom Descendant
 
-A later neighboring proposal may cite residue as ancestry or pressure only when generation is explicitly invoked under a declared policy. The proposal must name what dimensions were allowed to vary and what changed. It remains a proposal requiring ordinary admission.
+A neighboring proposal may cite residue as causal pressure only when generation is explicitly invoked against an explicitly declared ancestor proposal. The result must declare which dimensions were permitted to vary and which changed. It remains a proposal requiring ordinary admission elsewhere.
 
 ### World Re-entry Memory
 
-A compact re-entry seed should preserve enough truthful relation to reconstruct the specimen's navigable local projection in a fresh run. Re-entry is reconstruction from declared surviving relation, not a claim that the original encounter occurred again.
+A compact re-entry seed preserves enough truthful relation to reconstruct the specimen's **navigable relation graph** in a fresh local reader. It does not recreate vanished event bodies and does not claim the original encounter occurred again.
 
 ## Approaches considered
 
 ### A. Extend `WorldEncounterResidue` into a universal residue object
 
-This would add influence, generation, witness, and re-entry fields directly to the existing world-runtime residue model.
+Add influence, generation, witness, and re-entry fields directly to the existing world-runtime residue type.
 
-**Rejected for the first specimen.** It would make an experimental projection look constitutional merely because it sits inside an established runtime type. It would also overload one object with persistence, evidence, projection, generation, and reconstruction semantics.
+**Rejected.** It would make an experimental projection look constitutional merely because it lives inside an established runtime type and would overload persistence with projection/generation semantics.
 
-### B. Create a new cross-repository witness/residue package
+### B. Create a cross-repository witness/residue package now
 
-This would attempt to define a shared Static Collective protocol immediately and have Full Measure consume it.
+Define a shared Static Collective protocol and make Full Measure its first consumer.
 
-**Rejected.** The incubator explicitly has not earned a shared schema yet. A universal package would collapse domain-specific triggers and authority meanings before two materially different specimens prove a common contract.
+**Rejected.** The incubating concepts have not earned a shared schema. A universal package would flatten domain-specific triggers and authority semantics before independent specimens exist.
 
-### C. Add a Full Measure-local experimental projection layer over existing residue
+### C. Add a Full Measure-local projection layer over existing residue
 
-This approach leaves `WorldEncounterResidue` and donor contracts unchanged. A small local module consumes existing residue by reference and derives experimental, non-authoritative projections and receipts.
+Leave `WorldEncounterResidue` and donor contracts unchanged. A small local module consumes existing residue by reference and derives experimental, non-authoritative artifacts.
 
-**Selected.** It creates the smallest falsifiable collision while preserving the current constitutional floor. If the experiment fails, the existing world runtime remains intact. If it succeeds, later domains can test the same law independently before any shared abstraction is considered.
+**Selected.** It creates the smallest falsifiable collision while preserving the current constitutional floor. Failure leaves Boot the House intact; success can later be tested independently in another domain.
 
 ## Architectural boundary
-
-The specimen is downstream of the existing encounter and upstream of human-facing explanation only:
 
 ```text
 existing constitutional path
@@ -107,8 +105,8 @@ prepare
                     Collision Specimen 001
                      /       |        \
                     /        |         \
-          influence view   witness    optional
-              projection    session    descendant
+          influence view   witness    optional fixture
+              projection    session    descendant proof
                     \        |         /
                      \       |        /
                       compact re-entry seed
@@ -118,9 +116,9 @@ prepare
                     Garden / Human Terminal
 ```
 
-The collision layer has no port capable of calling Corpus OS, Project0, TranchNode, a shell, or a crossing confirmation endpoint. It receives already-produced evidence and returns projection/evidence objects only.
+The collision layer has **no port** capable of calling Corpus OS, Project0, TranchNode, shell/process execution, or a crossing confirmation endpoint. It receives already-produced evidence and returns projection/evidence objects only.
 
-That absence is intentional. The easiest way to prove residue cannot authorize is to give the residue-processing module no execution capability to begin with.
+That absence is part of the proof. Residue cannot authorize through a module that possesses no execution capability.
 
 ## Proposed module boundary
 
@@ -137,15 +135,15 @@ src/lib/collisionSpecimen/
   index.ts
 ```
 
-The exact file split may be simplified during implementation if individual files would be trivial. The important boundary is one importable module with pure deterministic transforms and no donor/process dependencies.
+The exact file split may collapse during implementation if smaller is clearer. The invariant is one module of pure deterministic transforms with no donor/process dependencies.
 
-Tests should live beside the repository's existing Node test suite, for example:
+Tests belong in the existing Node suite, for example:
 
 ```text
 tests/collision-specimen.test.ts
 ```
 
-No new persistence service is required for v0.1. The input residue is already persistent for the lifetime of the current Full Measure runtime; derived specimen artifacts may be computed deterministically and returned/read through the existing application surface.
+No new persistence service is required in v0.1.
 
 ## Input eligibility
 
@@ -157,47 +155,44 @@ refused | indeterminate
 
 It deliberately excludes:
 
-- `admitted` — constituted destination output belongs to the normal successful-world path;
-- `validation-failed` — the destination was not lawfully invoked, so treating it as a destination refusal would lie;
-- `failed` — transport/donor failure does not establish a constitutional refusal or unresolved destination disposition.
+- `admitted` — successful destination state belongs to the normal constituted-world path;
+- `validation-failed` — the destination was not lawfully invoked, so treating this as destination refusal would lie;
+- `failed` — transport/donor failure does not establish either constitutional refusal or unresolved destination disposition.
 
-This distinction is part of the test, not incidental validation.
+Eligibility is part of the semantic test, not incidental validation.
 
-## Local identity rule
+## Local deterministic identity
 
-The experiment needs deterministic local identities so replay can be tested. It does **not** need a second global canonical identity system.
+The specimen needs deterministic **local** refs for replay testing. It does not need another global canonicalizer.
 
-Derived refs should be computed from a stable, explicitly ordered local input envelope containing only declared specimen fields and a versioned local identity profile.
+Implementation should derive each local ref from an explicitly constructed fixed-order tuple rather than introducing a generic canonical JSON system. Set-like lists used in identities must be normalized by the local contract (deduplicated and lexically sorted) before tuple construction.
 
-Example conceptual input:
+Conceptually:
 
 ```ts
-{
-  profile: 'full-measure.collision-specimen/v0.1',
-  kind: 'residual-influence',
-  residueRef: 'world-residue:000004',
-  outcomeClass: 'refused',
-  sourceFieldRef: '...',
-  doorRef: '...',
-  crossingRef: '...',
-  evidenceRefs: ['...'],
-  unresolvedRefs: ['...']
-}
+const tuple = [
+  'full-measure.residual-influence/v0.1',
+  residue.residueRef,
+  residue.outcomeClass,
+  residue.sourceFieldRef,
+  residue.doorRef,
+  residue.crossingRef,
+  normalizedEvidenceRefs,
+  normalizedUnresolvedRefs,
+] as const;
 ```
 
-The local helper may use a stable JSON serialization owned by this experimental module and SHA-256 to derive a deterministic ref such as:
+SHA-256 over the fixed serialized tuple may yield a ref such as:
 
 ```text
 collision-influence:sha256:<digest>
 ```
 
-This identity means only "same declared local specimen input under the same versioned profile." It is not a Project0 canonical address and must not be presented as one.
-
-If a later implementation needs globally interoperable identity, that is a separate boundary and should defer to Project0 rather than widening this helper.
+The meaning is intentionally narrow: **same declared Full Measure-local specimen input under the same versioned profile**. It is not a Project0 canonical address and must not be presented as one.
 
 ## Residual influence projection
 
-A refused or indeterminate residue may generate a read-only `ResidualInfluence` projection.
+A refused or indeterminate residue may generate one read-only `ResidualInfluence`.
 
 Conceptual shape:
 
@@ -224,46 +219,46 @@ interface ResidualInfluence {
 
 ### Refused mapping
 
-A refused residue may produce:
+A refused residue produces:
 
 ```text
 effect.kind = attention-cue
 ```
 
-The cue means only that a declared attempt previously encountered a refusal at this relation. It may make the relation more explainable or visible in a later read-only projection.
+The cue means only that a declared attempt previously encountered a refusal at this relation. It may make that historical relation more visible or explainable.
 
 It does **not** mean:
 
-- the door is now reachable;
-- the refusal is universally true outside the witnessed cut;
-- the reason is current forever;
+- the door is now reachable or unreachable;
+- the refusal is universal outside the witnessed cut;
+- the refusal reason is eternally current;
 - a retry is authorized;
-- the system should hide or demote contrary evidence.
+- the cue may suppress contrary evidence.
 
 ### Indeterminate mapping
 
-An indeterminate residue must produce:
+An indeterminate residue produces:
 
 ```text
 effect.kind = unresolved-frontier
 ```
 
-It cannot be silently converted into a refusal cue. The projection should preserve unresolved reason/evidence refs and state that the prior destination disposition was unresolved.
+It cannot be silently converted to refusal. The projection preserves unresolved/evidence refs and states that the prior destination disposition was unresolved.
 
-This distinction is a negative control against narrative neatness.
+This is a deliberate negative control against narrative neatness.
 
 ## Projection effect boundary
 
-The first specimen allows influence to affect only **read-only presentation**.
+The first specimen permits influence to affect **read-only presentation only**.
 
-Permitted examples:
+Permitted:
 
-- Human Terminal can explain that a nearby relation has prior refused residue;
-- residue inspection can surface an unresolved frontier;
-- a later local view may include a weak `historical pressure` / `prior encounter` cue;
-- a human may explicitly choose to inspect or generate a neighboring proposal from that cue.
+- Human Terminal may explain that a relation has prior refused residue;
+- residue inspection may surface an unresolved frontier;
+- a local view may show `prior encounter` / `historical attention` metadata;
+- a human may choose to inspect the residue or explicitly invoke the fixture-only descendant experiment.
 
-Forbidden effects:
+Forbidden:
 
 - changing `WorldDoorProjection.reachability`;
 - changing `WorldDoorProjection.authority`;
@@ -273,19 +268,27 @@ Forbidden effects:
 - altering a destination adapter request;
 - adding `constitutedDestinationRefs`;
 - mutating the original residue;
-- auto-generating a descendant merely because residue exists.
+- automatically generating a descendant because residue exists.
 
-The first implementation should prefer a new read-only response field or operator explanation object rather than rewriting the canonical door projection shape.
+Prefer an additive read-only explanation/specimen block rather than rewriting canonical door projection fields.
 
-## Declared-freedom descendant
+## Declared-freedom descendant sub-proof
 
-A descendant is optional and human- or caller-invoked. Residual influence may make the option visible, but it cannot invoke it automatically.
+The descendant portion is deliberately **fixture-local in v0.1**. It proves freedom accounting and composability; it does not introduce a new product-level proposal generator.
+
+Residue alone does not contain the content of the attempted proposal. Therefore descendant generation must never pretend to reconstruct an ancestor from residue.
+
+The caller supplies an explicit bounded synthetic ancestor fixture alongside the causal residue reference.
 
 Conceptual request:
 
 ```ts
 interface DeclaredFreedomRequest {
   parentResidueRef: string;
+  ancestor: {
+    proposalRef: string;
+    body: Readonly<Record<string, string | number | boolean>>;
+  };
   invocationReason: string;
   policyVersion: string;
   allowedDimensions: string[];
@@ -300,12 +303,13 @@ interface DeclaredFreedomProposal {
   profile: 'full-measure.declared-freedom-proposal/v0.1';
   proposalRef: string;
   parentResidueRef: string;
+  ancestorProposalRef: string;
   invocationReason: string;
   policyVersion: string;
   allowedDimensions: string[];
   changedDimensions: string[];
   seed: string;
-  proposal: unknown;
+  proposal: Readonly<Record<string, string | number | boolean>>;
   authority: 'none';
   admission: 'required';
 }
@@ -313,30 +317,34 @@ interface DeclaredFreedomProposal {
 
 ### Generation law
 
-The generator must be deterministic for the same:
+The same:
 
 ```text
-parent residue
+parent residue ref
++ ancestor proposal ref/body
 + invocation reason
 + policy version
 + allowed dimensions
 + seed
-+ declared input
 ```
 
-It may alter only declared dimensions. `changedDimensions` must be a subset of `allowedDimensions`.
+must produce the same proposal and local identity.
 
-The parent residue and refused/indeterminate history remain unchanged and independently addressable.
+Only keys named in `allowedDimensions` may differ from the ancestor body. `changedDimensions` must equal the actual changed-key set and be a subset of `allowedDimensions`.
 
-### No trigger flattening
+The ancestor fixture and the refused/indeterminate residue remain unchanged and independently addressable.
 
-The local caller must declare why generation was invoked. This generic specimen must not invent that reason from the residue.
+### Trigger boundary
 
-Examples such as `explore-neighbor-after-refusal` or `human-requested-alternative` are calling-layer claims. A future Toaster STOMP invocation or TranchNode lawful bloom may use materially different triggers and should not be relabeled to fit this specimen.
+The caller declares `invocationReason`. The generic helper must not infer why generation happened from the residue.
+
+This prevents the fixture from erasing distinctions among future domain triggers such as human exploration, Toaster STOMP pressure, or a TranchNode refusal-conditioned bloom.
+
+No descendant output is inserted into Garden state, door state, world residue, or constituted state in v0.1.
 
 ## Witness Session
 
-The Witness Session is an evidence envelope over lifecycle stages, not a new adjudicator.
+The Witness Session is an evidence envelope over lifecycle stages, not an adjudicator.
 
 Conceptual shape:
 
@@ -365,7 +373,7 @@ interface CollisionWitnessSession {
 }
 ```
 
-The exact enum names may tighten, but two axes must remain orthogonal:
+Two axes remain orthogonal:
 
 ```text
 lifecycle stage
@@ -373,13 +381,17 @@ lifecycle stage
 claim/provenance class
 ```
 
-A proposal does not become evidence because it appears late in the lifecycle. A refused disposition does not become authority because it produced a durable residue. Re-entry does not become occurrence because it happens after the original session.
+A proposal does not become evidence because it appears later. A refused disposition does not become authority because it produced durable residue. Re-entry does not become occurrence because it happened after the original session.
 
-The session should preserve order and refs; it should not rewrite earlier entries when later evidence appears.
+The session is append-like: later entries do not rewrite earlier entries.
+
+For a projection-derived entry, `claimClass: 'evidence'` means **evidence that the projection was deterministically derived from declared residue**. It does not make the projection itself authoritative; the projection retains `authority: 'none'`.
+
+For an indeterminate destination disposition, the corresponding entry uses `claimClass: 'uncertainty'` rather than laundering the unresolved result into evidence of refusal.
 
 ## Re-entry seed
 
-The first re-entry seed is a compact relation-preserving artifact, not a narrative summary and not a full event archive.
+The first re-entry seed is a compact relation-preserving artifact, not a narrative summary, full event archive, or resurrection mechanism.
 
 Conceptual shape:
 
@@ -389,6 +401,7 @@ interface CollisionReentrySeed {
   reentryRef: string;
   sourceSessionRef: string;
   sourceResidueRef: string;
+  outcomeClass: 'refused' | 'indeterminate';
   relationRefs: {
     sourceFieldRef: string;
     doorRef: string;
@@ -397,22 +410,34 @@ interface CollisionReentrySeed {
     descendantProposalRef?: string;
   };
   evidenceRefs: string[];
+  unresolvedRefs: string[];
   decoderProfile: 'full-measure.collision-reentry/v0.1';
   reconstructionClaim: 'reentry-not-occurrence';
 }
 ```
 
-A fresh local reconstruction consumes the seed and resolves only the declared relational projection that the seed actually carries.
+A fresh local reader consumes the seed and reconstructs a bounded **relation projection** such as:
 
-The re-entry test passes when a fresh process can reconstruct the same specimen relation graph and deterministic derived refs from the seed's declared inputs.
+```text
+source field
+  -> door
+  -> attempted crossing
+  -> refused | indeterminate residue
+  -> influence projection
+  -> optional descendant proposal ref
+```
 
-The test fails if reconstruction requires hidden ambient state, if it silently invents missing historical detail, or if the UI says/implies that the original encounter happened again.
+The fresh reader is not required or permitted to recreate vanished proposal bodies, donor responses, human testimony text, or destination state that the seed does not carry. Missing bodies remain missing.
+
+The re-entry test passes when the seed alone reconstructs the same relation/ref graph and preserves the same epistemic labels without mutable prior-process state.
+
+The test fails if reconstruction invents missing detail, requires undeclared ambient state, or says/implies the original encounter happened again.
 
 ## Read-only application exposure
 
-Prefer the existing Human Terminal / residue-inspection path because it already exists to explain evidence without creating authority.
+Prefer the existing Human Terminal / residue-inspection seam because it already explains evidence without creating authority.
 
-A minimal application-facing result could extend residue inspection with an optional experimental block:
+A minimal application-facing result may add an optional experimental block:
 
 ```ts
 {
@@ -426,9 +451,9 @@ A minimal application-facing result could extend residue inspection with an opti
 }
 ```
 
-If modifying the existing response shape creates unnecessary compatibility risk, expose a new **read-only** Full Measure route or operator intent scoped explicitly to the specimen. Either choice must reuse existing residue lookup and must not duplicate the crossing execution path.
+If changing the existing response creates unnecessary compatibility risk, a new **read-only** Full Measure route/operator intent scoped to the specimen is acceptable. It must reuse existing residue lookup and must not duplicate the crossing execution path.
 
-The product wording should make the epistemic status visible. For example:
+Human-facing status should remain explicit:
 
 ```text
 Prior encounter: refused
@@ -437,7 +462,7 @@ Authority: none
 Current reachability: unchanged
 ```
 
-For an indeterminate specimen:
+or:
 
 ```text
 Prior encounter: unresolved
@@ -448,17 +473,19 @@ Current reachability: unchanged
 
 ## Error handling
 
-The collision module should fail closed and explicitly for malformed or ineligible input.
+The collision module fails closed for malformed or ineligible input.
 
-Required local errors include distinguishable cases for:
+Required distinguishable local errors:
 
 - ineligible outcome (`admitted`, `validation-failed`, `failed`);
 - missing residue lineage required by the projection;
-- descendant changed dimension outside `allowedDimensions`;
+- missing/invalid ancestor fixture for descendant generation;
+- descendant change outside `allowedDimensions`;
+- mismatch between declared and actual `changedDimensions`;
 - empty/unknown policy version;
 - re-entry profile mismatch;
 - re-entry seed missing required relation refs;
-- deterministic identity input containing unsupported/non-stable values.
+- unsupported value type in a deterministic identity tuple.
 
 These are local contract errors. They must not be reclassified as destination refusal or Project0 validation failure.
 
@@ -470,11 +497,11 @@ Implementation follows RED -> observed failure -> minimal GREEN -> broader verif
 
 Given one stable refused `WorldEncounterResidue`:
 
-- derives a deterministic `attention-cue` influence;
+- derives deterministic `attention-cue` influence;
 - preserves source/door/crossing/evidence refs;
 - has `authority: none`;
-- leaves original residue deeply unchanged;
-- leaves door reachability and authority unchanged;
+- leaves the original residue deeply unchanged;
+- leaves door reachability/authority unchanged;
 - produces no constituted destination refs.
 
 ### 2. Indeterminate specimen
@@ -484,105 +511,118 @@ Given one stable indeterminate residue:
 - derives `unresolved-frontier`;
 - preserves unresolved refs;
 - never labels the outcome refused;
-- does not invent a reason beyond the residue evidence.
+- does not invent a reason beyond source evidence.
 
 ### 3. Deterministic replay
 
 Same declared input under the same profile produces byte-equivalent derived projection data and identical local refs.
 
-A changed seed/policy/allowed-dimension declaration changes the descendant identity where appropriate.
+Set-like input order differences that normalize to the same set produce the same identity.
 
 ### 4. Descendant freedom accounting
 
-- `changedDimensions` is a subset of `allowedDimensions`;
-- same parent/policy/seed/input reproduces the same proposal;
-- parent residue is unchanged;
+Using a bounded synthetic ancestor fixture:
+
+- same residue/ancestor/reason/policy/allowed dimensions/seed reproduces the same proposal;
+- only allowed keys change;
+- `changedDimensions` exactly matches actual changed keys;
+- ancestor and residue remain unchanged;
 - proposal carries `authority: none` and `admission: required`;
-- proposal is not inserted into constituted state.
+- proposal is not inserted into constituted or Garden state.
 
 ### 5. No-authority negative control
 
-Attempt to feed `ResidualInfluence`, `DeclaredFreedomProposal`, or `CollisionReentrySeed` into any helper as if it were confirmation or destination authority.
+The collision module exposes no execution/confirmation port. Application integration must still require the existing prepare -> explicit-confirm path for any later crossing.
 
-The collision module must expose no such capability. Application integration must still require the existing prepare/explicit-confirm path for any later crossing.
+Tests should prove collision artifacts cannot be accepted where confirmation/capability/destination authority is expected merely because their object shape is available.
 
 ### 6. Witness-stage orthogonality
 
-A session with a refused disposition plus a later descendant proposal must retain:
+A refused session with a later fixture descendant retains:
 
 ```text
-disposed        -> evidence
-residue-recorded -> evidence
-projection-derived -> evidence/projection
-proposal         -> proposal
-reentry-derived  -> evidence of reconstruction, not occurrence
+disposed             -> evidence
+residue-recorded     -> evidence
+projection-derived   -> evidence of derivation; projection authority none
+descendant-proposed  -> proposal
+reentry-derived      -> evidence of reconstruction, not occurrence
 ```
 
-No later stage may rewrite the earlier claim class.
+An indeterminate disposition remains `uncertainty`.
+
+No later stage rewrites an earlier claim class.
 
 ### 7. Re-entry reconstruction
 
-Serialize one compact seed, construct a fresh local collision reader, and reconstruct the same relation projection and refs without access to mutable prior process state.
+Serialize one compact seed, create a fresh local re-entry reader, and reconstruct the same relation/ref graph using only the seed.
 
-Assert `reconstructionClaim === 'reentry-not-occurrence'` in both stored and reconstructed output.
+Assert:
+
+```text
+reconstructionClaim = reentry-not-occurrence
+```
+
+Missing event/proposal bodies remain absent rather than being fabricated.
 
 ### 8. Regression gate
 
-Run the repository's existing tests plus:
+Run the existing repository checks plus:
 
 ```bash
 npm run check
 ```
 
-The existing world-runtime, Garden, and Human Terminal tests must remain green.
+Existing world-runtime, Garden, and Human Terminal tests must remain green.
 
 ## Riqor evidence plan
 
-Implementation should run under one repository-scoped Riqor evidence run with a specific goal such as:
+Implementation should run under one repository-scoped Riqor evidence run with the goal:
 
 ```text
-Prove Collision Specimen 001 can derive deterministic non-authoritative influence, witness, descendant, and re-entry artifacts from refused/indeterminate Full Measure residue without mutating constituted state or authority.
+Prove Collision Specimen 001 derives deterministic non-authoritative influence, witness, fixture-descendant, and re-entry artifacts from refused/indeterminate Full Measure residue without mutating constituted state or authority.
 ```
 
-After every final mutation, verification must be fresh. A successful earlier test run does not remain completion evidence after later source changes.
+After the final mutation, verification must be fresh. Earlier passing tests do not remain completion evidence after later source changes.
 
-Riqor is evidence orchestration for the repository state; it does not become part of the runtime contract or a source of application authority.
+Riqor is evidence orchestration for repository state; it is not part of the application runtime contract and acquires no application authority.
 
-## GitBook evidence boundary
+## GitBook boundary
 
-GitBook should receive a project-backed **evidence specimen only after** the repository implementation and verification exist.
+GitBook should receive a project-backed **evidence specimen only after** repository implementation and verification exist.
 
-The published note should record:
+The published evidence should record:
 
-- exact Full Measure PR/merge commit;
+- exact Full Measure PR and merge commit;
 - exact verification command/result;
 - one refused specimen and one indeterminate specimen;
-- what influence changed in presentation;
-- proof that reachability/authority/constituted state did not change;
-- descendant freedom accounting if exercised;
-- re-entry reconstruction result;
+- the precise read-only projection effect;
+- proof that reachability, authority, and constituted state did not change;
+- fixture descendant freedom accounting, if exercised;
+- re-entry relation reconstruction result;
 - residual fog and failed hypotheses.
 
 Passing one Full Measure specimen does not automatically graduate Ghost, Witness Session, Declared Witness Channels, Declared-Freedom Descendant, Refusal Topology, or World Re-entry into shared law.
 
+A design-only GitBook projection before implementation, if created, must remain explicitly marked as frontier/design and point back to the repository-owned spec rather than claiming evidence.
+
 ## Google Drive role
 
-Google Drive is **not** canonical for the experiment.
+Google Drive is **not canonical** for the experiment.
 
-If used, it should serve only as a human lab notebook or collection point for screenshots, informal observations, exported receipts, or external human annotations that do not belong in Git or GitBook yet.
+The current Drive search did not reveal an existing canonical Full Measure collision notebook. Drive is therefore optional and should be used only if human field work creates loose material that benefits from a notebook: screenshots, informal observations, exported receipts, or external annotations not ready for Git/GitBook.
 
 Rules:
 
 - GitHub remains canonical for executable source, tests, issue, spec, and PR state;
-- GitBook remains the public bounded projection/evidence layer after proof;
-- Drive material must not silently become runtime input or authority merely because it exists;
-- any Drive artifact promoted into project evidence must be explicitly cited/ingested with provenance rather than assumed current.
+- GitBook remains the bounded public projection/evidence layer after proof;
+- Drive material does not silently become runtime input or authority because it exists;
+- any Drive artifact promoted into project evidence must be explicitly ingested/cited with provenance.
 
-No new Drive document is required for v0.1 unless a human witness produces material that benefits from a loose notebook.
+No new Drive document is required for v0.1 today.
 
 ## Success condition
 
-Collision Specimen 001 succeeds only if one repository-backed proof demonstrates all of the following at once:
+The specimen succeeds only if one repository-backed proof demonstrates all of these at once:
 
 ```text
 refusal / indeterminate history remains true
@@ -590,24 +630,24 @@ original constituted state remains unchanged
 original authority remains unchanged
 residue remains inspectable
 residue changes a later read-only projection in a bounded way
-optional descendant declares exactly what freedom it spent
-witness session preserves stage/provenance differences
+optional fixture descendant declares exactly what freedom it spent
+witness session preserves lifecycle/provenance differences
 re-entry reconstructs navigable relation without impersonating occurrence
 ```
 
-If any one of those requires authority leakage, hidden state, semantic flattening, or a new master graph, the collision has exposed a real incompatibility and the specimen should fail rather than broaden its definitions.
+If any part requires authority leakage, hidden state, semantic flattening, or a new master graph, the collision has revealed a real incompatibility and should fail rather than broaden its definitions.
 
-## What comes after a successful specimen
+## After a successful specimen
 
 Do not immediately generalize the implementation.
 
 The next lawful sequence is:
 
-1. preserve the Full Measure specimen as evidence;
+1. preserve the Full Measure specimen as project evidence;
 2. name only the invariant(s) that actually survived;
-3. test one materially different domain independently — Upper Room is a strong candidate for shared attention/witness boundaries;
+3. test one materially different domain independently — Upper Room is a strong candidate for shared-attention/witness boundaries;
 4. separately use TranchNOSE as a destructive continuity/falsification chamber when its software harness is ready;
-5. compare contracts across domains;
+5. compare the contracts across domains;
 6. only then decide whether any local type deserves a shared primitive boundary.
 
-The experiment is valuable even if the answer is that some primitives do **not** compose cleanly. The goal is not architectural elegance. The goal is to discover which laws survive contact.
+The specimen remains valuable if some primitives fail to compose. The target is not architectural neatness. The target is discovering which laws survive contact.
