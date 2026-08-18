@@ -44,6 +44,25 @@ const CORPUS_DOOR = {
   sourceMode: 'fixture' as const,
 };
 
+function residueBody(outcomeClass: string) {
+  return {
+    residue: {
+      residueRef: `world-residue:${outcomeClass}`,
+      sourceFieldRef: FIELD.fieldRef,
+      doorRef: CORPUS_DOOR.doorRef,
+      crossingRef: `world-crossing:${outcomeClass}`,
+      outcomeClass,
+      evidenceRefs: [`evidence:${outcomeClass}`],
+      unresolvedRefs:
+        outcomeClass === 'refused' || outcomeClass === 'indeterminate'
+          ? [`reason:${outcomeClass}`]
+          : [],
+      returnRefs: [],
+      constitutedDestinationRefs: [],
+    },
+  };
+}
+
 test('orientation reads only the Full Measure field projection', async () => {
   const fixture = fakeFetch([
     { status: 200, body: { field: FIELD, availability: {} } },
@@ -107,34 +126,59 @@ test('safe moves preserve read-only, confirmation, blocked, source-mode, and aut
 
 test('residue projection preserves exact outcome class and exact evidence refs', async () => {
   const fixture = fakeFetch([
-    {
-      status: 200,
-      body: {
-        residue: {
-          residueRef: 'world-residue:000001',
-          sourceFieldRef: FIELD.fieldRef,
-          doorRef: CORPUS_DOOR.doorRef,
-          crossingRef: 'world-crossing:000001',
-          outcomeClass: 'validation-failed',
-          evidenceRefs: ['project0:validation'],
-          unresolvedRefs: [],
-          returnRefs: [],
-          constitutedDestinationRefs: [],
-        },
-      },
-    },
+    { status: 200, body: residueBody('validation-failed') },
   ]);
   const operator = createHumanTerminalOperator(createWorldRuntimeClient(fixture.fetcher));
 
   const output = await operator.execute({
     kind: 'inspect-residue',
-    residueRef: 'world-residue:000001',
+    residueRef: 'world-residue:validation-failed',
   });
 
   assert.equal(output.outcomeClass, 'validation-failed');
-  assert.deepEqual(output.evidenceRefs, ['project0:validation']);
+  assert.deepEqual(output.evidenceRefs, ['evidence:validation-failed']);
   assert.match(output.lines.join(' '), /destination was not invoked/i);
   assert.equal(output.lines.join(' ').includes('refused'), false);
+  assert.equal(
+    output.lines.some((line) => line.startsWith('Residual influence:')),
+    false,
+  );
+});
+
+test('refused residue inspection exposes only a historical attention cue with no authority or reachability change', async () => {
+  const fixture = fakeFetch([{ status: 200, body: residueBody('refused') }]);
+  const operator = createHumanTerminalOperator(createWorldRuntimeClient(fixture.fetcher));
+
+  const output = await operator.execute({
+    kind: 'inspect-residue',
+    residueRef: 'world-residue:refused',
+  });
+
+  assert.ok(output.lines.includes('Residual influence: historical attention cue.'));
+  assert.ok(
+    output.lines.includes('Authority: none; current reachability is unchanged.'),
+  );
+  assert.deepEqual(output.moves, []);
+  assert.deepEqual(output.evidenceRefs, ['evidence:refused']);
+});
+
+test('indeterminate residue inspection exposes an unresolved frontier without coercing it to refusal', async () => {
+  const fixture = fakeFetch([
+    { status: 200, body: residueBody('indeterminate') },
+  ]);
+  const operator = createHumanTerminalOperator(createWorldRuntimeClient(fixture.fetcher));
+
+  const output = await operator.execute({
+    kind: 'inspect-residue',
+    residueRef: 'world-residue:indeterminate',
+  });
+
+  assert.ok(output.lines.includes('Residual influence: unresolved frontier.'));
+  assert.ok(
+    output.lines.includes('Authority: none; current reachability is unchanged.'),
+  );
+  assert.equal(output.outcomeClass, 'indeterminate');
+  assert.deepEqual(output.moves, []);
 });
 
 test('begin-crossing is a handoff and performs zero HTTP calls', async () => {
