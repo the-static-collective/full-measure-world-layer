@@ -1,6 +1,6 @@
 # Collision Specimen 001 — Witnessed Residue Loop
 
-**Status:** design-only experimental slice; implementation requires separate approval
+**Status:** approved design; implementation under review in PR #22
 
 **Tracking:** #21
 
@@ -189,6 +189,8 @@ collision-influence:sha256:<digest>
 ```
 
 The meaning is intentionally narrow: **same declared Full Measure-local specimen input under the same versioned profile**. It is not a Project0 canonical address and must not be presented as one.
+
+Because the read-only influence projection is consumed by the browser-bundled Human Terminal, the implementation uses a small synchronous browser-safe SHA-256 helper rather than Node-only `node:crypto`. Standard UTF-8 SHA-256 vectors are pinned in repository tests. This changes transport compatibility only; the identity profile and digest algorithm remain SHA-256.
 
 ## Residual influence projection
 
