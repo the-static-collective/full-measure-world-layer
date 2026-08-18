@@ -71,6 +71,10 @@ type CrossingOutcome = {
   residue: WorldEncounterResidue;
 };
 
+interface Props {
+  onResidue?: (residue: WorldEncounterResidue) => void;
+}
+
 const EMPTY_AVAILABILITY: Availability = {
   tranchnode: false,
   project0: false,
@@ -140,7 +144,7 @@ function shouldAppendPoint(points: RawPointerPoint[], next: RawPointerPoint): bo
   return Math.hypot(dx, dy) >= MIN_SAMPLE_DISTANCE;
 }
 
-export function WorldEncounterPanel() {
+export function WorldEncounterPanel({ onResidue }: Props = {}) {
   const [field, setField] = useState<WorldFieldProjection | null>(null);
   const [doors, setDoors] = useState<WorldDoorProjection[]>([]);
   const [availability, setAvailability] = useState<Availability>(EMPTY_AVAILABILITY);
@@ -344,13 +348,15 @@ export function WorldEncounterPanel() {
       setMessage(readableFailure(confirmed.body, 'Encounter orchestration did not complete'));
       return;
     }
-    setOutcome(confirmed.body.value);
+    const nextOutcome = confirmed.body.value;
+    setOutcome(nextOutcome);
+    onResidue?.(nextOutcome.residue);
   };
 
   const polyline = rawPoints.map((point) => `${point.x},${point.y}`).join(' ');
 
   return (
-    <section className="mb-8 overflow-hidden rounded-3xl border border-stone-300 bg-white shadow-sm">
+    <section id="world-threshold" className="mb-8 overflow-hidden rounded-3xl border border-stone-300 bg-white shadow-sm">
       <div className="border-b border-stone-200 bg-stone-950 px-5 py-5 text-stone-50">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
