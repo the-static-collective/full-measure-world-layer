@@ -199,4 +199,4 @@ Review additionally found and repaired two documentation/verification gaps: brow
 
 - [ ] **Step 7: Mark PR ready only after fresh verification**
 
-Update PR #22 to implementation scope, request review, and proceed through PR Completion readiness. Landing remains separately confirmation-gated for the exact verified head SHA.
+Final checkboxes remain intentionally open in this committed plan until the latest head completes both the repository check and PR readiness transition. Landing remains separately confirmation-gated for the exact verified head SHA.
