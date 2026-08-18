@@ -3,9 +3,20 @@ import test from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import App from '../src/App.js';
+Object.defineProperty(globalThis, 'localStorage', {
+  configurable: true,
+  value: {
+    length: 0,
+    clear() {},
+    getItem() { return null; },
+    key() { return null; },
+    removeItem() {},
+    setItem() {},
+  },
+});
 
-test('campfire mounts Human Terminal before the inhabited World Threshold', () => {
+test('campfire mounts Human Terminal before the inhabited World Threshold', async () => {
+  const { default: App } = await import('../src/App.js');
   const html = renderToStaticMarkup(React.createElement(App));
   const terminal = html.indexOf('Human Terminal');
   const threshold = html.indexOf('World Threshold');
