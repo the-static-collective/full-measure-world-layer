@@ -1,24 +1,30 @@
 {
   "schema": "static-collective.project-status.v1",
-  "asOf": "2026-08-17",
+  "asOf": "2026-08-19",
   "repository": "the-static-collective/full-measure-world-layer",
   "defaultBranch": "main",
   "project": "Full Measure — World Layer",
   "state": "active",
-  "phase": "Boot the House v0.1 inhabited Garden encounter loop",
+  "phase": "Boot the House v0.1 + Human Terminal v0.1 + STRIDE Specimen 001",
   "canonicalAuthority": "project-owned repository",
-  "observedMainCommit": "534f6eb4520371f877af78a85429fe7d64c9fb05",
+  "observedMainCommit": "5ac66fa58b35b699ae4dcf17af21a8e9d0be0752",
   "executableSurface": [
     {"id": "garden-causal-loop", "status": "landed", "interface": "local Express + React prototype"},
     {"id": "boot-the-house-server-composition", "status": "landed", "evidence": {"commit": "c62275019c452a881565e3a6ce444b6a66968714", "pullRequest": 12}},
     {"id": "inhabited-world-encounter-panel", "status": "landed", "evidence": {"commit": "cb99bfd7ca240d031ba33da96211e35cdb579f80", "pullRequest": 14}},
     {"id": "composed-proof-receipt", "status": "landed", "evidence": {"commit": "05cdfd61780eba41cb9ddb314a814013ccb48a7c", "pullRequest": 16}},
-    {"id": "federated-world-encounter-loop-design", "status": "landed-design", "evidence": {"commit": "534f6eb4520371f877af78a85429fe7d64c9fb05"}}
+    {"id": "federated-world-encounter-loop-design", "status": "landed-design", "evidence": {"commit": "534f6eb4520371f877af78a85429fe7d64c9fb05"}},
+    {"id": "human-terminal-v0.1", "status": "landed", "scope": "basic-human operator projection over the existing Garden/world-runtime boundary", "evidence": {"commit": "1fbbcd10c7d51b9ad4310853fecd225d59714544", "pullRequest": 19}},
+    {"id": "human-terminal-outcome-distinction-regression", "status": "landed", "scope": "test-only pinning of admitted/refused/indeterminate/failed residue copy", "evidence": {"commit": "5ac66fa58b35b699ae4dcf17af21a8e9d0be0752", "pullRequest": 20}},
+    {"id": "stride-specimen-001", "status": "landed", "scope": "Full Measure-local two-step witnessed locomotion with fresh stance and independent confirmation", "evidence": {"commit": "f475b3d8592eaf2e4de01cc7d8fd1abf7f0e4447", "pullRequest": 24}}
   ],
   "nonClaims": [
     "gesture recognition does not authorize crossing",
     "human confirmation is required before a candidate crossing is attempted",
     "fixture-only mode does not pretend donor repositories are configured",
-    "world encounter transport does not collapse donor authority boundaries"
+    "world encounter transport does not collapse donor authority boundaries",
+    "Human Terminal is an operator projection, not a second execution plane",
+    "STRIDE contains no future authority: one confirmation never authorizes the next attempt",
+    "Collision Specimen 001 remains unlanded frontier and is excluded from this current-state snapshot"
   ]
 }
