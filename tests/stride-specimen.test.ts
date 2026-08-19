@@ -30,7 +30,7 @@ function residue(input: {
 
 function expectStrideError(fn: () => unknown, code: string): void {
   assert.throws(fn, (error: unknown) => {
-    assert.ok(error instanceof StrideSpecimenError);
+    if (!(error instanceof StrideSpecimenError)) return false;
     assert.equal(error.code, code);
     return true;
   });
