@@ -99,7 +99,6 @@ The local evaluator must fail closed when:
 - the door is not exposed from the current stance;
 - the residue belongs to another source/door/crossing;
 - a non-admitted outcome claims constituted destination refs;
-- an admitted outcome does not constitute the selected destination ref;
 - a confirmation ref is reused;
 - a third attempted step is requested.
 
@@ -110,6 +109,8 @@ For `outcomeClass: "admitted"`:
 ```text
 position_after = selected destination
 ```
+
+The position change follows the already-declared selected door. Destination-owned `constitutedDestinationRefs` remain whatever output refs the ordinary encounter membrane actually admitted; STRIDE does not reinterpret those output refs as the destination identity.
 
 Fresh orientation is then derived from the destination's fixture entry.
 
@@ -137,7 +138,7 @@ This artificial ceiling is constitutional evidence that STRIDE is not autonomous
 
 ## Determinism
 
-All local refs are derived from normalized declared inputs using a small Full Measure-local deterministic serializer and SHA-256 helper scoped only to this module. This helper is not a Project0 canonical address and must use a `stride-local:` prefix so it cannot be confused with shared identity authority.
+All local refs use deterministic, explicitly local string identities under the `stride-local:` prefix derived from declared step ordinal, position, crossing, and residue identities. These are specimen-local replay refs, not Project0 canonical addresses and not cryptographic content addresses.
 
 Array ordering is semantically significant for residue/footprint history and must be preserved. Fixture door arrays are emitted in declared order.
 
