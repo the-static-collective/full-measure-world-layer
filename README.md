@@ -8,7 +8,7 @@ The original Garden vertical still places evidence-derived participation over Ju
 Tension → Pledge → Accept → Report → Human Witness → Harvest → Capacity
 ```
 
-The repository now also contains the first executable **Boot the House v0.1** world-encounter loop: a human gesture can be witnessed, decoded through TranchNode, wrapped as Project 0 encounter testimony, explicitly confirmed by a human, and offered to a destination-local Corpus OS admission boundary without collapsing the donor projects into one authority.
+The repository now also contains the executable **Boot the House v0.1** world-encounter loop, the **Human Terminal v0.1** basic-human operator membrane, and **STRIDE Specimen 001** for two separately confirmed local steps. These surfaces compose around the same authority boundary rather than creating parallel constitutions.
 
 Only attributable events change the sheet. A model may propose a quest or narrate a chronicle, but it cannot award a Deed, establish truth, manufacture witness, or silently rewrite memory.
 
@@ -74,6 +74,31 @@ The important boundaries are executable:
 - Full Measure stores local encounter residue; it does not rewrite donor history.
 
 The server-side donor composition, inhabited Garden panel, and a composed proof receipt are landed on `main`.
+
+### Human Terminal v0.1
+
+Human Terminal projects the existing Garden/world-runtime contracts into bounded basic-human moves rather than creating a second execution plane. It preserves the difference between `admitted`, `refused`, `indeterminate`, `failed`, and validation failure in both machine outcome and human-facing residue explanation.
+
+A “begin crossing” move is a handoff to the existing confirmation membrane. Inspecting residue cannot manufacture a new crossing, rewrite the disposition, or elevate history into authority.
+
+### STRIDE Specimen 001
+
+STRIDE is a Full Measure-local proof of two-step witnessed locomotion:
+
+```text
+STANCE A
+→ independently confirmed attempt
+→ FOOTPRINT 1
+→ fresh STANCE B
+→ independently confirmed attempt
+→ FOOTPRINT 2
+→ STANCE E
+→ explicit stop
+```
+
+Its founding law is **a stride contains no future authority**. Each step requires its own confirmation; only an admitted result may change constituted position; refusal or indeterminacy still leaves an honest footprint; stale stance, stale door, confirmation reuse, and a third attempt fail closed.
+
+`Collision Specimen 001` remains an open frontier experiment and is intentionally not described here as landed current state.
 
 Machine-readable snapshot: [`PROJECT_STATUS.json`](PROJECT_STATUS.json).
 
