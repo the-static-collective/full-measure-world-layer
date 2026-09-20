@@ -19,7 +19,7 @@ export function projectClockworkMap(event:OccurrenceRef,projections:readonly Map
   required(event.occurrenceId,'occurrenceId'); required(event.sourceRef,'event sourceRef');
   if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/.test(event.occurredUtc) ||
      !Number.isFinite(Date.parse(event.occurredUtc)) ||
-     new Date(event.occurredUtc).toISOString()!==event.occurredUtc)throw Error('verified explicit UTC syntax required');
+     new Date(event.occurredUtc).toISOString().replace('.000Z', 'Z')!==event.occurredUtc)throw Error('verified explicit UTC syntax required');
   if(!Array.isArray(projections)||projections.length>100)throw Error('bounded projections required');
   const seen=new Set<string>();
   const layers:ClockworkMap['layers']={time:[],place:[],relation:[],narrative:[]};
