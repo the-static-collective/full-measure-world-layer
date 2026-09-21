@@ -73,7 +73,7 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
     <div className="min-h-[30rem] bg-gradient-to-b from-sky-50 via-amber-50 to-stone-50 px-4 py-7 sm:px-8">
       <div className="mx-auto max-w-2xl">
         <p className="text-xs font-bold uppercase tracking-[0.22em] text-sky-900">{scene.eyebrow}</p>
-        <h2 className="mt-2 text-3xl font-semibold tracking-tight text-stone-950">{scene.title}</h2>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight text-stone-950">{puppyInterrupt ? puppyInterrupt.title : scene.title}</h2>
         <p className="mt-3 text-sm leading-relaxed text-stone-700">{scene.body}</p>
         <p className="mt-3 text-xs text-stone-500">Tuesday is sealed. Wednesday carries its receipts and residuals, not a fresh starting inventory.</p>
         <div className="mt-5 grid grid-cols-5 gap-1.5" aria-label="Carried supply">
