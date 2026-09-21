@@ -87,6 +87,11 @@ export const GraceMercyDualSheet: React.FC<Props> = ({ currentUser }) => {
 
   return (
     <section className={`rounded-3xl border p-5 sm:p-6 space-y-5 transition-colors ${projection.currentSheet === 'MERCY' ? 'bg-stone-100 border-stone-400' : 'parchment-card-warm border-[#e2d7c7]'}`}>
+      <div className="rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3">
+        <p className="text-[9px] uppercase tracking-[0.2em] font-bold text-amber-900">FICTIONAL FIXTURE · BROKEN PROMISE 001</p>
+        <p className="text-[11px] text-stone-700 mt-1">This prototype uses a fixed scenario to exercise the dual sheet. It is not evaluating your relationships or inferring a real rupture.</p>
+      </div>
+
       <header className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shrink-0 ${currentUser.avatarColor || 'bg-amber-800 text-amber-50'}`}>{initials}</div>
