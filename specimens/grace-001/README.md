@@ -329,14 +329,27 @@ Generation 2 descendant
 
 The descendant preserves the parent card id and complete lineage while explicitly refusing to claim physical custody transfer or inherited interpretive authority.
 
+## GRACE-PLAY-003 / TOMORROW HAS A MEMORY
+
+Campfire now exposes an explicit **Begin Wednesday** button when Tuesday reaches its House Takes Attendance screen. Wednesday is a separate, locally persisted append-only day, not a replay of Tuesday's starting supply.
+
+The handoff freezes Tuesday's Day Receipt and its exact event log. Wednesday replay checks both the prior-day replay witness and that inherited event sequence before admitting new Wednesday actions. This is local integrity checking, **not** cryptographic authorship or independent evidence about real events.
+
+Wednesday receives **four new game-time blocks** and retains Tuesday's actual cash, food, transport, and attention. Its own dinner is a new declared need. Unmet Tuesday demands stay visible as carried residuals, but a meal cooked on Wednesday never retroactively completes Tuesday's dinner.
+
+The compact Wednesday hand may offer:
+- **Make Wednesday dinner** using surviving food, not respawned groceries.
+- **Follow up on housing** only where a prior attributable housing attempt/offer exists; follow-up != housing secured.
+- **Offer a shared-table invitation** when Tuesday included a shared meal. The invitation creates neither acceptance nor food.
+- **Check the vehicle**, pray, or rest subject to the actual carried supply.
+- **Return to the porch with both receipts** only when Tuesday contains the specific *Door Learns the Morning* archaeology choice **and** an attributable later reflection targeting that exact visit. The player must express a relation using the Wednesday interaction. The result opens a local fictional archive, not a real-world door or a verified theological interpretation.
+
+Two different Tuesdays can end with identical resource totals yet produce different Wednesday hands because the **attributable actions** were different. The porch mystery is optional; it never blocks dinner, rest, stopping play, or reviewing Tuesday.
+
+Wednesday's scene, four-card hand, selected-card commit, consequence beat, attendance, and local save are executable in Campfire. The Tuesday inspector is hidden once Wednesday begins, preventing edits to the source day through normal play. Tuesday's sealed Day Receipt remains reviewable/exportable.
+
+**Current boundary:** This is a two-day local playable specimen, not full multi-user synchronization, a canonical WORLDSEED crossing, or a general infinite-calendar simulator.
+
 ## Next frontier
 
-Make this *inhabited*:
-
-- add a phone-shaped React encounter surface;
-- let the player pick party + current location;
-- persist append-only receipts;
-- add one Upper Room return witness;
-- add one dream/MADDJack encounter;
-- feed exact state declarations through a Dogram adapter;
-- export resulting world residue to WORLDSEED.
+Next measurable scope: review the two-day source/receipt boundary, export an explicitly versioned Wednesday Day Receipt, and field-test one human-played Tuesday → Wednesday run before considering a third day or shared-play transport.
