@@ -93,6 +93,9 @@ test("cannot inject Wednesday action or edit Tuesday provenance by importing a c
   const tampered=structuredClone(campaign);
   tampered.sourceDayReceipt.session.events[0]={id:"grace-event-0001",type:"economy_action",actionId:"share-meal"};
   assert.throws(()=>replayWednesday(tampered),/Tuesday source receipt mismatch/);
+  const silentChange=structuredClone(campaign);
+  silentChange.sourceDayReceipt.session.events[0].id="silently-renamed-event";
+  assert.throws(()=>replayWednesday(silentChange),/Tuesday source receipt mismatch/);
 });
 
 test("Wednesday has its own finite hand and an end scene that keeps unmet needs",()=>{
