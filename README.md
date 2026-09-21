@@ -102,6 +102,22 @@ Its founding law is **a stride contains no future authority**. Each step require
 
 Machine-readable snapshot: [`PROJECT_STATUS.json`](PROJECT_STATUS.json).
 
+### Grace / Mercy Broken Promise 001
+
+The character sheet now has a bounded dual-sheet specimen for rupture and discernment.
+
+**Grace** asks what good can live here. **Mercy** asks what actually happened, what must remain protected, and what lawful relationship is still possible now. Both are projections of the same character and history.
+
+The first specimen is intentionally a **fixed fictional fixture**. It is not evaluating any real participant or relationship. It proves that known consequences can support a scoped boundary while motive remains unknown, and that `Y`, `HOLD`, and `REFUSE` can remain distinct outcomes without changing Gifts, Quests, Deeds, Seeds, Witness, Harvests, or chapter progress.
+
+Run the deterministic specimen:
+
+```bash
+npm run grace-mercy:001
+```
+
+The specimen is not combat, diagnosis, legal or emergency advice, a moral score, or automatic reconciliation.
+
 ## Truth-state boundary
 
 The participation slice still uses a local Express JSON event store and simulated profile switching, so the UI must not claim shared network authority merely because the experience is playable.

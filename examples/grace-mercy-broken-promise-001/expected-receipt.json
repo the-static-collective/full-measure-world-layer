@@ -1,0 +1,53 @@
+{
+  "version": "full-measure/mercy-encounter-receipt/v0.1",
+  "encounterId": "grace-mercy:broken-promise-001:specimen-grace",
+  "characterRef": "specimen:grace",
+  "ruptureRef": "rupture:broken-promise-001",
+  "startingSheet": "GRACE",
+  "sheetTurns": [
+    {
+      "eventId": "specimen-action-02",
+      "from": "GRACE",
+      "to": "MERCY",
+      "reasonRef": "rupture:broken-promise-001",
+      "occurredAt": "2026-09-21T14:01:00.000Z"
+    }
+  ],
+  "evidenceRefs": [
+    "evidence:promise-made",
+    "evidence:miss-1",
+    "evidence:miss-2",
+    "evidence:absorbed-consequence",
+    "report:warning-a",
+    "report:warning-b"
+  ],
+  "unknowns": ["intent_unknown"],
+  "boundaries": ["commitment:renew-under-same-conditions"],
+  "discernment": "REFUSE",
+  "disposition": "BOUNDED",
+  "consequences": [
+    "promise_missed_1",
+    "promise_missed_2",
+    "consequence_absorbed_by_other"
+  ],
+  "endingSheet": "MERCY",
+  "eventIds": [
+    "specimen-action-01",
+    "specimen-action-02",
+    "specimen-action-03",
+    "specimen-action-04",
+    "specimen-action-05",
+    "specimen-action-06",
+    "specimen-action-07",
+    "specimen-action-08"
+  ],
+  "nonClaims": [
+    "does_not_establish_motive",
+    "does_not_diagnose_person",
+    "does_not_establish_moral_worth",
+    "does_not_establish_divine_interpretation",
+    "does_not_restore_relationship",
+    "does_not_remove_consequence"
+  ],
+  "receiptHash": "sha256:61fce7edfa7df6c30d1bd17485f44fa268b51d66bbee752ea79d4a7c2294a826"
+}

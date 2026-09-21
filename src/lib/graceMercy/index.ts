@@ -4,3 +4,4 @@ export * from './projection.js';
 export * from './brokenPromise.js';
 export * from './receipt.js';
 export * from './httpContract.js';
+export * from './specimen.js';

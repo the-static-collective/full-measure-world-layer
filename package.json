@@ -10,7 +10,8 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
-    "check": "npm run lint && npm test && npm run build"
+    "check": "npm run lint && npm test && npm run build",
+    "grace-mercy:001": "node --import tsx scripts/grace-mercy-broken-promise-001.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
