@@ -16,11 +16,14 @@ import {
 } from "./apertures.ts";
 import {applyEconomyAction, initialCultureState, type CultureState} from "./culture.ts";
 import {
+  applyWorldResponse,
   chooseFocus,
   drawQuestProposal,
   initialState,
   playCard,
   type GraceState,
+  type WorldResponseDisposition,
+  type WorldResponseId,
 } from "./kernel.ts";
 import {
   enterUpperRoomFromDream,
@@ -45,7 +48,8 @@ export type GraceSessionInputEvent =
   | {type: "flashback_reflection"; sourceEventId: string; presentReflection: string}
   | {type: "possible_world_toggle"; principleId: PossibleWorldPrincipleId}
   | {type: "possible_world_return"}
-  | {type: "archaeology_visit"; sceneId: ArchaeologySceneId; choiceId: string};
+  | {type: "archaeology_visit"; sceneId: ArchaeologySceneId; choiceId: string}
+  | {type: "world_response"; responseId: WorldResponseId; disposition: WorldResponseDisposition};
 
 export type GraceSessionEvent = GraceSessionInputEvent & {id: string};
 
@@ -174,6 +178,9 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
           choiceId: event.choiceId,
           party: apertures.party,
         });
+        break;
+      case "world_response":
+        story = applyWorldResponse(story, event.responseId, event.disposition);
         break;
     }
   }
