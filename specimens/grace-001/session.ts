@@ -14,14 +14,16 @@ import {
   type MeaningState,
 } from "./meaning.ts";
 
-export type GraceSessionEvent =
-  | {id: string; type: "focus"; threadId: string}
-  | {id: string; type: "story_card"; cardId: string}
-  | {id: string; type: "economy_action"; actionId: string}
-  | {id: string; type: "dm_roll"; seed: number}
-  | {id: string; type: "dream_red_door"}
-  | {id: string; type: "upper_room_return"; dreamId: string; playerNote?: string}
-  | {id: string; type: "remembered_word"; returnId: string};
+export type GraceSessionInputEvent =
+  | {type: "focus"; threadId: string}
+  | {type: "story_card"; cardId: string}
+  | {type: "economy_action"; actionId: string}
+  | {type: "dm_roll"; seed: number}
+  | {type: "dream_red_door"}
+  | {type: "upper_room_return"; dreamId: string; playerNote?: string}
+  | {type: "remembered_word"; returnId: string};
+
+export type GraceSessionEvent = GraceSessionInputEvent & {id: string};
 
 export interface GraceSession {
   schema: "full-measure.grace-session.v1";
@@ -41,7 +43,7 @@ export function emptySession(): GraceSession {
 
 export function appendEvent(
   session: GraceSession,
-  event: Omit<GraceSessionEvent, "id">
+  event: GraceSessionInputEvent
 ): GraceSession {
   return {
     ...session,
