@@ -86,7 +86,10 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
   let apertures = initialApertureState();
   let lastProposal: ReturnType<typeof drawQuestProposal> | null = null;
 
-  for (const event of session.events) {
+  for (let eventIndex = 0; eventIndex < session.events.length; eventIndex += 1) {
+    const event = session.events[eventIndex];
+    const previousEvent = session.events[eventIndex - 1];
+
     switch (event.type) {
       case "focus":
         story = chooseFocus(story, event.threadId);
@@ -116,8 +119,18 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
         apertures = chooseParty(apertures, event.members);
         break;
       case "flashback_reflection": {
-        if (!session.events.some((candidate) => candidate.id === event.sourceEventId && candidate.id !== event.id)) {
-          throw new Error(`Unknown flashback source event: ${event.sourceEventId}`);
+        const sourceExistsEarlier = session.events
+          .slice(0, eventIndex)
+          .some((candidate) => candidate.id === event.sourceEventId);
+        if (!sourceExistsEarlier) {
+          throw new Error(`Unknown earlier flashback source event: ${event.sourceEventId}`);
+        }
+        if (
+          !previousEvent ||
+          previousEvent.type !== "economy_action" ||
+          previousEvent.actionId !== "reflection-block"
+        ) {
+          throw new Error("flashback reflection requires an immediately preceding reflection-block");
         }
         apertures = recordFlashbackReflection(
           apertures,
@@ -130,6 +143,13 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
         apertures = togglePossibleWorldPrinciple(apertures, event.principleId);
         break;
       case "possible_world_return":
+        if (
+          !previousEvent ||
+          previousEvent.type !== "economy_action" ||
+          previousEvent.actionId !== "worldbuilding-block"
+        ) {
+          throw new Error("possible-world return requires an immediately preceding worldbuilding-block");
+        }
         apertures = returnFromPossibleWorld(apertures);
         break;
     }
