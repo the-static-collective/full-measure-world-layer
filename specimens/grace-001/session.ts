@@ -53,6 +53,13 @@ export type GraceSessionInputEvent =
 
 export type GraceSessionEvent = GraceSessionInputEvent & {id: string};
 
+const delayedWorldTurnActions = new Set([
+  "client-call",
+  "grocery-run",
+  "prayer-block",
+  "rest-block",
+]);
+
 export interface GraceSession {
   schema: "full-measure.grace-session.v1";
   events: GraceSessionEvent[];
@@ -179,9 +186,42 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
           party: apertures.party,
         });
         break;
-      case "world_response":
+      case "world_response": {
+        const priorEvents = session.events.slice(0, eventIndex);
+        const duplicate = priorEvents.some(
+          (candidate) =>
+            candidate.type === "world_response" &&
+            candidate.responseId === event.responseId,
+        );
+        if (duplicate) {
+          throw new Error(`duplicate world response: ${event.responseId}`);
+        }
+
+        if (event.responseId === "housing-coordinator-callback") {
+          const callIndex = priorEvents.findIndex(
+            (candidate) =>
+              candidate.type === "economy_action" &&
+              candidate.actionId === "client-call",
+          );
+          if (callIndex < 0) {
+            throw new Error("housing coordinator callback requires an earlier attempted call");
+          }
+
+          const laterTurns = priorEvents
+            .slice(callIndex + 1)
+            .filter(
+              (candidate) =>
+                candidate.type === "economy_action" &&
+                delayedWorldTurnActions.has(candidate.actionId),
+            ).length;
+          if (laterTurns < 2) {
+            throw new Error("housing coordinator callback requires two later ordinary turns");
+          }
+        }
+
         story = applyWorldResponse(story, event.responseId, event.disposition);
         break;
+      }
     }
   }
 
