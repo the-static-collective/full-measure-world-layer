@@ -18,6 +18,7 @@ export interface GraceDayReceipt {
     party: string[];
     flashbacks: number;
     possibleWorldReturns: number;
+    archaeologyVisits: number;
   };
   claims: string[];
   nonClaims: string[];
@@ -39,6 +40,7 @@ function replayFingerprint(session: GraceSession): string {
     culture: replay.culture,
     meaning: replay.meaning,
     apertures: replay.apertures,
+    archaeology: replay.archaeology,
     lastProposal: replay.lastProposal,
   }));
 }
@@ -62,6 +64,7 @@ export function createDayReceipt(session: GraceSession): GraceDayReceipt {
       party: [...replay.apertures.party],
       flashbacks: replay.apertures.flashbacks.length,
       possibleWorldReturns: replay.apertures.possibleWorldReturns.length,
+      archaeologyVisits: replay.archaeology.visits.length,
     },
     claims: [
       "this artifact contains the declared local event sequence for one campaign day",
