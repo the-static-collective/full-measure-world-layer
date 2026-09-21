@@ -122,6 +122,12 @@ export const economyActions: Record<string, EconomyAction> = {
     label: "Build a Possible World",
     costs: { time: 1, attention: 1 },
     note: "Spend present time and attention to explore a hypothetical world; imagination does not create external supply."
+  },
+  "storyship-block": {
+    id: "storyship-block",
+    label: "Visit a Storyship Scene",
+    costs: { time: 1, attention: 1 },
+    note: "Spend present time and attention to enter an artistic source-derived scene; source material does not become history by being visited."
   }
 };
 
