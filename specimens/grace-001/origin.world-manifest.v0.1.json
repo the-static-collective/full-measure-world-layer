@@ -1,0 +1,33 @@
+{
+  "schema": "origin.world-manifest.v0.1",
+  "worldId": "full-measure/grace-001",
+  "displayName": "GRACE-001 // An Ordinary Tuesday",
+  "version": "0.1-fixture-policy",
+  "status": "experimental-fixture-policy-only",
+  "authority": "grace-world-local",
+  "adapterKind": "grace-origin-entry-policy-only",
+  "authorityPolicyRef": "full-measure/grace-001/local-authorship",
+  "memoryPolicyRef": "minimum-reference-only",
+  "declaredCapabilities": [],
+  "knownGateRefs": [],
+  "constitutionRef": "specimens/grace-001/worldseed.json",
+  "localCampaignSchema": "full-measure.grace-session.v1",
+  "entryPolicyRef": "full-measure/grace-001/entry-policy-v0.1",
+  "exitPolicyRef": "not-yet-declared",
+  "transferPolicyRef": "full-measure/grace-001/reference-only-preview-v0.1",
+  "privacyPolicyRef": "explicit-local-consent-required",
+  "arrivalPolicyRef": "not-yet-declared",
+  "localTimeModel": "grace-session-day-phase",
+  "continuationModel": "append-only-grace-session-replay",
+  "allowedSourceWorldRefs": [
+    "foreign-room-seed-001"
+  ],
+  "liveAdapterEnabled": false,
+  "nonClaims": [
+    "manifest_is_not_an_entry_invitation",
+    "manifest_does_not_confer_origin_admission",
+    "grace_and_heaven_are_not_incoming_party_resources",
+    "no_personal_grace_session_data_is_exposed",
+    "no_world_state_mutation"
+  ]
+}
