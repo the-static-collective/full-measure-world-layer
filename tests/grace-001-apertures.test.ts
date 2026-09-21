@@ -52,7 +52,7 @@ test("flashback cannot point to a nonexistent historical event", () => {
     sourceEventId: "grace-event-9999",
     presentReflection: "invented past",
   });
-  assert.throws(() => replaySession(session), /Unknown flashback source event/);
+  assert.throws(() => replaySession(session), /Unknown earlier flashback source event/);
 });
 
 test("possible world can hold abundance principles while keeping hard tensions visible", () => {
