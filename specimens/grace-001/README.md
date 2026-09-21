@@ -92,6 +92,26 @@ Candidate Dogram checks:
 
 Dogram calculates. It does not choose the morally correct move.
 
+## Live Dogram donor
+
+Full Measure can now use Dogram itself as an optional local mechanics donor.
+
+Set only the local repository root:
+
+```bash
+GRACE_DOGRAM_REPO=/path/to/Dogram
+```
+
+Full Measure fixes the executable and argv in code:
+
+```text
+python3 -m dogram.game_mechanics_stdio
+```
+
+The browser never spawns Python directly. It calls the Full Measure server, which uses the existing bounded no-shell process membrane and rejects any Dogram response whose declared authority is not exactly `none`.
+
+When Dogram is unavailable, the UI explicitly falls back to the local TypeScript mirror and labels that fallback rather than claiming the donor ran.
+
 ## WORLDSEED / Bandcamp
 
 `worldseed.json` admits only candidate motifs from the supplied Bandcamp corpus: open E, lemons, tables, roots/seeds/fruit, porch/room/door, weather/static/road, and the kept light.
