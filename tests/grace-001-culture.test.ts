@@ -65,3 +65,12 @@ test("an unaffordable action is refused rather than borrowing supply from nowher
   const once = applyEconomyAction(start, "share-meal");
   assert.throws(() => applyEconomyAction(once, "feed-home"), /Cannot afford/);
 });
+
+
+test("prayer recharge spends finite time in the culture economy", () => {
+  const start = initialCultureState();
+  const next = applyEconomyAction(start, "prayer-block");
+  assert.equal(next.stocks.time, start.stocks.time - 1);
+  assert.equal(next.stocks.attention, start.stocks.attention + 1);
+  assert.equal(next.traces.prayer, 1);
+});
