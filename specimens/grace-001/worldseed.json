@@ -252,7 +252,10 @@
     "party members contribute lenses, not fungible labor units or stat buffs",
     "flashback reflection cannot rewrite an earlier event",
     "possible-world exploration must preserve supply and maintenance tensions",
-    "meaning work consumes declared present time and attention"
+    "meaning work consumes declared present time and attention",
+    "Bandcamp scene seed != historical fact",
+    "story archaeology consumes present time and attention",
+    "party lens may change prompts without changing source provenance"
   ],
   "partyOptions": [
     {
@@ -333,5 +336,73 @@
         "imagination does not create external supply"
       ]
     }
+  },
+  "archaeology": {
+    "method": "Novelist material-seed discipline: artistic source -> non-canonical scene seed -> paid campaign visit -> attributable witness",
+    "visitCost": {
+      "time": 1,
+      "attention": 1
+    },
+    "scenes": [
+      {
+        "id": "porch-lemon-seeds",
+        "sourceTitle": "Forty-Two Lemon Seeds",
+        "sourceRef": "BandCamp (4)(1).txt:998-1057",
+        "status": "seed",
+        "canonical": false,
+        "location": "house.porch",
+        "motifs": [
+          "lemon seeds",
+          "porch",
+          "cleanup",
+          "cable",
+          "roots",
+          "open E",
+          "future stranger"
+        ]
+      },
+      {
+        "id": "portable-witness-road",
+        "sourceTitle": "Static Knows the Road",
+        "sourceRef": "BandCamp (4)(1).txt:1197-1246",
+        "status": "seed",
+        "canonical": false,
+        "location": "road.school",
+        "motifs": [
+          "road",
+          "portable witness",
+          "static",
+          "fence wire",
+          "power line",
+          "cracked phone",
+          "weather"
+        ]
+      },
+      {
+        "id": "door-learns-morning",
+        "sourceTitle": "The Door Learns the Morning",
+        "sourceRef": "BandCamp (4)(1).txt:5342-5396",
+        "status": "seed",
+        "canonical": false,
+        "location": "house.kitchen",
+        "motifs": [
+          "morning",
+          "door",
+          "chair",
+          "table",
+          "lemon",
+          "open E",
+          "aftermath",
+          "rest"
+        ]
+      }
+    ],
+    "law": [
+      "artistic source material != automatic campaign history",
+      "scene visit requires storyship-block opportunity cost",
+      "party changes questions, not source facts",
+      "selected relation remains candidate until separately admitted",
+      "Day Receipt replay binds the visit witness"
+    ]
   }
 }
