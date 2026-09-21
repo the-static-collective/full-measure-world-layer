@@ -16,3 +16,8 @@ test('Mercy presentation keeps one character identity and no dark-form language'
 test('Grace return can show the still-active Mercy boundary', () => {
   assert.ok(source.includes('Boundary still active'));
 });
+
+test('dual sheet visibly labels the Broken Promise scenario as a fictional fixture', () => {
+  assert.ok(source.includes('FICTIONAL FIXTURE'));
+  assert.ok(source.includes('not evaluating your relationships'));
+});
