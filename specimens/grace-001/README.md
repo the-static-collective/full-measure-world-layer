@@ -54,7 +54,7 @@ Changing focus suspends the prior focused thread, preserves `resume:<thread-id>`
 
 This is ergonomics, not ontology: foreground focus does not declare that the chosen thread is objectively more important than everything else.
 
-## MADDcl0wn
+## Culture under scarcity\n\nThe first culture-economy specimen starts with 4 time blocks, $18, 1 ready food serving, 1 transport use, and 3 attention while home dinner, a client callback, vehicle trouble, rest, and a neighbor meal are all live demands.\n\nEvery economy action emits an opportunity-cost receipt. If Grace shares the only ready meal, Make Dinner at Home was affordable before the choice and is no longer affordable afterward; the home-dinner demand remains explicit.\n\nGrocery Run converts 2 time + $18 + 1 transport + 1 attention into 4 additional food servings. That is investment under scarcity, not a free resource spawn.\n\nRepeated attributable choices build culture traces for hospitality, stewardship, discipleship, rest, and mutual aid. Discipleship means formation/apprenticeship here: it never creates ownership, obedience, or guaranteed future labor.\n\nThe intended Age-of-Empires pressure is therefore: finite supply -> hard choice -> receipted opportunity cost -> residual demand -> repeated practice -> visible culture -> new future possibilities.\n\nCLI: npm run grace -- economy ; npm run grace -- choices ; npm run grace -- choose share-meal\n\n## MADDcl0wn
 
 Wild Cards are permission to bend declared game grammar under receipt.
 
