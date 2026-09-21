@@ -47,7 +47,7 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
       setExpression("");
       setError(null);
       if(receipt) setBeat({
-        title:next.events.at(-1)?.actionId==="porch-relation"?"A new door in the fiction":"Wednesday answered",
+        title:receipt.actionId==="porch-relation"?"A new door in the fiction":"Wednesday answered",
         lines:[...receipt.claims,...receipt.nonClaims],
       });
     }catch(err){setError(err instanceof Error?err.message:String(err));}
