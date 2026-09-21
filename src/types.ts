@@ -48,7 +48,8 @@ export type AggregateType =
   | 'receipt'
   | 'capacity'
   | 'circle'
-  | 'invitation';
+  | 'invitation'
+  | 'mercy_encounter';
 
 export interface Profile {
   id: string;
