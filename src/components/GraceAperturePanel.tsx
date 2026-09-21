@@ -71,10 +71,10 @@ export function GraceAperturePanel({
 
   const toggleCompanion = (member: PartyMemberId) => {
     if (member === 'grace') return;
-    const selected = new Set(apertures.party);
+    const selected = new Set<PartyMemberId>(apertures.party);
     if (selected.has(member)) selected.delete(member);
     else selected.add(member);
-    commit({type: 'choose_party', members: [...selected]});
+    commit({type: 'choose_party', members: Array.from(selected)});
   };
 
   const recordReflection = () => {
