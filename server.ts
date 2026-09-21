@@ -127,17 +127,17 @@ async function startServer() {
 
   app.post('/api/grace/dogram/calculate', async (req: Request, res: Response) => {
     const result = await graceDogram.calculate(req.body as GraceDogramRequest);
-    if (result.ok) {
-      return res.json(result);
+    if (result.ok === false) {
+      const status =
+        result.kind === 'unavailable'
+          ? 503
+          : result.kind === 'donor'
+            ? 422
+            : 502;
+      return res.status(status).json(result);
     }
 
-    const status =
-      result.kind === 'unavailable'
-        ? 503
-        : result.kind === 'donor'
-          ? 422
-          : 502;
-    return res.status(status).json(result);
+    return res.json(result);
   });
 
   // 2. Reset database to seed data
