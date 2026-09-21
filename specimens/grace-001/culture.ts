@@ -110,6 +110,18 @@ export const economyActions: Record<string, EconomyAction> = {
     costs: { time: 2, attention: 1 },
     traces: { discipleship: 1 },
     note: "Invest in voluntary apprenticeship/formation. This creates no ownership of another person's future labor."
+  },
+  "reflection-block": {
+    id: "reflection-block",
+    label: "Reflect on an Earlier Moment",
+    costs: { time: 1, attention: 1 },
+    note: "Spend present time and attention to revisit an earlier campaign event without altering what happened."
+  },
+  "worldbuilding-block": {
+    id: "worldbuilding-block",
+    label: "Build a Possible World",
+    costs: { time: 1, attention: 1 },
+    note: "Spend present time and attention to explore a hypothetical world; imagination does not create external supply."
   }
 };
 
