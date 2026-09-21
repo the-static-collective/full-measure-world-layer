@@ -37,11 +37,9 @@ export function GraceCampaignPanel() {
   const chooseEconomyAction = (actionId: string) => {
     try {
       setError(null);
-      setCulture((current) => {
-        const next = applyEconomyAction(current, actionId);
-        setEconomyReceipt(next.history.at(-1) ?? null);
-        return next;
-      });
+      const nextCulture = applyEconomyAction(culture, actionId);
+      setCulture(nextCulture);
+      setEconomyReceipt(nextCulture.history.at(-1) ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -50,7 +48,21 @@ export function GraceCampaignPanel() {
   const playStoryCard = (cardId: string) => {
     try {
       setError(null);
-      setStory((current) => playCard(current, cardId));
+      const nextStory = playCard(story, cardId);
+      setStory(nextStory);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const playRecharge = (cardId: string, economyActionId: string) => {
+    try {
+      setError(null);
+      const nextStory = playCard(story, cardId);
+      const nextCulture = applyEconomyAction(culture, economyActionId);
+      setStory(nextStory);
+      setCulture(nextCulture);
+      setEconomyReceipt(nextCulture.history.at(-1) ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -108,18 +120,18 @@ export function GraceCampaignPanel() {
             <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Recharge / wild cards</p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <button
-                onClick={() => playStoryCard('practice.pray')}
+                onClick={() => playRecharge('practice.pray', 'prayer-block')}
                 className="rounded-2xl border border-violet-200 bg-violet-50 px-3 py-3 text-left"
               >
                 <span className="block text-sm font-semibold text-violet-950">Pray</span>
-                <span className="mt-1 block text-xs text-violet-800">Restore attention + resilience; external facts stay external.</span>
+                <span className="mt-1 block text-xs text-violet-800">Costs 1 time. Restore attention + resilience; external facts stay external.</span>
               </button>
               <button
-                onClick={() => playStoryCard('practice.rest')}
+                onClick={() => playRecharge('practice.rest', 'rest-block')}
                 className="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-3 text-left"
               >
                 <span className="block text-sm font-semibold text-emerald-950">Rest</span>
-                <span className="mt-1 block text-xs text-emerald-800">Spend time now so later choices are not made from zero.</span>
+                <span className="mt-1 block text-xs text-emerald-800">Costs 2 time. Recover now so later choices are not made from zero.</span>
               </button>
               <button
                 onClick={() => playStoryCard('wild.no-optimize')}
