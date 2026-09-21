@@ -1,0 +1,101 @@
+{
+  "candidateGate": {
+    "gateId": "sha256:09861e1d636dc4169415f405d3c48118442ca9652eec4dd15a26f6f6f3c75630",
+    "sourceWorldRef": "foreign-room-seed-001",
+    "destinationWorldRef": "full-measure/grace-001",
+    "status": "DETECTED",
+    "authorized": false,
+    "admissionStatus": "UNREQUESTED",
+    "reportedLocalEventRef": "sha256:69aba9b3648c4a1c6576654925a0e8d4c4e36c007867b28a8883517f359293a9",
+    "priorCrossingRef": "sha256:25963110bca38622cd77592757f01eb326a69143d5ab70f88aa03b49c373446e",
+    "sourceAddress": {
+      "worldId": "full-measure/grace-001",
+      "sourceSystem": "the-static-collective/full-measure-world-layer",
+      "sourceBranch": "feature/grace-001-worldseed",
+      "sourceCommit": "df1f20702012cd4e14a279e05d1a47a8255a40b9",
+      "sourceSchema": "full-measure.grace-worldseed.v0",
+      "sourcePath": "specimens/grace-001/worldseed.json",
+      "claimScope": "developer-source-pointer-only"
+    },
+    "unresolvedConditions": [
+      "grace-owned-world-manifest",
+      "grace-owned-entry-policy",
+      "foreign-room-exit-policy",
+      "party-confirmation"
+    ],
+    "nonClaims": [
+      "not_a_grace_world_invitation",
+      "not_a_destination_admission",
+      "not_a_live_world_connection",
+      "no_authority_transfer",
+      "reported_address_not_source_verified"
+    ]
+  },
+  "exitOffer": {
+    "schema": "origin.foreign-room-exit-offer.v0.1",
+    "status": "OFFERED",
+    "admitted": false,
+    "sourceWorldRef": "foreign-room-seed-001",
+    "destinationWorldRef": "full-measure/grace-001",
+    "partyRef": "fixture:party-1",
+    "anchorRef": "card:first-inheritance",
+    "candidateGateRef": "sha256:09861e1d636dc4169415f405d3c48118442ca9652eec4dd15a26f6f6f3c75630",
+    "priorCrossingRef": "sha256:25963110bca38622cd77592757f01eb326a69143d5ab70f88aa03b49c373446e",
+    "sourceLocalReceiptRef": "sha256:401014d99521d6823be480ce365e9d2309dba4ea39c837930aa6efb7fb069644",
+    "sourceLocalEventRef": "foreign-room-seed-001/exit:exit-specimen-offer-001",
+    "transferBundle": {
+      "schema": "origin.transfer-preview-request.v0.1",
+      "sourceWorldRef": "foreign-room-seed-001",
+      "proposedDestinationRef": "full-measure/grace-001",
+      "partyRef": "fixture:party-1",
+      "anchorRef": "card:first-inheritance",
+      "priorCrossingRef": "sha256:25963110bca38622cd77592757f01eb326a69143d5ab70f88aa03b49c373446e",
+      "items": [
+        {
+          "ref": "human:fixture:human-1",
+          "sourceSystem": "static-field/worldseed-001",
+          "claimScope": "participant-ref",
+          "requestedMode": "reference",
+          "evidenceRef": "sha256:25963110bca38622cd77592757f01eb326a69143d5ab70f88aa03b49c373446e"
+        },
+        {
+          "ref": "card:first-inheritance",
+          "sourceSystem": "postemahhn",
+          "claimScope": "card-reference-not-physical-custody",
+          "requestedMode": "reference",
+          "evidenceRef": "sha256:25963110bca38622cd77592757f01eb326a69143d5ab70f88aa03b49c373446e"
+        },
+        {
+          "ref": "thread:bell-unresolved",
+          "sourceSystem": "static-field/worldseed-001",
+          "claimScope": "unresolved-thread-only",
+          "requestedMode": "reference",
+          "evidenceRef": "sha256:25963110bca38622cd77592757f01eb326a69143d5ab70f88aa03b49c373446e"
+        },
+        {
+          "ref": "foreign-room:reported-origin/porch",
+          "sourceSystem": "foreign-room-seed-001",
+          "claimScope": "destination-local-reported-origin-only",
+          "requestedMode": "reference",
+          "evidenceRef": "sha256:d818feb937795ef936f1e36ccde4f2cb60de00985e83ecdced07035a9fc4898c"
+        }
+      ]
+    },
+    "transferBundleRef": "sha256:d526d9b445809826f312b80e3e574b4c7fb8472c760b7dac8f42addad7e6ea48",
+    "unresolvedConditions": [
+      "grace-owned-entry-policy",
+      "grace-local-host-consent",
+      "grace-owned-arrival-adapter",
+      "separate-human-party-confirmation"
+    ],
+    "nonClaims": [
+      "not_a_grace_world_invitation",
+      "not_a_destination_admission",
+      "not_a_second_crossing",
+      "not_a_live_world_connection",
+      "no_automatic_local_authority_transfer"
+    ],
+    "sourceStatus": "synthetic-foreign-room-local-policy",
+    "receiptId": "sha256:51bc8cc95e591e8927ac593f8efccfa805cf232553b62760c912ded5b5b05ef4"
+  }
+}

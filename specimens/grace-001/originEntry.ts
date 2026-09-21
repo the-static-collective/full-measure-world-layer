@@ -175,3 +175,80 @@ export function previewGraceTransfer(candidate: unknown, request: unknown) {
     nonClaims: [...NON_CLAIMS],
   };
 }
+
+const OFFER_KEYS = [
+  'admitted', 'anchorRef', 'candidateGateRef', 'destinationWorldRef',
+  'nonClaims', 'partyRef', 'priorCrossingRef', 'receiptId', 'schema',
+  'sourceLocalEventRef', 'sourceLocalReceiptRef', 'sourceStatus',
+  'sourceWorldRef', 'status', 'transferBundle', 'transferBundleRef',
+  'unresolvedConditions',
+].sort().join('|');
+const ALLOWED_FIXTURE_REFS = new Set([
+  'human:fixture:human-1', 'card:first-inheritance',
+  'thread:bell-unresolved', 'foreign-room:reported-origin/porch',
+]);
+
+/**
+ * Recognize a FOREIGN ROOM offer *shape* and its bounded links. This is not
+ * external-source authentication or approval for a Grace-local arrival.
+ */
+export function inspectGraceSourceExitOffer(candidate: unknown, rawOffer: unknown) {
+  const inspection = inspectGraceCandidate(candidate);
+  if (!object(rawOffer)) return fail('SOURCE_OFFER_REQUIRED');
+  if (Object.keys(rawOffer).sort().join('|') !== OFFER_KEYS) return fail('SOURCE_OFFER_FIELDS_INVALID');
+  if (rawOffer.schema !== 'origin.foreign-room-exit-offer.v0.1'
+    || rawOffer.status !== 'OFFERED' || rawOffer.admitted !== false
+    || rawOffer.sourceStatus !== 'synthetic-foreign-room-local-policy') return fail('SOURCE_OFFER_STATUS_INVALID');
+  if (rawOffer.sourceWorldRef !== SOURCE || rawOffer.destinationWorldRef !== DESTINATION
+    || rawOffer.candidateGateRef !== inspection.candidateGateRef
+    || rawOffer.priorCrossingRef !== inspection.priorCrossingRef) return fail('SOURCE_OFFER_GATE_MISMATCH');
+  if (!reference(rawOffer.receiptId) || !reference(rawOffer.sourceLocalReceiptRef)
+    || !reference(rawOffer.transferBundleRef)
+    || typeof rawOffer.sourceLocalEventRef !== 'string'
+    || !/^foreign-room-seed-001\/exit:[a-zA-Z0-9_-]{1,128}$/.test(rawOffer.sourceLocalEventRef)) return fail('SOURCE_OFFER_REF_INVALID');
+  if (rawOffer.partyRef !== 'fixture:party-1' || rawOffer.anchorRef !== 'card:first-inheritance') return fail('SOURCE_OFFER_PARTY_MISMATCH');
+  if (!Array.isArray(rawOffer.unresolvedConditions)
+    || !rawOffer.unresolvedConditions.includes('grace-local-host-consent')
+    || !rawOffer.unresolvedConditions.includes('separate-human-party-confirmation')
+    || !Array.isArray(rawOffer.nonClaims)
+    || !rawOffer.nonClaims.includes('not_a_grace_world_invitation')
+    || !rawOffer.nonClaims.includes('not_a_destination_admission')) return fail('SOURCE_OFFER_CLAIMS_INVALID');
+  if (!object(rawOffer.transferBundle)) return fail('SOURCE_OFFER_BUNDLE_MISMATCH');
+  const bundle = rawOffer.transferBundle;
+  if (bundle.partyRef !== rawOffer.partyRef || bundle.anchorRef !== rawOffer.anchorRef
+    || bundle.priorCrossingRef !== rawOffer.priorCrossingRef
+    || bundle.sourceWorldRef !== SOURCE || bundle.proposedDestinationRef !== DESTINATION
+    || !Array.isArray(bundle.items) || bundle.items.length !== 4
+    || bundle.items.some((raw: unknown) => !object(raw) || !ALLOWED_FIXTURE_REFS.has(raw.ref as string)
+      || raw.requestedMode !== 'reference')) return fail('SOURCE_OFFER_BUNDLE_MISMATCH');
+  try { previewGraceTransfer(candidate, bundle); }
+  catch { return fail('SOURCE_OFFER_BUNDLE_MISMATCH'); }
+  return {
+    schema: 'full-measure.grace-source-offer-inspection.v0.1' as const,
+    status: 'SOURCE_OFFER_SHAPE_RECOGNIZED' as const,
+    sourceIntegrity: 'UNVERIFIED_BY_DESTINATION' as const,
+    admitted: false as const,
+    manifestRef: GRACE_ORIGIN_WORLD_MANIFEST.worldId,
+    sourceOfferRef: rawOffer.receiptId as string,
+    sourceLocalReceiptRef: rawOffer.sourceLocalReceiptRef as string,
+    candidateGateRef: inspection.candidateGateRef,
+    priorCrossingRef: inspection.priorCrossingRef,
+    partyRef: rawOffer.partyRef as string,
+    anchorRef: rawOffer.anchorRef as string,
+    unresolvedConditions: [...CONDITIONS],
+    nonClaims: [...NON_CLAIMS],
+  };
+}
+
+/** Second-branch compatibility proof: a real-shaped offer still returns HOLD. */
+export function previewGraceSourceExitOffer(candidate: unknown, offer: unknown) {
+  const inspection = inspectGraceSourceExitOffer(candidate, offer);
+  const source = offer as {transferBundle: unknown};
+  const preview = previewGraceTransfer(candidate, source.transferBundle);
+  return {
+    ...preview,
+    sourceOfferRef: inspection.sourceOfferRef,
+    sourceOfferStatus: inspection.status,
+    sourceIntegrity: inspection.sourceIntegrity,
+  };
+}
