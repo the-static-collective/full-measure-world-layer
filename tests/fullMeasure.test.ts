@@ -208,3 +208,45 @@ test('counts project traces whether the project is the aggregate or payload pare
     2
   );
 });
+
+test('Mercy encounter traces do not change Full Measure factual measures', () => {
+  const before = buildFullMeasureSheet({
+    userId: 'builder',
+    offers: [offer],
+    projects: [project],
+    receipts: [receipt],
+    capacities: [capacity],
+    events: [confirmation],
+  });
+  const mercyEvents: DomainEvent[] = [
+    {
+      id: 'mercy_1',
+      circleId: 'circle_1',
+      aggregateType: 'mercy_encounter',
+      aggregateId: 'grace-mercy:broken-promise-001:builder',
+      eventType: 'mercy.sheet_turned',
+      actorId: 'builder',
+      payload: { to: 'MERCY' },
+      createdAt: '2026-09-21T00:00:00.000Z',
+    },
+    {
+      id: 'mercy_2',
+      circleId: 'circle_1',
+      aggregateType: 'mercy_encounter',
+      aggregateId: 'grace-mercy:broken-promise-001:builder',
+      eventType: 'mercy.discerned',
+      actorId: 'builder',
+      payload: { discernment: 'REFUSE', disposition: 'BOUNDED' },
+      createdAt: '2026-09-21T00:01:00.000Z',
+    },
+  ];
+  const after = buildFullMeasureSheet({
+    userId: 'builder',
+    offers: [offer],
+    projects: [project],
+    receipts: [receipt],
+    capacities: [capacity],
+    events: [confirmation, ...mercyEvents],
+  });
+  assert.deepEqual(after, before);
+});
