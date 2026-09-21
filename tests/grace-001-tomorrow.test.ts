@@ -64,7 +64,7 @@ test("Wednesday meal spends carried food, not freshly minted supply",()=>{
   const after=replayWednesday(playWednesdayAction(next,"make-wednesday-dinner"));
   assert.equal(after.stocks.food,before.stocks.food-1);
   assert.equal(after.stocks.time,before.stocks.time-1);
-  assert.ok(!after.openNeeds.some(d=>d.id==="wednesday-dinner"));
+  assert.equal(after.openNeeds.find(d=>d.id==="wednesday-dinner")?.remaining,0);
   assert.ok(after.openNeeds.some(d=>d.id==="client-callback"));
 });
 
