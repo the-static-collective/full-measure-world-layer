@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   availableActions,
   demandPressure,
@@ -6,6 +6,16 @@ import {
 import {
   receiptOpportunityCost,
 } from '../../specimens/grace-001/dogramBridge.ts';
+import {
+  createDayReceipt,
+  decodeDayReceipt,
+  encodeDayReceipt,
+} from '../../specimens/grace-001/dayReceipt.ts';
+import {
+  makePortableCardEnvelope,
+  upperRoomAnchors,
+  type PortableCardEnvelope,
+} from '../../specimens/grace-001/meaning.ts';
 import {
   appendEvent,
   decodeSession,
@@ -41,6 +51,9 @@ function loadSession(): GraceSession {
 export function GraceCampaignPanel() {
   const [session, setSession] = useState<GraceSession>(() => loadSession());
   const [error, setError] = useState<string | null>(null);
+  const [selectedAnchorId, setSelectedAnchorId] = useState('be-still');
+  const dayReceiptInputRef = useRef<HTMLInputElement | null>(null);
+  const cardEnvelopeInputRef = useRef<HTMLInputElement | null>(null);
   const replayed = useMemo(() => replaySession(session), [session]);
   const {story, culture, meaning, lastProposal} = replayed;
 
@@ -80,6 +93,59 @@ export function GraceCampaignPanel() {
     window.localStorage.setItem(GRACE_SESSION_STORAGE_KEY, encodeSession(next));
   };
 
+  const downloadJson = (filename: string, body: string) => {
+    const blob = new Blob([body], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportDayReceipt = () => {
+    try {
+      const receipt = createDayReceipt(session);
+      downloadJson('grace-001-tuesday.day-receipt.json', encodeDayReceipt(receipt));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const importDayReceipt = async (file?: File) => {
+    if (!file) return;
+    try {
+      setError(null);
+      const receipt = decodeDayReceipt(await file.text());
+      replaySession(receipt.session);
+      setSession(receipt.session);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const exportLatestCard = () => {
+    try {
+      const card = meaning.cards.at(-1);
+      if (!card) throw new Error('No remembered card exists yet.');
+      const envelope = makePortableCardEnvelope(meaning, card.id, 'local-player');
+      downloadJson(`${card.id}.portable-card.json`, JSON.stringify(envelope, null, 2));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const importCardEnvelope = async (file?: File) => {
+    if (!file) return;
+    try {
+      setError(null);
+      const envelope = JSON.parse(await file.text()) as PortableCardEnvelope;
+      commit({type: 'seed_card_envelope', envelope});
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
   const latestDream = meaning.dreams.at(-1);
   const latestReturn = meaning.returns.at(-1);
   const latestRememberedWord = meaning.cards.at(-1);
@@ -102,6 +168,25 @@ export function GraceCampaignPanel() {
             >
               Roll pressure
             </button>
+            <button
+              onClick={exportDayReceipt}
+              className="rounded-full border border-amber-300 bg-white px-3 py-2 text-xs font-medium text-amber-900 hover:bg-amber-50"
+            >
+              Export Day Receipt
+            </button>
+            <button
+              onClick={() => dayReceiptInputRef.current?.click()}
+              className="rounded-full border border-amber-300 bg-white px-3 py-2 text-xs font-medium text-amber-900 hover:bg-amber-50"
+            >
+              Import
+            </button>
+            <input
+              ref={dayReceiptInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(event) => void importDayReceipt(event.target.files?.[0])}
+            />
             <button
               onClick={reset}
               className="rounded-full border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-medium text-stone-600 hover:bg-stone-100"
@@ -196,12 +281,30 @@ export function GraceCampaignPanel() {
                 <p className="mt-1 text-xs text-indigo-900">{latestDream.experienced.join(' · ')}</p>
                 <p className="mt-2 text-xs text-indigo-700">Interpretation: {latestDream.interpretation}</p>
                 {!latestReturn && (
-                  <button
-                    onClick={() => commit({type: 'upper_room_return', dreamId: latestDream.id})}
-                    className="mt-3 rounded-full bg-indigo-950 px-4 py-2 text-xs font-semibold text-white"
-                  >
-                    Carry it into Upper Room
-                  </button>
+                  <div className="mt-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-indigo-700">Choose a text anchor</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {upperRoomAnchors.map((anchor) => (
+                        <button
+                          key={anchor.id}
+                          onClick={() => setSelectedAnchorId(anchor.id)}
+                          className={
+                            selectedAnchorId === anchor.id
+                              ? 'rounded-full bg-indigo-950 px-3 py-1.5 text-xs font-semibold text-white'
+                              : 'rounded-full border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-900'
+                          }
+                        >
+                          {anchor.scriptureAnchor}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => commit({type: 'upper_room_return', dreamId: latestDream.id, anchorId: selectedAnchorId})}
+                      className="mt-3 rounded-full bg-indigo-950 px-4 py-2 text-xs font-semibold text-white"
+                    >
+                      Carry it into Upper Room
+                    </button>
+                  </div>
                 )}
               </>
             )}
@@ -228,6 +331,28 @@ export function GraceCampaignPanel() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-600">Generation {latestRememberedWord.generation}</p>
                 <p className="mt-1 font-semibold text-indigo-950">{latestRememberedWord.title}</p>
                 <p className="mt-1 text-xs text-indigo-700">{latestRememberedWord.scriptureAnchor}</p>
+                <p className="mt-1 text-[10px] text-indigo-500">Lineage: {latestRememberedWord.lineage.join(' → ')}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    onClick={exportLatestCard}
+                    className="rounded-full border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-950"
+                  >
+                    Export card seed
+                  </button>
+                  <button
+                    onClick={() => cardEnvelopeInputRef.current?.click()}
+                    className="rounded-full border border-indigo-300 bg-white px-3 py-1.5 text-xs font-semibold text-indigo-950"
+                  >
+                    Receive lineage
+                  </button>
+                  <input
+                    ref={cardEnvelopeInputRef}
+                    type="file"
+                    accept="application/json,.json"
+                    className="hidden"
+                    onChange={(event) => void importCardEnvelope(event.target.files?.[0])}
+                  />
+                </div>
               </div>
             )}
           </div>
