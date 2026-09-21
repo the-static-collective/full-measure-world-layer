@@ -11,7 +11,9 @@ import {
   initialMeaningState,
   makeRememberedWordCard,
   recordRedDoorDream,
+  seedDescendantFromEnvelope,
   type MeaningState,
+  type PortableCardEnvelope,
 } from "./meaning.ts";
 
 export type GraceSessionInputEvent =
@@ -20,8 +22,9 @@ export type GraceSessionInputEvent =
   | {type: "economy_action"; actionId: string}
   | {type: "dm_roll"; seed: number}
   | {type: "dream_red_door"}
-  | {type: "upper_room_return"; dreamId: string; playerNote?: string}
-  | {type: "remembered_word"; returnId: string};
+  | {type: "upper_room_return"; dreamId: string; playerNote?: string; anchorId?: string}
+  | {type: "remembered_word"; returnId: string}
+  | {type: "seed_card_envelope"; envelope: PortableCardEnvelope};
 
 export type GraceSessionEvent = GraceSessionInputEvent & {id: string};
 
@@ -85,10 +88,13 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
         meaning = recordRedDoorDream(meaning);
         break;
       case "upper_room_return":
-        meaning = enterUpperRoomFromDream(meaning, event.dreamId, event.playerNote);
+        meaning = enterUpperRoomFromDream(meaning, event.dreamId, event.playerNote, event.anchorId ?? "be-still");
         break;
       case "remembered_word":
         meaning = makeRememberedWordCard(meaning, event.returnId);
+        break;
+      case "seed_card_envelope":
+        meaning = seedDescendantFromEnvelope(meaning, event.envelope);
         break;
     }
   }
