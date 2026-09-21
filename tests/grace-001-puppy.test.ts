@@ -6,6 +6,11 @@ import {
   availableWednesdayActions,offerPuppyCare,respondToPuppyCare,
   derivePuppyArrivalOffer,derivePuppyInterrupt,
 } from "../specimens/grace-001/tomorrow.ts";
+function dayWithTransport() {
+  let t=emptySession();
+  for(let i=0;i<4;i++) t=appendEvent(t,{type:"economy_action",actionId:"prayer-block"});
+  return startWednesday(t);
+}
 function day() {
   let t=emptySession();
   t=appendEvent(t,{type:"economy_action",actionId:"grocery-run"});
@@ -50,7 +55,7 @@ test("puppy wild card interrupts after one later act and makes concrete care due
   assert.ok(state.receipts.at(-1)?.nonClaims.includes("care receipt != puppy consent, ownership, or guaranteed affection"));
 });
 test("dog park requires a real transport unit and makes only a candidate encounter",()=>{
-  let w=playWednesdayAction(day(),"pray-wednesday");
+  let w=playWednesdayAction(dayWithTransport(),"pray-wednesday");
   w=offerPuppyCare(w,"temporary-care");
   w=playWednesdayAction(w,"pray-wednesday");
   const before=replayWednesday(w);
@@ -62,7 +67,7 @@ test("dog park requires a real transport unit and makes only a candidate encount
   assert.throws(()=>respondToPuppyCare(w,"porch"),/not currently due/);
 });
 test("when ordinary time is exhausted, urgent puppy care creates explicit next-day time debt rather than neglect",()=>{
-  let w=playWednesdayAction(day(),"pray-wednesday");
+  let w=playWednesdayAction(day(),"rest-wednesday");
   w=offerPuppyCare(w,"temporary-care");
   w=playWednesdayAction(w,"rest-wednesday");
   const due=derivePuppyInterrupt(w);
