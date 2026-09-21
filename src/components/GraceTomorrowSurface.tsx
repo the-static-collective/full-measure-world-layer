@@ -2,8 +2,14 @@ import React, {useMemo, useState} from "react";
 import {
   availableWednesdayActions,
   deriveWednesdayScene,
+  derivePuppyArrivalOffer,
+  derivePuppyInterrupt,
+  offerPuppyCare,
+  respondToPuppyCare,
   playWednesdayAction,
   replayWednesday,
+  type PuppyArrivalChoice,
+  type PuppyCareChoice,
   type WednesdayActionId,
   type WednesdayCampaign,
 } from "../../specimens/grace-001/tomorrow.ts";
@@ -26,6 +32,9 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
   const current=useMemo(()=>replayWednesday(campaign),[campaign]);
   const scene=useMemo(()=>deriveWednesdayScene(campaign),[campaign]);
   const actions=useMemo(()=>availableWednesdayActions(campaign),[campaign]);
+  const puppyArrival=useMemo(()=>derivePuppyArrivalOffer(campaign),[campaign]);
+  const puppyInterrupt=useMemo(()=>derivePuppyInterrupt(campaign),[campaign]);
+  const puppyOffer=puppyInterrupt??puppyArrival;
   const picked=actions.find(action=>action.id===selected)??null;
 
   const perform=(id:WednesdayActionId)=>{
@@ -44,6 +53,22 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
     }catch(err){setError(err instanceof Error?err.message:String(err));}
   };
 
+  const respondToPuppy=(choice:string)=>{
+    try {
+      const next=puppyInterrupt
+        ? respondToPuppyCare(campaign,choice as PuppyCareChoice)
+        : offerPuppyCare(campaign,choice as PuppyArrivalChoice);
+      const receipt=replayWednesday(next).receipts.at(-1);
+      onChange(next);
+      setSelected(null);
+      setError(null);
+      setBeat(receipt?{
+        title:puppyInterrupt?"The puppy's plans matter too":"A new set of paws enters the story",
+        lines:[...receipt.claims,...receipt.nonClaims],
+      }:null);
+    }catch(err){setError(err instanceof Error?err.message:String(err));}
+  };
+
   return (
     <div className="min-h-[30rem] bg-gradient-to-b from-sky-50 via-amber-50 to-stone-50 px-4 py-7 sm:px-8">
       <div className="mx-auto max-w-2xl">
@@ -59,6 +84,41 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
             </div>
           ))}
         </div>
+        {current.puppy.status==="visiting" && (
+          <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-orange-900">Puppy in the party · temporary care</p>
+            <p className="mt-1 text-sm text-stone-800">
+              {current.puppy.care==="settled"?
+                "The puppy has been cared for. A real handoff or future care still needs arranging.":
+                current.puppy.care==="due"?
+                "The puppy needs outside time now; other ordinary choices are held.":
+                "A new dependent has its own schedule."}
+            </p>
+            {current.puppy.timeDebt>0 && (
+              <p className="mt-2 text-xs font-semibold text-orange-900">
+                {current.puppy.timeDebt} future time block owed for urgent care given beyond today's available time.
+              </p>
+            )}
+          </div>
+        )}
+        {!beat && puppyOffer && (
+          <section className="mt-5 rounded-2xl border-2 border-violet-400 bg-violet-950 p-5 text-white" aria-label="Puppy wild card">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-300">Living wild card · puppy</p>
+            <h3 className="mt-2 text-2xl font-semibold">{puppyOffer.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-violet-100">{puppyOffer.body}</p>
+            <div className="mt-5 grid gap-2">
+              {puppyOffer.options.map(option=>(
+                <button type="button" key={option.id}
+                  onClick={()=>respondToPuppy(option.id)}
+                  className="min-h-14 rounded-xl border border-white/20 bg-white/10 p-3 text-left hover:bg-white/20">
+                  <span className="block text-sm font-semibold">{option.label}</span>
+                  <span className="mt-1 block text-xs text-violet-200">{option.note}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-4 text-xs text-violet-300">{puppyOffer.nonClaims.join(" · ")}</p>
+          </section>
+        )}
         {beat && (
           <section aria-live="polite" className="mt-5 rounded-2xl border border-cyan-200 bg-slate-950 p-5 text-white">
             <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-300">Consequence receipt</p>
@@ -68,7 +128,7 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
               className="mt-5 min-h-11 rounded-xl bg-cyan-200 px-4 py-2 text-sm font-semibold text-slate-950">Continue Wednesday</button>
           </section>
         )}
-        {!beat && actions.length>0 && (
+        {!beat && !puppyOffer && actions.length>0 && (
           <>
             <p className="mt-6 text-xs font-bold uppercase tracking-widest text-stone-500">What can you carry now?</p>
             <div className="mt-2 grid gap-2">
@@ -105,7 +165,7 @@ export function GraceTomorrowSurface({campaign,onChange,onExportTuesday}:Props) 
             )}
           </>
         )}
-        {!beat && current.stocks.time===0 && (
+        {!beat && !puppyOffer && current.stocks.time===0 && (
           <section className="mt-5 rounded-2xl bg-stone-950 p-5 text-stone-100">
             <h3 className="text-xl font-semibold">Wednesday takes attendance</h3>
             <p className="mt-2 text-xs text-stone-400">Open needs remain open; this is not a verdict.</p>
