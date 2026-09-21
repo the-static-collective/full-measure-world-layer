@@ -2,6 +2,7 @@ import React, {useMemo, useState} from 'react';
 
 import {
   deriveDayAttendance,
+  deriveDayPhase,
   deriveEncounterOffer,
   derivePlayActions,
   derivePlayScene,
@@ -13,6 +14,7 @@ import {
   type PlayActionId,
 } from '../../specimens/grace-001/playExperience.ts';
 import type {WorldResponseDisposition} from '../../specimens/grace-001/kernel.ts';
+import {GraceRoomStage} from './GraceRoomStage.tsx';
 import {
   replaySession,
   type GraceSession,
@@ -359,45 +361,14 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
   return (
     <div className="bg-gradient-to-b from-amber-50 via-orange-50/60 to-stone-50 px-4 py-6 sm:px-7 sm:py-8">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-[2rem] border border-amber-200/80 bg-white/90 p-5 shadow-lg shadow-amber-950/5 sm:p-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-amber-800">
-            {scene.eyebrow}
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-stone-950">
-            {scene.title}
-          </h2>
-          <p className="mt-3 text-base leading-relaxed text-stone-650">
-            {scene.body}
-          </p>
-
-          <div className="mt-5 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
-              One thing now
-            </p>
-            <p className="mt-1 text-sm font-semibold text-stone-900">{scene.focus}</p>
-          </div>
-
-          {!projectionsHidden ? (
-            <div className="mt-4 grid grid-cols-5 gap-1.5" aria-label="Current supply">
-              {([
-                ['time', scene.resources.time],
-                ['cash', scene.resources.cash],
-                ['food', scene.resources.food],
-                ['trip', scene.resources.transport],
-                ['attention', scene.resources.attention],
-              ] as const).map(([label, value]) => (
-                <div key={label} className="rounded-xl bg-stone-950 px-1.5 py-2.5 text-center text-white">
-                  <div className="text-base font-bold">{label === 'cash' ? '$' : ''}{value}</div>
-                  <div className="mt-0.5 text-[9px] uppercase tracking-wide text-stone-400">{label}</div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-4 rounded-2xl bg-fuchsia-950 px-4 py-3 text-sm font-semibold text-fuchsia-100">
-              Numeric projections are hidden. The underlying state is still there.
-            </div>
-          )}
-        </div>
+        <GraceRoomStage
+          scene={scene}
+          phase={deriveDayPhase(session)}
+          actions={actions}
+          selectedActionId={selectedActionId}
+          onSelectAction={(id) => setSelectedActionId((current) => current === id ? null : id)}
+          projectionsHidden={projectionsHidden}
+        />
 
         <div className="mt-5">
           <p className="px-1 text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500">
