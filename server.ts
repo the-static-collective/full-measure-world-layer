@@ -9,6 +9,11 @@ import { createWorldRuntimeServices } from './src/lib/worldRuntime/services.js';
 import { createWorldRuntimeHttpHandlers } from './src/lib/worldRuntime/http.js';
 import { registerWorldRuntimeRoutes } from './src/lib/worldRuntime/routes.js';
 import {
+  acceptGraceMercyAction,
+  buildGraceMercyEncounter,
+  GraceMercyHttpError,
+} from './src/lib/graceMercy/httpContract.js';
+import {
   JubileeDataStore,
   Offer,
   Project,
@@ -896,6 +901,55 @@ async function startServer() {
       };
     });
     res.json(events);
+  });
+
+
+  // Grace / Mercy dual-sheet specimen
+  app.get('/api/grace-mercy/broken-promise/:userId', (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const profile = store.profiles.find((candidate) => candidate.id === userId);
+    if (!profile) return res.status(404).json({ error: 'Participant not found.' });
+
+    const result = buildGraceMercyEncounter(userId, store.domainEvents);
+    res.json(result);
+  });
+
+  app.post('/api/grace-mercy/broken-promise/:userId/action', (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const actorId = getActorId(req);
+    const profile = store.profiles.find((candidate) => candidate.id === userId);
+    if (!profile) return res.status(404).json({ error: 'Participant not found.' });
+    const circleId =
+      store.circleMembers.find((member) => member.userId === userId)?.circleId ??
+      store.circles[0]?.id ??
+      'circle_1';
+
+    try {
+      const result = acceptGraceMercyAction({
+        userId,
+        actorId,
+        circleId,
+        body: req.body,
+        events: store.domainEvents,
+        now: new Date().toISOString(),
+      });
+
+      if (!result.duplicate) {
+        store.domainEvents.unshift(result.event);
+        saveDataStore(store);
+      }
+
+      res.status(result.duplicate ? 200 : 201).json({
+        duplicate: result.duplicate,
+        projection: result.projection,
+        receipt: result.receipt,
+      });
+    } catch (error) {
+      if (error instanceof GraceMercyHttpError) {
+        return res.status(error.status).json({ error: error.code, code: error.code });
+      }
+      throw error;
+    }
   });
 
   // 10. Participant Lineage

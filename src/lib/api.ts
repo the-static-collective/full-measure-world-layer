@@ -10,6 +10,9 @@ import {
   OfferCategory,
   PledgeStatus,
 } from '../types.js';
+import type { BrokenPromiseAction } from './graceMercy/brokenPromise.js';
+import type { MercyEncounterReceipt } from './graceMercy/receipt.js';
+import type { MercyEncounterProjection } from './graceMercy/types.js';
 
 let currentUserId = localStorage.getItem('jubilee_user_id') || 'user_lu';
 
@@ -222,6 +225,22 @@ export const api = {
   getCapacities: () =>
     apiFetch<Array<Capacity & { receipt?: Receipt; project?: Project }>>('/api/capacities'),
   getEvents: () => apiFetch<Array<DomainEvent & { actor?: Profile }>>('/api/events'),
+
+
+  // Grace / Mercy dual-sheet specimen
+  getGraceMercyEncounter: (userId: string) =>
+    apiFetch<{ projection: MercyEncounterProjection; receipt: MercyEncounterReceipt | null }>(
+      `/api/grace-mercy/broken-promise/${encodeURIComponent(userId)}`
+    ),
+  postGraceMercyAction: (userId: string, action: BrokenPromiseAction, actionId: string) =>
+    apiFetch<{
+      duplicate: boolean;
+      projection: MercyEncounterProjection;
+      receipt: MercyEncounterReceipt | null;
+    }>(`/api/grace-mercy/broken-promise/${encodeURIComponent(userId)}/action`, {
+      method: 'POST',
+      body: JSON.stringify({ action, actionId }),
+    }),
 
   // Participant Lineage
   getParticipantLineage: (id: string) =>

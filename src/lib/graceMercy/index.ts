@@ -3,3 +3,4 @@ export * from './fixtures.js';
 export * from './projection.js';
 export * from './brokenPromise.js';
 export * from './receipt.js';
+export * from './httpContract.js';
