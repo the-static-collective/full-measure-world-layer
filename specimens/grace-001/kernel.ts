@@ -11,7 +11,7 @@ export interface Thread {
 
 export interface Receipt {
   id: string;
-  kind: "proposal" | "act" | "rule_change" | "hold" | "resume";
+  kind: "proposal" | "act" | "rule_change" | "hold" | "resume" | "world_response";
   cardId?: string;
   threadId?: string;
   claims: string[];
@@ -152,6 +152,66 @@ export function holdFocus(state: GraceState, reason = "held by player"): GraceSt
     claims: [`foreground thread suspended: ${reason}`, `return address preserved: ${current.returnAddress}`],
     nonClaims: ["suspended does not mean complete", "other residual needs are not erased"]
   });
+  return next;
+}
+
+export type WorldResponseId = "housing-coordinator-callback";
+export type WorldResponseDisposition = "answer" | "let-ring" | "hold-tomorrow";
+
+export function applyWorldResponse(
+  state: GraceState,
+  responseId: WorldResponseId,
+  disposition: WorldResponseDisposition,
+): GraceState {
+  const next = copyState(state);
+
+  if (responseId !== "housing-coordinator-callback") {
+    throw new Error(`Unknown world response: ${responseId}`);
+  }
+  if (next.external.clientHousing !== "attempted") {
+    throw new Error("housing coordinator callback requires an earlier attempted call");
+  }
+
+  const claims = ["housing coordinator callback arrived"];
+  const nonClaims = ["callback arrival != housing secured"];
+
+  if (disposition === "answer") {
+    next.external.clientHousing = "appointment_offered";
+    const thread = next.threads.find((candidate) => candidate.id === "client-housing");
+    if (thread) {
+      thread.residual = "appointment offered; eligibility and housing remain unresolved";
+    }
+    claims.push("appointment was offered");
+    nonClaims.push(
+      "appointment offered != housing secured",
+      "appointment offered != eligibility confirmed",
+    );
+  } else if (disposition === "let-ring") {
+    claims.push("callback was not answered in this moment");
+    nonClaims.push(
+      "unanswered callback != refused help",
+      "unanswered callback != closed need",
+    );
+  } else if (disposition === "hold-tomorrow") {
+    const thread = next.threads.find((candidate) => candidate.id === "client-housing");
+    if (thread) thread.returnAddress = "resume:client-housing";
+    claims.push("callback response was deliberately deferred until tomorrow");
+    nonClaims.push(
+      "deferred != complete",
+      "deferred != refused help",
+    );
+  } else {
+    throw new Error(`Unknown world response disposition: ${String(disposition)}`);
+  }
+
+  next.receipts.push({
+    id: receiptId(next),
+    kind: "world_response",
+    threadId: "client-housing",
+    claims,
+    nonClaims,
+  });
+
   return next;
 }
 
