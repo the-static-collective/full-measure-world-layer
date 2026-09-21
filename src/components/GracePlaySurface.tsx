@@ -22,6 +22,7 @@ import {
 interface GracePlaySurfaceProps {
   session: GraceSession;
   commit: (...events: GraceSessionInputEvent[]) => void;
+  onBeginWednesday?: () => void;
 }
 
 interface WorldResponseBeat {
@@ -68,7 +69,7 @@ function beatForWorldResponse(disposition: WorldResponseDisposition): WorldRespo
   }
 }
 
-export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
+export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlaySurfaceProps) {
   const [selectedActionId, setSelectedActionId] = useState<PlayActionId | null>(null);
   const [beat, setBeat] = useState<ConsequenceBeat | null>(null);
   const [worldBeat, setWorldBeat] = useState<WorldResponseBeat | null>(null);
@@ -342,6 +343,12 @@ export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
           <p className="mt-6 text-xs leading-relaxed text-stone-500">
             {attendance.nonClaims.join(' · ')}
           </p>
+          {onBeginWednesday && (
+            <button type="button" onClick={onBeginWednesday}
+              className="mt-6 min-h-12 w-full rounded-2xl bg-amber-300 px-5 py-3 text-sm font-bold text-stone-950 hover:bg-amber-200">
+              Begin Wednesday · carry the receipts
+            </button>
+          )}
         </div>
       </div>
     );

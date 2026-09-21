@@ -1,6 +1,8 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {GraceAperturePanel} from './GraceAperturePanel';
 import {GracePlaySurface} from './GracePlaySurface';
+import {GraceTomorrowSurface} from './GraceTomorrowSurface';
+import {startWednesday, replayWednesday, type WednesdayCampaign} from '../../specimens/grace-001/tomorrow.ts';
 import {
   availableActions,
   demandPressure,
@@ -33,6 +35,20 @@ import {
   type GraceSessionInputEvent,
 } from '../../specimens/grace-001/session.ts';
 
+const WEDNESDAY_STORAGE_KEY = "full-measure.grace-wednesday.v1";
+
+function loadWednesday(tuesday: GraceSession): WednesdayCampaign | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(WEDNESDAY_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as WednesdayCampaign;
+    if (JSON.stringify(parsed.sourceDayReceipt.session) !== JSON.stringify(tuesday)) return null;
+    replayWednesday(parsed);
+    return parsed;
+  } catch { return null; }
+}
+
 const stockLabels: Record<string, string> = {
   time: 'Time',
   cash: 'Cash',
@@ -56,6 +72,7 @@ function loadSession(): GraceSession {
 
 export function GraceCampaignPanel() {
   const [session, setSession] = useState<GraceSession>(() => loadSession());
+  const [wednesday, setWednesday] = useState<WednesdayCampaign | null>(() => loadWednesday(loadSession()));
   const [error, setError] = useState<string | null>(null);
   const [selectedAnchorId, setSelectedAnchorId] = useState('be-still');
   const [showInspector, setShowInspector] = useState(false);
@@ -83,6 +100,11 @@ export function GraceCampaignPanel() {
   useEffect(() => {
     window.localStorage.setItem(GRACE_SESSION_STORAGE_KEY, encodeSession(session));
   }, [session]);
+
+  useEffect(() => {
+    if (wednesday) window.localStorage.setItem(WEDNESDAY_STORAGE_KEY, JSON.stringify(wednesday));
+    else window.localStorage.removeItem(WEDNESDAY_STORAGE_KEY);
+  }, [wednesday]);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,6 +141,7 @@ export function GraceCampaignPanel() {
   };
 
   const reset = () => {
+    setWednesday(null);
     const next = emptySession();
     setSession(next);
     setError(null);
@@ -151,6 +174,7 @@ export function GraceCampaignPanel() {
       const receipt = decodeDayReceipt(await file.text());
       replaySession(receipt.session);
       setSession(receipt.session);
+      setWednesday(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -184,9 +208,19 @@ export function GraceCampaignPanel() {
 
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-amber-200 bg-white/85 shadow-sm">
-      <GracePlaySurface session={session} commit={commit} />
+      {wednesday
+        ? <GraceTomorrowSurface campaign={wednesday} onChange={setWednesday} onExportTuesday={exportDayReceipt} />
+        : <GracePlaySurface session={session} commit={commit} onBeginWednesday={() => {
+            try {
+              setError(null);
+              setWednesday(startWednesday(session));
+              setShowInspector(false);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : String(err));
+            }
+          }} />}
 
-      <div className="border-t border-amber-100 bg-white px-4 py-3 sm:px-6">
+      {!wednesday && <div className="border-t border-amber-100 bg-white px-4 py-3 sm:px-6">
         <button
           type="button"
           onClick={() => setShowInspector((current) => !current)}
@@ -195,9 +229,9 @@ export function GraceCampaignPanel() {
         >
           {showInspector ? 'Close world inspector' : 'Inspect world'}
         </button>
-      </div>
+      </div>}
 
-      {showInspector && (
+      {!wednesday && showInspector && (
         <>
       <div className="border-b border-amber-100 bg-amber-50/80 px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
