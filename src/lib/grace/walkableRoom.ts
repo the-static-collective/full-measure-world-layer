@@ -1,4 +1,4 @@
-import type {PlayActionId} from '../../specimens/grace-001/playExperience.ts';
+import type {PlayActionId} from '../../../specimens/grace-001/playExperience.ts';
 
 export interface RoomPose {x: number; z: number; yaw: number}
 export type RoomMove = 'forward' | 'back' | 'left' | 'right' | 'turn-left' | 'turn-right';

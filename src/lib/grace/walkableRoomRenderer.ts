@@ -1,4 +1,4 @@
-import type {DayPhase} from '../../specimens/grace-001/playExperience.ts';
+import type {DayPhase} from '../../../specimens/grace-001/playExperience.ts';
 import type {RoomPose} from './walkableRoom.ts';
 
 /** Procedural WebGL1 room. Camera movement changes presentation, never game state. */
