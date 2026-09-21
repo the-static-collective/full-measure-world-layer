@@ -1,4 +1,10 @@
 import {
+  initialArchaeologyState,
+  visitArchaeologyScene,
+  type ArchaeologySceneId,
+  type ArchaeologyState,
+} from "./archaeology.ts";
+import {
   chooseParty,
   initialApertureState,
   recordFlashbackReflection,
@@ -38,7 +44,8 @@ export type GraceSessionInputEvent =
   | {type: "choose_party"; members: PartyMemberId[]}
   | {type: "flashback_reflection"; sourceEventId: string; presentReflection: string}
   | {type: "possible_world_toggle"; principleId: PossibleWorldPrincipleId}
-  | {type: "possible_world_return"};
+  | {type: "possible_world_return"}
+  | {type: "archaeology_visit"; sceneId: ArchaeologySceneId; choiceId: string};
 
 export type GraceSessionEvent = GraceSessionInputEvent & {id: string};
 
@@ -52,6 +59,7 @@ export interface ReplayedGraceSession {
   culture: CultureState;
   meaning: MeaningState;
   apertures: ApertureState;
+  archaeology: ArchaeologyState;
   lastProposal: ReturnType<typeof drawQuestProposal> | null;
 }
 
@@ -84,6 +92,7 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
   let culture = initialCultureState();
   let meaning = initialMeaningState();
   let apertures = initialApertureState();
+  let archaeology = initialArchaeologyState();
   let lastProposal: ReturnType<typeof drawQuestProposal> | null = null;
 
   for (let eventIndex = 0; eventIndex < session.events.length; eventIndex += 1) {
@@ -152,10 +161,24 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
         }
         apertures = returnFromPossibleWorld(apertures);
         break;
+      case "archaeology_visit":
+        if (
+          !previousEvent ||
+          previousEvent.type !== "economy_action" ||
+          previousEvent.actionId !== "storyship-block"
+        ) {
+          throw new Error("archaeology visit requires an immediately preceding storyship-block");
+        }
+        archaeology = visitArchaeologyScene(archaeology, {
+          sceneId: event.sceneId,
+          choiceId: event.choiceId,
+          party: apertures.party,
+        });
+        break;
     }
   }
 
-  return {story, culture, meaning, apertures, lastProposal};
+  return {story, culture, meaning, apertures, archaeology, lastProposal};
 }
 
 export function encodeSession(session: GraceSession): string {
