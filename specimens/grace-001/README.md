@@ -98,6 +98,52 @@ Dogram calculates. It does not choose the morally correct move.
 
 A lyric is artistic source material, not automatic campaign canon. Full Measure-local admission remains separate.
 
+## Persistence and replay
+
+The inhabited React surface now stores only the append-only `full-measure.grace-session.v1` event log in local browser storage.
+
+On reload, the current story state, culture economy, DM proposal, dream witnesses, Upper Room returns, and remembered cards are reconstructed by deterministic replay from the seed state.
+
+A malformed or unaffordable event sequence fails replay rather than borrowing supply from nowhere.
+
+## Dream → Upper Room → remembered card
+
+The first MADDJack path is executable:
+
+```text
+RED DOOR DREAM
+  ↓ attributable dream witness
+interpretation: unresolved
+  ↓
+UPPER ROOM RETURN
+text anchor: Psalm 46:10
+practice: prayer
+  ↓
+REMEMBERED WORD
+generation: 1
+```
+
+The return preserves the text anchor and prayer occurrence while explicitly refusing the claims that the dream was prophetic, that one interpretation has been proven, or that prayer guarantees an external outcome.
+
+This follows Upper Room's existing `continuity without captivity` boundary: preserve enough provenance for honest re-entry without forcing one pose or interpretation.
+
+## Dogram-compatible mechanics witnesses
+
+`dogramBridge.ts` now provides two bounded exact receipts:
+
+- `GRACE-OPPORTUNITY-COST-001` compares the before/after lawful action sets and receipts foreclosed, newly available, and retained successors.
+- `BUDGET-ROUNDING-RESIDUAL-001` mirrors Dogram's merged largest-fractional-remainder integer-budget specimen for declared finite game budgets.
+
+The frozen `5:4:1` / budget `7` control reproduces:
+
+```text
+exact      7/2 : 14/5 : 7/10
+allocation   3 :    3 :    1
+residual  -1/2 :  1/5 : 3/10
+```
+
+These are mechanics calculations with `authority: none`. Successor availability does not mean occurrence, and numerical allocation does not decide the right human choice.
+
 ## Next frontier
 
 Make this *inhabited*:
