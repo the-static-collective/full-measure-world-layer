@@ -10,36 +10,160 @@
       "id": "grace",
       "role": "player-character",
       "irreducible": true,
-      "notes": ["single mother", "case manager", "builder", "faith practice"]
+      "notes": [
+        "single mother",
+        "case manager",
+        "builder",
+        "faith practice"
+      ]
     },
     {
       "id": "heaven",
       "role": "party-member",
       "irreducible": true,
-      "notes": ["daughter", "has her own wants, fatigue, humor, refusal, initiative and surprises"],
-      "nonClaims": ["not a morale bonus", "not a player-owned resource"]
+      "notes": [
+        "daughter",
+        "has her own wants, fatigue, humor, refusal, initiative and surprises"
+      ],
+      "nonClaims": [
+        "not a morale bonus",
+        "not a player-owned resource"
+      ]
     }
   ],
   "locations": [
-    {"id": "house.kitchen", "title": "Kitchen", "seedMotifs": ["lemon", "table", "dishes", "light"]},
-    {"id": "house.porch", "title": "Porch", "seedMotifs": ["chair", "weather", "screen door", "open E"]},
-    {"id": "road.school", "title": "School Road", "seedMotifs": ["gravel", "car", "clock", "static"]},
-    {"id": "work.community-desk", "title": "Community Desk", "seedMotifs": ["phone", "declared need", "referral", "receipt"]},
-    {"id": "upper-room", "title": "Upper Room", "seedMotifs": ["Scripture", "prayer", "branch", "return"]},
-    {"id": "dream.red-door", "title": "Red Door Dream", "seedMotifs": ["door", "water", "three keys", "unresolved woman"]},
-    {"id": "possible-world.grace-house", "title": "Grace's Possible House", "seedMotifs": ["food without proof", "art room", "porch", "community kitchen", "garden"]}
+    {
+      "id": "house.kitchen",
+      "title": "Kitchen",
+      "seedMotifs": [
+        "lemon",
+        "table",
+        "dishes",
+        "light"
+      ]
+    },
+    {
+      "id": "house.porch",
+      "title": "Porch",
+      "seedMotifs": [
+        "chair",
+        "weather",
+        "screen door",
+        "open E"
+      ]
+    },
+    {
+      "id": "road.school",
+      "title": "School Road",
+      "seedMotifs": [
+        "gravel",
+        "car",
+        "clock",
+        "static"
+      ]
+    },
+    {
+      "id": "work.community-desk",
+      "title": "Community Desk",
+      "seedMotifs": [
+        "phone",
+        "declared need",
+        "referral",
+        "receipt"
+      ]
+    },
+    {
+      "id": "upper-room",
+      "title": "Upper Room",
+      "seedMotifs": [
+        "Scripture",
+        "prayer",
+        "branch",
+        "return"
+      ]
+    },
+    {
+      "id": "dream.red-door",
+      "title": "Red Door Dream",
+      "seedMotifs": [
+        "door",
+        "water",
+        "three keys",
+        "unresolved woman"
+      ]
+    },
+    {
+      "id": "possible-world.grace-house",
+      "title": "Grace's Possible House",
+      "seedMotifs": [
+        "food without proof",
+        "art room",
+        "porch",
+        "community kitchen",
+        "garden"
+      ]
+    }
   ],
   "bandcampSeed": {
     "source": "The Static Collective Bandcamp corpus, supplied export",
     "method": "motif admission only; lyric occurrence does not automatically establish fictional canon",
     "motifs": [
-      {"motif": "open E", "roles": ["return-tone", "threshold-memory"]},
-      {"motif": "lemon", "roles": ["Grace-marker", "ordinary-particular", "crooked-grin"]},
-      {"motif": "table", "roles": ["gathering", "world-expansion", "care"]},
-      {"motif": "seed/root/fruit", "roles": ["formation", "inheritance", "slow consequence"]},
-      {"motif": "porch/room/door", "roles": ["home", "aperture", "departure", "return"]},
-      {"motif": "weather/static/road", "roles": ["movement", "uncertainty", "carrier"]},
-      {"motif": "light kept on", "roles": ["continuity", "care", "rest"]}
+      {
+        "motif": "open E",
+        "roles": [
+          "return-tone",
+          "threshold-memory"
+        ]
+      },
+      {
+        "motif": "lemon",
+        "roles": [
+          "Grace-marker",
+          "ordinary-particular",
+          "crooked-grin"
+        ]
+      },
+      {
+        "motif": "table",
+        "roles": [
+          "gathering",
+          "world-expansion",
+          "care"
+        ]
+      },
+      {
+        "motif": "seed/root/fruit",
+        "roles": [
+          "formation",
+          "inheritance",
+          "slow consequence"
+        ]
+      },
+      {
+        "motif": "porch/room/door",
+        "roles": [
+          "home",
+          "aperture",
+          "departure",
+          "return"
+        ]
+      },
+      {
+        "motif": "weather/static/road",
+        "roles": [
+          "movement",
+          "uncertainty",
+          "carrier"
+        ]
+      },
+      {
+        "motif": "light kept on",
+        "roles": [
+          "continuity",
+          "care",
+          "rest"
+        ]
+      }
     ]
   },
   "economy": {
@@ -51,16 +175,32 @@
       "attention": 3
     },
     "liveDemand": [
-      {"id": "home-dinner", "required": true},
-      {"id": "client-callback", "required": true},
-      {"id": "vehicle-check", "required": false},
-      {"id": "rest", "required": false},
-      {"id": "neighbor-meal", "required": false}
+      {
+        "id": "home-dinner",
+        "required": true
+      },
+      {
+        "id": "client-callback",
+        "required": true
+      },
+      {
+        "id": "vehicle-check",
+        "required": false
+      },
+      {
+        "id": "rest",
+        "required": false
+      },
+      {
+        "id": "neighbor-meal",
+        "required": false
+      }
     ],
     "cultureTraces": [
       "hospitality",
       "stewardship",
       "discipleship",
+      "prayer",
       "rest",
       "mutual_aid"
     ],
@@ -71,14 +211,31 @@
       "meeting one demand does not erase residual demand",
       "people are not fungible resource units",
       "discipleship is formation/apprenticeship, not ownership of labor",
-      "culture emerges from repeated attributable choices rather than a morality score"
+      "culture emerges from repeated attributable choices rather than a morality score",
+      "prayer and rest recharge by spending finite time"
     ]
   },
   "decks": {
-    "pressure": ["The Morning Is Late", "Client Needs Housing", "Pickup Clock", "Vehicle Noise", "Quiet House"],
-    "practice": ["Pray", "Drink Water", "Rest"],
-    "relation": ["Make the Call", "Ask for Help"],
-    "wild": ["YOU MAY NOT OPTIMIZE THIS", "THE WRONG DOOR OPENS"]
+    "pressure": [
+      "The Morning Is Late",
+      "Client Needs Housing",
+      "Pickup Clock",
+      "Vehicle Noise",
+      "Quiet House"
+    ],
+    "practice": [
+      "Pray",
+      "Drink Water",
+      "Rest"
+    ],
+    "relation": [
+      "Make the Call",
+      "Ask for Help"
+    ],
+    "wild": [
+      "YOU MAY NOT OPTIMIZE THIS",
+      "THE WRONG DOOR OPENS"
+    ]
   },
   "laws": [
     "focus is not the total case",
