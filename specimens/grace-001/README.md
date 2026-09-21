@@ -92,6 +92,51 @@ Candidate Dogram checks:
 
 Dogram calculates. It does not choose the morally correct move.
 
+## Party, flashback, and possible-world apertures
+
+The inhabited campaign now exposes three explicit world/meaning apertures without creating a second authority system.
+
+### Choose your party
+
+Grace remains the player-character. Heaven and Paula can be included or left out of the active party.
+
+Party membership contributes **lenses and prompts**, not fungible labor, stat bonuses, obedience, or automatic agreement.
+
+### Flashback
+
+A flashback points to an earlier append-only campaign event.
+
+The player may spend:
+
+```text
+1 time
+1 attention
+```
+
+to add a present-day reflection.
+
+Replay refuses a flashback that has no earlier source event or that lacks the immediately preceding `reflection-block`. The source event is never edited.
+
+```text
+earlier event
+  != later memory
+  != present interpretation
+```
+
+### Grace's Possible House
+
+The seeded hypothetical world can currently hold:
+
+- food without proving worth;
+- a huge art room for Heaven;
+- a porch around the whole house;
+- a community kitchen;
+- garden everywhere.
+
+Returning from the possible world costs `1 time + 1 attention` and receipts both the selected principles and the tensions they still require: supply, maintenance, cleanup, land, water, seasonality, boundaries, accessibility, and rest.
+
+The aperture therefore allows fantasy/utopia to become **design material without becoming fake present-world supply**.
+
 ## Live Dogram donor
 
 Full Measure can now use Dogram itself as an optional local mechanics donor.
