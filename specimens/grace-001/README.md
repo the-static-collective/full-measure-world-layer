@@ -329,6 +329,18 @@ Generation 2 descendant
 
 The descendant preserves the parent card id and complete lineage while explicitly refusing to claim physical custody transfer or inherited interpretive authority.
 
+## GRACE-PUPPY-001 / THE PUPPY HAS OTHER PLANS
+
+A living puppy can interrupt Wednesday's focused hand after its first ordinary action. A neighbor offers **temporary care**, together with one puppy-specific meal and a leash. The player may decline without penalty or accept an actual care obligation; the puppy is not owned, a worker unit, an automatic happiness boost, or a required quest key.
+
+If temporary care is accepted, the puppy needs an outside break and its supplied meal after a subsequent ordinary move. This interrupts other moves in replay and in the focused UI. The player can go outside together, or take the puppy to the dog park **only if a transport use remains**. Both care responses use one declared time block; the dog park also uses one transport unit. The puppy's own meal is separate from Grace's human food ledger.
+
+If an urgent care need surfaces after Wednesday has spent all its ordinary time, the care action still occurs and explicitly records one **future time block owed**; it is not a free resource refill or a completed third-day action. Wednesday can then take attendance with that obligation visible. Later-days settlement is outside this two-day specimen.
+
+The optional puppy arrival, the choice to accept or decline, and the later care response are append-only Wednesday events with replay validation. The interruption cannot be bypassed by adding ordinary actions to the event log. A possible dog-park conversation remains a candidate, not an automatically fulfilled relationship.
+
+The first release does not add pet ownership, automatic positive outcomes, real-world animal-care advice, or an infinite pet simulation. It adds a particular living interruption with concrete responsibility, choice, and residual future care.
+
 ## GRACE-PLAY-003 / TOMORROW HAS A MEMORY
 
 Campfire now exposes an explicit **Begin Wednesday** button when Tuesday reaches its House Takes Attendance screen. Wednesday is a separate, locally persisted append-only day, not a replay of Tuesday's starting supply.
