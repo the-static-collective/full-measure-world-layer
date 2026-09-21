@@ -207,3 +207,19 @@ test("House Takes Attendance appears when time is exhausted and preserves open n
     ),
   );
 });
+
+
+test("replay refuses a manually injected callback before its declared delay", () => {
+  let session = emptySession();
+  session = resolvePlayAction(session, "return-client-call").session;
+  session = appendEvent(session, {
+    type: "world_response",
+    responseId: "housing-coordinator-callback",
+    disposition: "answer",
+  });
+
+  assert.throws(
+    () => replaySession(session),
+    /requires two later ordinary turns/,
+  );
+});
