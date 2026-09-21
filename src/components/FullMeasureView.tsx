@@ -36,6 +36,7 @@ import {
   MeasureKey,
 } from '../lib/fullMeasure';
 import { NavTab } from './Navbar';
+import { GraceMercyDualSheet } from './GraceMercyDualSheet';
 
 interface Props {
   currentUser: Profile | null;
@@ -269,6 +270,8 @@ export const FullMeasureView: React.FC<Props> = ({
           durable participation trace.
         </p>
       </section>
+
+      <GraceMercyDualSheet currentUser={currentUser} />
 
       {quest ? (
         <section className="parchment-card-warm rounded-3xl border border-[#e2d7c7] overflow-hidden">
