@@ -255,7 +255,11 @@
     "meaning work consumes declared present time and attention",
     "Bandcamp scene seed != historical fact",
     "story archaeology consumes present time and attention",
-    "party lens may change prompts without changing source provenance"
+    "party lens may change prompts without changing source provenance",
+    "the world may answer a prior act after a deterministic delay",
+    "world response occurrence and player disposition are replayed history",
+    "end of day preserves unresolved needs instead of narratively closing them",
+    "day phase derives from existing time supply rather than adding a second clock"
   ],
   "partyOptions": [
     {
@@ -404,5 +408,56 @@
       "selected relation remains candidate until separately admitted",
       "Day Receipt replay binds the visit witness"
     ]
+  },
+  "playExperience": {
+    "play002": {
+      "id": "GRACE-PLAY-002",
+      "seal": "THE DAY MOVES WITHOUT YOU",
+      "dayPhase": {
+        "source": "remaining existing time supply",
+        "mapping": {
+          "morning": "time >= 4",
+          "midday": "time 2-3",
+          "evening": "time = 1",
+          "night": "time = 0"
+        },
+        "nonClaims": [
+          "day phase does not introduce a second clock resource"
+        ]
+      },
+      "delayedResponses": [
+        {
+          "id": "housing-coordinator-callback",
+          "trigger": "two later ordinary turns after client-call",
+          "dispositions": [
+            "answer",
+            "let-ring",
+            "hold-tomorrow"
+          ],
+          "law": [
+            "callback occurrence is recorded even when unanswered",
+            "appointment offered != housing secured",
+            "unanswered callback != refused help",
+            "replay refuses premature injection"
+          ]
+        }
+      ],
+      "endOfDay": {
+        "title": "THE HOUSE TAKES ATTENDANCE",
+        "trigger": "time = 0 after higher-priority incoming/uncanny encounters are handled or dismissed",
+        "includes": [
+          "completed local demands",
+          "open demands",
+          "culture practiced",
+          "declared changes",
+          "strange retained witnesses"
+        ],
+        "nonClaims": [
+          "end of day != resolution of every open need",
+          "unfinished != failed",
+          "completed local scope != optimal day"
+        ]
+      }
+    }
   }
 }
