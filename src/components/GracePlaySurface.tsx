@@ -1,14 +1,18 @@
 import React, {useMemo, useState} from 'react';
 
 import {
+  deriveDayAttendance,
   deriveEncounterOffer,
   derivePlayActions,
   derivePlayScene,
+  deriveWorldResponseOffer,
   previewPlayAction,
   resolvePlayAction,
+  resolveWorldResponse,
   type ConsequenceBeat,
   type PlayActionId,
 } from '../../specimens/grace-001/playExperience.ts';
+import type {WorldResponseDisposition} from '../../specimens/grace-001/kernel.ts';
 import {
   replaySession,
   type GraceSession,
@@ -20,6 +24,11 @@ interface GracePlaySurfaceProps {
   commit: (...events: GraceSessionInputEvent[]) => void;
 }
 
+interface WorldResponseBeat {
+  title: string;
+  lines: string[];
+}
+
 function costText(cost: Record<string, number | undefined>): string {
   return Object.entries(cost)
     .filter(([, value]) => typeof value === 'number' && value > 0)
@@ -27,9 +36,42 @@ function costText(cost: Record<string, number | undefined>): string {
     .join(' · ');
 }
 
+function beatForWorldResponse(disposition: WorldResponseDisposition): WorldResponseBeat {
+  switch (disposition) {
+    case 'answer':
+      return {
+        title: 'A window opens',
+        lines: [
+          'Grace answers the returning call.',
+          'A housing appointment is offered.',
+          'Eligibility and housing itself are still unresolved.',
+        ],
+      };
+    case 'let-ring':
+      return {
+        title: 'The phone stops ringing',
+        lines: [
+          'The callback happened.',
+          'Grace did not answer it in this moment.',
+          'The housing need remains open; unanswered is not the same as refused.',
+        ],
+      };
+    case 'hold-tomorrow':
+      return {
+        title: 'Tomorrow gets a return address',
+        lines: [
+          'Grace does not force the callback into the remainder of tonight.',
+          'The response is deferred rather than completed or erased.',
+          'The housing need remains addressable tomorrow.',
+        ],
+      };
+  }
+}
+
 export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
   const [selectedActionId, setSelectedActionId] = useState<PlayActionId | null>(null);
   const [beat, setBeat] = useState<ConsequenceBeat | null>(null);
+  const [worldBeat, setWorldBeat] = useState<WorldResponseBeat | null>(null);
   const [dismissedEncounter, setDismissedEncounter] = useState<{
     id: string;
     eventCount: number;
@@ -38,7 +80,9 @@ export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
   const replayed = useMemo(() => replaySession(session), [session]);
   const scene = useMemo(() => derivePlayScene(session), [session]);
   const actions = useMemo(() => derivePlayActions(session), [session]);
+  const worldResponse = useMemo(() => deriveWorldResponseOffer(session), [session]);
   const encounter = useMemo(() => deriveEncounterOffer(session), [session]);
+  const attendance = useMemo(() => deriveDayAttendance(session), [session]);
   const visibleEncounter =
     encounter &&
     !(
@@ -76,6 +120,19 @@ export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
     commit(...action.events);
   };
 
+  const respondToWorld = (disposition: WorldResponseDisposition) => {
+    if (!worldResponse) return;
+    resolveWorldResponse(session, worldResponse.id, disposition);
+    setWorldBeat(beatForWorldResponse(disposition));
+    setSelectedActionId(null);
+    setDismissedEncounter(null);
+    commit({
+      type: 'world_response',
+      responseId: worldResponse.id,
+      disposition,
+    });
+  };
+
   if (beat) {
     return (
       <div
@@ -110,6 +167,66 @@ export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
           >
             Continue Tuesday
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (worldBeat) {
+    return (
+      <div
+        className="min-h-[32rem] bg-gradient-to-b from-slate-950 via-blue-950 to-stone-950 px-5 py-8 text-white sm:px-8"
+        aria-live="polite"
+      >
+        <div className="mx-auto flex min-h-[26rem] max-w-xl flex-col justify-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
+            The world answered back
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">{worldBeat.title}</h2>
+          <div className="mt-5 space-y-3 text-base leading-relaxed text-white/80">
+            {worldBeat.lines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setWorldBeat(null)}
+            className="mt-7 min-h-12 rounded-2xl bg-cyan-200 px-5 py-3 text-sm font-bold text-slate-950 transition hover:-translate-y-0.5 hover:bg-cyan-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-100"
+          >
+            Keep moving
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (worldResponse) {
+    return (
+      <div className="min-h-[32rem] bg-gradient-to-br from-sky-950 via-slate-950 to-stone-950 px-5 py-8 text-white sm:px-8">
+        <div className="mx-auto flex min-h-[26rem] max-w-xl flex-col justify-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-300">
+            Incoming world response
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">{worldResponse.title}</h2>
+          <p className="mt-5 text-base leading-relaxed text-white/80">{worldResponse.body}</p>
+
+          <div className="mt-7 grid gap-3">
+            {worldResponse.options.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => respondToWorld(option.id)}
+                className="min-h-14 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <span className="block text-sm font-bold text-white">{option.label}</span>
+                <span className="mt-1 block text-xs leading-relaxed text-white/60">{option.note}</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-5 text-xs leading-relaxed text-white/45">
+            {worldResponse.nonClaims.join(' · ')}
+          </p>
         </div>
       </div>
     );
@@ -159,6 +276,71 @@ export function GracePlaySurface({session, commit}: GracePlaySurfaceProps) {
 
           <p className="mt-5 text-xs leading-relaxed text-white/45">
             {visibleEncounter.nonClaims.join(' · ')}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (attendance) {
+    return (
+      <div className="min-h-[32rem] bg-gradient-to-b from-indigo-950 via-stone-950 to-black px-5 py-8 text-stone-100 sm:px-8">
+        <div className="mx-auto max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
+            Tuesday · night
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight">{attendance.title}</h2>
+          <p className="mt-3 text-sm leading-relaxed text-stone-400">
+            The day is over. The record is not a verdict.
+          </p>
+
+          <div className="mt-7 grid gap-4 sm:grid-cols-2">
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Completed locally</h3>
+              <div className="mt-3 space-y-2 text-sm text-stone-200">
+                {attendance.completed.length > 0
+                  ? attendance.completed.map((item) => <p key={item}>{item}</p>)
+                  : <p>Nothing fully completed in this declared demand scope.</p>}
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-orange-300">Still open</h3>
+              <div className="mt-3 space-y-2 text-sm text-stone-200">
+                {attendance.open.length > 0
+                  ? attendance.open.map((item) => <p key={item}>{item}</p>)
+                  : <p>No declared demand remains open.</p>}
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300">Practiced</h3>
+              <p className="mt-3 text-sm text-stone-200">
+                {attendance.practiced.length > 0 ? attendance.practiced.join(' · ') : 'No culture trace advanced.'}
+              </p>
+            </section>
+
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">What changed</h3>
+              <div className="mt-3 space-y-2 text-sm text-stone-200">
+                {attendance.changed.length > 0
+                  ? attendance.changed.map((item) => <p key={item}>{item}</p>)
+                  : <p>No additional declared change needs highlighting.</p>}
+              </div>
+            </section>
+          </div>
+
+          {attendance.strange.length > 0 && (
+            <section className="mt-4 rounded-2xl border border-fuchsia-400/20 bg-fuchsia-400/5 p-4">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-fuchsia-300">Strange things that came home too</h3>
+              <div className="mt-3 space-y-2 text-sm text-stone-200">
+                {attendance.strange.map((item) => <p key={item}>{item}</p>)}
+              </div>
+            </section>
+          )}
+
+          <p className="mt-6 text-xs leading-relaxed text-stone-500">
+            {attendance.nonClaims.join(' · ')}
           </p>
         </div>
       </div>
