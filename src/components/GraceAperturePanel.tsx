@@ -6,6 +6,9 @@ import {
   type PartyMemberId,
 } from '../../specimens/grace-001/apertures.ts';
 import {
+  archaeologyScenes,
+} from '../../specimens/grace-001/archaeology.ts';
+import {
   replaySession,
   type GraceSession,
   type GraceSessionInputEvent,
@@ -42,6 +45,8 @@ function eventLabel(event: GraceSession['events'][number]): string {
       return `${event.id} · possible-world principle`;
     case 'possible_world_return':
       return `${event.id} · possible-world return`;
+    case 'archaeology_visit':
+      return `${event.id} · Storyship archaeology → ${event.sceneId}`;
   }
 }
 
@@ -98,6 +103,7 @@ export function GraceAperturePanel({
 
   const latestFlashback = apertures.flashbacks.at(-1);
   const latestPossibleReturn = apertures.possibleWorldReturns.at(-1);
+  const latestArchaeology = replayed.archaeology.visits.at(-1);
 
   return (
     <div className="border-t border-amber-100 bg-stone-50/70 px-5 py-5">
@@ -248,6 +254,94 @@ export function GraceAperturePanel({
           )}
         </section>
       </div>
+
+      <section className="mt-5 rounded-2xl border border-violet-200 bg-violet-50/60 p-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">
+              Storyship archaeology · Novelist material seeds
+            </p>
+            <p className="mt-1 max-w-3xl text-sm text-stone-600">
+              These scenes come from identified Bandcamp material. They are playable source-derived seeds, not automatic campaign history.
+            </p>
+          </div>
+          <p className="text-xs font-medium text-violet-800">
+            Visit cost · 1 time + 1 attention
+          </p>
+        </div>
+
+        <div className="mt-4 grid gap-3 xl:grid-cols-3">
+          {archaeologyScenes.map((scene) => (
+            <article key={scene.id} className="rounded-2xl border border-violet-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-600">
+                    seed · non-canon · {scene.location}
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold text-stone-950">{scene.title}</h3>
+                  <p className="mt-1 text-xs text-violet-800">Source: {scene.sourceTitle}</p>
+                </div>
+              </div>
+
+              <ul className="mt-3 list-disc space-y-1 pl-4 text-xs text-stone-600">
+                {scene.sourceFacts.map((fact) => (
+                  <li key={fact}>{fact}</li>
+                ))}
+              </ul>
+
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {scene.motifs.map((motif) => (
+                  <span key={motif} className="rounded-full bg-violet-50 px-2 py-1 text-[10px] text-violet-700">
+                    {motif}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-4 space-y-2">
+                {scene.choices.map((choice) => (
+                  <button
+                    key={choice.id}
+                    onClick={() =>
+                      commit(
+                        {type: 'economy_action', actionId: 'storyship-block'},
+                        {type: 'archaeology_visit', sceneId: scene.id, choiceId: choice.id},
+                      )
+                    }
+                    className="w-full rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-left hover:bg-violet-100"
+                  >
+                    <span className="block text-xs font-semibold text-violet-950">{choice.label}</span>
+                    <span className="mt-1 block text-[10px] text-violet-700">
+                      Candidate relations: {choice.candidateRelations.join(' · ')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {latestArchaeology && (
+          <div className="mt-4 rounded-2xl border border-violet-300 bg-white p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-600">
+              Latest archaeology witness · {latestArchaeology.sourceTitle}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-stone-950">{latestArchaeology.choiceLabel}</p>
+            <p className="mt-2 text-xs text-stone-700">
+              Candidate relations: {latestArchaeology.candidateRelations.join(' · ')}
+            </p>
+            <div className="mt-3 grid gap-2 md:grid-cols-2">
+              {latestArchaeology.partyPrompts.map((prompt) => (
+                <p key={prompt} className="rounded-xl bg-violet-50 px-3 py-2 text-xs text-violet-900">
+                  {prompt}
+                </p>
+              ))}
+            </div>
+            <p className="mt-3 text-[10px] text-violet-600">
+              Source lyric is not automatically campaign history. Candidate relation is not admitted world fact.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
