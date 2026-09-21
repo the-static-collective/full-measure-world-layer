@@ -6,11 +6,24 @@ export type WednesdayActionId =
   | "housing-follow-up" | "make-wednesday-dinner" | "shared-table-invitation"
   | "porch-relation" | "check-vehicle" | "pray-wednesday" | "rest-wednesday";
 
-export interface WednesdayEvent {
-  id: string;
-  type: "action";
-  actionId: WednesdayActionId;
-  relationText?: string;
+export type PuppyArrivalChoice = "temporary-care" | "decline";
+export type PuppyCareChoice = "porch" | "dog-park";
+export type WednesdayEvent =
+  | {id:string;type:"action";actionId:WednesdayActionId;relationText?:string}
+  | {id:string;type:"puppy_arrival";choice:PuppyArrivalChoice}
+  | {id:string;type:"puppy_care";choice:PuppyCareChoice};
+export interface PuppyState {
+  status:"not_met" | "declined" | "visiting";
+  care:"not_due" | "due" | "settled";
+  kitMeals:number;
+  timeDebt:number;
+}
+export interface PuppyOffer {
+  id:"puppy-at-the-door" | "puppy-needs-outside";
+  title:string;
+  body:string;
+  options:{id:string;label:string;note:string}[];
+  nonClaims:string[];
 }
 export interface WednesdayCampaign {
   schema: "full-measure.grace-wednesday.v1";
@@ -37,6 +50,7 @@ export interface WednesdayReplay {
   cultureTraces: Record<CultureTrace, number>;
   sharedTable: "none" | "offered";
   housingFollowUp: "none" | "attempted";
+  puppy:PuppyState;
   porchDoor: null | {
     status: "opened-in-fiction";
     sourceTuesdayEventIds: string[];
@@ -164,7 +178,8 @@ function initialState(campaign:WednesdayCampaign):WednesdayReplay {
     openNeeds:[...carry,{id:"wednesday-dinner",label:"Wednesday dinner",
       remaining:1,required:true}],
     cultureTraces:copy(tuesday.culture.traces),
-    sharedTable:"none",housingFollowUp:"none",porchDoor:null,receipts:[],
+    sharedTable:"none",housingFollowUp:"none",porchDoor:null,
+    puppy:{status:"not_met",care:"not_due",kitMeals:0,timeDebt:0},receipts:[],
   };
 }
 export function startWednesday(tuesday:GraceSession):WednesdayCampaign {
@@ -183,8 +198,57 @@ export function replayWednesday(campaign:WednesdayCampaign):WednesdayReplay {
   const next=initialState(campaign);
   for(let i=0;i<campaign.events.length;i++) {
     const event=campaign.events[i];
-    if(event.type!=="action" || event.id!==`wed-event-${String(i+1).padStart(4,"0")}`)
+    if(event.id!==`wed-event-${String(i+1).padStart(4,"0")}` ||
+      !["action","puppy_arrival","puppy_care"].includes(event.type))
       throw new Error("Invalid Wednesday event identity or type");
+    if(event.type==="puppy_arrival") {
+      if(next.puppy.status!=="not_met" ||
+        !campaign.events.slice(0,i).some(item=>item.type==="action") ||
+        next.stocks.time<=0)
+        throw new Error("puppy arrival is not currently available");
+      next.puppy.status=event.choice==="temporary-care"?"visiting":"declined";
+      if(next.puppy.status==="visiting") next.puppy.kitMeals=1;
+      if(!["temporary-care","decline"].includes(event.choice))
+        throw new Error("unknown puppy arrival choice");
+      next.receipts.push({
+        id:event.id,actionId:"puppy-arrival",sourceTuesdayEventIds:[],
+        claims:event.choice==="temporary-care"?
+          ["Grace accepted temporary puppy care with a supplied leash and one puppy-specific meal"]:
+          ["Grace declined the request for temporary puppy care"],
+        nonClaims:["temporary care != permanent ownership",
+          "a puppy is not a worker unit or an automatic morale bonus",
+          "puppy-specific meal != human food"],
+      });
+      continue;
+    }
+    if(event.type==="puppy_care") {
+      if(next.puppy.status!=="visiting" || next.puppy.care!=="due")
+        throw new Error("puppy care is not currently due");
+      if(!["porch","dog-park"].includes(event.choice))
+        throw new Error("unknown puppy care choice");
+      if(next.puppy.kitMeals<1) throw new Error("no declared puppy meal in the supplied kit");
+      if(event.choice==="dog-park") {
+        if(next.stocks.transport<1) throw new Error("dog park requires an available transport unit");
+        next.stocks.transport-=1;
+      }
+      if(next.stocks.time>=1) next.stocks.time-=1;
+      else next.puppy.timeDebt+=1;
+      next.puppy.kitMeals-=1;
+      next.puppy.care="settled";
+      next.receipts.push({
+        id:event.id,actionId:"puppy-care",sourceTuesdayEventIds:[],
+        claims:event.choice==="porch"?
+          ["the puppy was taken outside to the porch and given its supplied meal"]:
+          ["the puppy was taken to the dog park and given its supplied meal",
+           "a possible dog-park conversation was noticed, not established"],
+        nonClaims:["care receipt != puppy consent, ownership, or guaranteed affection",
+          "puppy meal did not subtract from or create human food",
+          "next-day time debt != free time or a completed future-day action"],
+      });
+      continue;
+    }
+    if(next.puppy.status==="visiting" && next.puppy.care==="due")
+      throw new Error("puppy care response required before another ordinary action");
     const hand=order.filter(id=>eligible(campaign,next,id)).slice(0,4);
     if(!hand.includes(event.actionId))
       throw new Error(`Wednesday action not available: ${event.actionId}`);
@@ -245,16 +309,74 @@ export function replayWednesday(campaign:WednesdayCampaign):WednesdayReplay {
     next.receipts.push({
       id:event.id,actionId:event.actionId,claims,nonClaims,sourceTuesdayEventIds,
     });
+    if(next.puppy.status==="visiting" && next.puppy.care==="not_due")
+      next.puppy.care="due";
   }
   return next;
 }
 export function availableWednesdayActions(campaign:WednesdayCampaign):WednesdayAction[] {
   const state=replayWednesday(campaign);
+  if(state.puppy.status==="visiting" && state.puppy.care==="due") return [];
   return order.filter(id=>eligible(campaign,state,id)).slice(0,4).map(id=>copy(actions[id]));
+}
+export function derivePuppyArrivalOffer(campaign:WednesdayCampaign):PuppyOffer|null {
+  const state=replayWednesday(campaign);
+  if(state.puppy.status!=="not_met" || state.stocks.time<=0 ||
+    !campaign.events.some(event=>event.type==="action")) return null;
+  return {
+    id:"puppy-at-the-door",title:"A puppy appears at the screen door",
+    body:"A neighbor asks if Grace can provide temporary care. They bring a leash and one puppy-specific meal. Taking the puppy in is a choice, not a quest requirement.",
+    options:[
+      {id:"temporary-care",label:"Offer temporary care",note:"Accept a real dependent with needs and unpredictable timing."},
+      {id:"decline",label:"Not today",note:"Grace does not take responsibility for an animal she cannot care for today."},
+    ],
+    nonClaims:["arrival offer != compelled adoption","temporary care != permanent ownership"],
+  };
+}
+export function derivePuppyInterrupt(campaign:WednesdayCampaign):PuppyOffer|null {
+  const state=replayWednesday(campaign);
+  if(state.puppy.status!=="visiting" || state.puppy.care!=="due") return null;
+  return {
+    id:"puppy-needs-outside",title:"The puppy has other plans",
+    body:"A leash scrapes the floor. The puppy needs to go outside and have its supplied meal. Tuesday's plans do not get priority over a living creature's immediate care.",
+    options:[
+      {id:"porch",label:"Go outside together",note:"Costs one Wednesday time block, or records one block of next-day time debt if the day is already full."},
+      ...(state.stocks.transport>=1?
+        [{id:"dog-park",label:"Take the puppy to the dog park",note:"Costs one time block and one real transport use. A possible social encounter is only a candidate."}]:[]),
+    ],
+    nonClaims:["wild card != permission to neglect an animal","puppy care != guaranteed affection"],
+  };
+}
+export function offerPuppyCare(
+  campaign:WednesdayCampaign,choice:PuppyArrivalChoice,
+):WednesdayCampaign {
+  if(!derivePuppyArrivalOffer(campaign)) throw new Error("puppy arrival is not currently available");
+  const next={...campaign,events:[...campaign.events,{
+    id:`wed-event-${String(campaign.events.length+1).padStart(4,"0")}`,
+    type:"puppy_arrival" as const,choice,
+  }]};
+  replayWednesday(next);
+  return next;
+}
+export function respondToPuppyCare(
+  campaign:WednesdayCampaign,choice:PuppyCareChoice,
+):WednesdayCampaign {
+  const offer=derivePuppyInterrupt(campaign);
+  if(!offer) throw new Error("puppy care is not currently due");
+  if(!offer.options.some(option=>option.id===choice))
+    throw new Error("puppy care choice is not currently available");
+  const next={...campaign,events:[...campaign.events,{
+    id:`wed-event-${String(campaign.events.length+1).padStart(4,"0")}`,
+    type:"puppy_care" as const,choice,
+  }]};
+  replayWednesday(next);
+  return next;
 }
 export function playWednesdayAction(
   campaign:WednesdayCampaign,actionId:WednesdayActionId,relationText?:string,
 ):WednesdayCampaign {
+  if(derivePuppyInterrupt(campaign))
+    throw new Error("puppy care response required before another ordinary action");
   if(!availableWednesdayActions(campaign).some(action=>action.id===actionId))
     throw new Error(`Wednesday action not available: ${actionId}`);
   if(actionId==="porch-relation" && (!relationText || relationText.trim().length<8))
@@ -282,9 +404,15 @@ export function deriveWednesdayScene(campaign:WednesdayCampaign):WednesdayScene 
   const withInvitation=tuesday.culture.history.some(r=>r.actionId==="share-meal");
   return {
     eyebrow:"Wednesday · the world remembers",
-    title:state.porchDoor?"The porch archive is open":withInvitation?
+    title:state.puppy.status==="visiting"?
+      (state.puppy.care==="settled"?"The puppy settles near the table":"There are paws in the hallway"):
+      state.porchDoor?"The porch archive is open":withInvitation?
       "Someone remembers Tuesday's table":"Yesterday left something on the table",
-    body:state.porchDoor?
+    body:state.puppy.status==="visiting"?
+      (state.puppy.care==="settled"?
+        "Outside time and the supplied puppy meal were real work. The puppy's future care and handoff remain the party's responsibility, not a bonus.":
+        "A living guest has its own schedule. The next care need cannot be optimized away."):
+      state.porchDoor?
       "Two distinct receipts made a local fictional archive reachable. No outside-world fact was changed.":
       withInvitation?
       "Tuesday's shared meal makes a new invitation possible. Another person's response remains their own.":
