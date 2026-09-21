@@ -15,6 +15,7 @@ import {
 } from '../../specimens/grace-001/playExperience.ts';
 import type {WorldResponseDisposition} from '../../specimens/grace-001/kernel.ts';
 import {GraceRoomStage} from './GraceRoomStage.tsx';
+import {GraceWalkableRoom} from './GraceWalkableRoom.tsx';
 import {
   replaySession,
   type GraceSession,
@@ -73,6 +74,7 @@ function beatForWorldResponse(disposition: WorldResponseDisposition): WorldRespo
 
 export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlaySurfaceProps) {
   const [selectedActionId, setSelectedActionId] = useState<PlayActionId | null>(null);
+  const [exploringRoom,setExploringRoom] = useState(false);
   const [beat, setBeat] = useState<ConsequenceBeat | null>(null);
   const [worldBeat, setWorldBeat] = useState<WorldResponseBeat | null>(null);
   const [dismissedEncounter, setDismissedEncounter] = useState<{
@@ -361,14 +363,21 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
   return (
     <div className="bg-gradient-to-b from-amber-50 via-orange-50/60 to-stone-50 px-4 py-6 sm:px-7 sm:py-8">
       <div className="mx-auto max-w-2xl">
-        <GraceRoomStage
-          scene={scene}
-          phase={deriveDayPhase(session)}
-          actions={actions}
-          selectedActionId={selectedActionId}
-          onSelectAction={(id) => setSelectedActionId((current) => current === id ? null : id)}
-          projectionsHidden={projectionsHidden}
-        />
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">Tuesday / Your room</p>
+          <button type="button" aria-pressed={exploringRoom}
+            onClick={() => setExploringRoom(current => !current)}
+            className="min-h-11 rounded-full border border-stone-400 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-sm hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+          >{exploringRoom ? 'Return to illustrated room' : 'Explore room in 3D'}</button>
+        </div>
+        {exploringRoom
+          ? <GraceWalkableRoom phase={deriveDayPhase(session)} actions={actions}
+              selectedActionId={selectedActionId}
+              onSelectAction={(id) => setSelectedActionId((current) => current===id ? null : id)} />
+          : <GraceRoomStage scene={scene} phase={deriveDayPhase(session)}
+              actions={actions} selectedActionId={selectedActionId}
+              onSelectAction={(id) => setSelectedActionId((current) => current===id ? null : id)}
+              projectionsHidden={projectionsHidden} />}
 
         <div className="mt-5">
           <p className="px-1 text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500">

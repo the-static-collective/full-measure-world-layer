@@ -1,0 +1,28 @@
+/* GRACE-WALKABLE-ROOM-005: optional WebGL playfield with accessible DOM controls. */
+.grace-walk{overflow:hidden;border:1px solid #7f8c78;border-radius:1.4rem;background:#172f2e;color:#f8efdc;box-shadow:0 24px 48px -32px #203b39}
+.grace-walk__top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.15rem;background:#1d3e3b}
+.grace-walk__top h2{font-family:Georgia,serif;font-size:clamp(1.3rem,3vw,1.9rem);line-height:1.2;margin:.35rem 0 0;font-weight:600}
+.grace-walk__eyebrow{margin:0;font-size:.61rem;font-weight:800;letter-spacing:.18em;color:#e4c79a}
+.grace-walk__phase{font-size:.7rem;color:#d0e1d1;text-transform:capitalize;text-align:right}
+.grace-walk__viewport{position:relative;min-height:340px;height:min(52vw,470px);max-height:470px;outline-offset:4px;background:linear-gradient(#65594e,#2c443f);overflow:hidden}
+.grace-walk__viewport:focus-visible{outline:3px solid #f2d698}
+.grace-walk__viewport canvas{display:block;width:100%;height:100%;touch-action:manipulation}
+.grace-walk__reticle{position:absolute;pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.35rem;color:#f8e7bfb3;text-shadow:0 1px 5px #172e2e}
+.grace-walk__notice{position:absolute;pointer-events:none;left:10px;top:10px;max-width:72%;font-size:.65rem;line-height:1.5;background:#142e2dbb;color:#fae7c3;padding:.5rem .7rem;border-radius:.55rem;border:1px solid #e0be8255}
+.grace-walk__coordinates{position:absolute;pointer-events:none;right:9px;bottom:8px;background:#172e2eb3;padding:.3rem .55rem;border-radius:.35rem;font-size:.61rem;letter-spacing:.03em}
+.grace-walk__fallback{position:absolute;inset:20% 8% auto;background:#fef5df;color:#273934;border:2px solid #e3c690;border-radius:.7rem;padding:1rem;text-align:center;font-size:.9rem;line-height:1.5}
+.grace-walk__foot{display:grid;grid-template-columns:minmax(170px,.85fr) minmax(0,1.15fr);gap:1.15rem;padding:1rem;border-top:1px solid #a7ae8f52}
+.grace-walk__controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem;align-content:start}
+.grace-walk__controls button{min-height:50px;min-width:0;border-radius:.65rem;border:1px solid #a0bbac;background:#2e5049;color:#fff5df;font-size:1.25rem;font-weight:750;cursor:pointer}
+.grace-walk__controls button:hover:not(:disabled){background:#457369}
+.grace-walk__controls button:focus-visible,.grace-walk__nearby button:focus-visible{outline:3px solid #f6d99f;outline-offset:3px}
+.grace-walk__controls button:disabled{opacity:.48;cursor:not-allowed}
+.grace-walk__nearby{display:flex;flex-direction:column;gap:.48rem;min-width:0}
+.grace-walk__nearby>p:not(.grace-walk__eyebrow){margin:0;font-size:.75rem;line-height:1.5;color:#d1ddcf}
+.grace-walk__nearby button{border-radius:.65rem;border:1px solid #f6d99b;background:#e9c992;color:#243b35;text-align:left;min-height:45px;padding:.6rem .8rem;font-size:.82rem;font-weight:800;cursor:pointer}
+.grace-walk__nearby button:hover{background:#f7dfb0}
+.grace-walk__nearby button span{float:right}
+.grace-walk__nearby .grace-walk__boundary{margin-top:.35rem;font-size:.67rem;color:#bcd0c7}
+.grace-walk__door-status{margin:0;padding:.7rem 1rem;font-size:.66rem;line-height:1.4;border-top:1px solid #9bad8b44;background:#203b37;color:#e4ceaa}
+@media(max-width:630px){.grace-walk{border-radius:1.1rem}.grace-walk__top{padding:.85rem .75rem;align-items:flex-start}.grace-walk__top h2{font-size:1.32rem}.grace-walk__phase{font-size:.63rem;max-width:100px}.grace-walk__viewport{height:330px;min-height:330px}.grace-walk__foot{grid-template-columns:1fr;gap:.9rem;padding:.75rem}.grace-walk__controls{grid-template-columns:repeat(3,minmax(0,1fr))}.grace-walk__controls button{min-height:46px}.grace-walk__notice{font-size:.61rem;max-width:83%}}
+@media(prefers-reduced-motion:reduce){.grace-walk *{transition:none!important;animation:none!important}}

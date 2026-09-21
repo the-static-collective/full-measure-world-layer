@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './grace-room-stage.css';
+import './grace-walkable-room.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
