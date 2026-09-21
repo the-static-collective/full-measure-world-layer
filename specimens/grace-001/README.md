@@ -180,6 +180,55 @@ The witness explicitly refuses:
 
 Day Receipt replay/checksum includes archaeology visits.
 
+## GRACE-PLAY-002 / THE DAY MOVES WITHOUT YOU
+
+The focused play loop now has a deterministic day rhythm without adding a second clock resource.
+
+### Day phases
+
+The existing finite `time` supply drives presentation:
+
+```text
+4 time      → morning
+2-3 time    → midday
+1 time      → evening
+0 time      → night
+```
+
+Earlier choices can change later scene copy. A grocery run, for example, can make evening explicitly acknowledge that food made it home while the vehicle remains unresolved.
+
+### Delayed world response
+
+After Grace attempts the housing-resource call, the coordinator callback becomes eligible only after **two later ordinary turns**.
+
+The callback interrupts the normal hand with three dispositions:
+
+- **Answer** — an appointment can become offered; housing remains unresolved.
+- **Let it ring** — the callback occurrence is still retained; unanswered does not mean refused.
+- **Hold it for tomorrow** — a return address is preserved instead of forcing the remainder into tonight.
+
+The delay law is enforced during deterministic replay as well as in the UI, so an imported session cannot inject the callback early.
+
+### The House Takes Attendance
+
+When ordinary time reaches zero, the focused surface becomes:
+
+```text
+THE HOUSE TAKES ATTENDANCE
+```
+
+It reports:
+
+- completed local demand scopes;
+- demands still open;
+- culture actually practiced;
+- declared state changes;
+- strange/dream/Storyship residue carried by the day.
+
+The screen explicitly refuses `unfinished == failed` and does not silently close any residual need.
+
+Incoming world responses and bounded MADDJack/MADDcl0wn encounters may surface before attendance, so the end of the day can still be interrupted by something that actually returned.
+
 ## Live Dogram donor
 
 Full Measure can now use Dogram itself as an optional local mechanics donor.
