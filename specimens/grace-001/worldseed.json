@@ -259,7 +259,11 @@
     "the world may answer a prior act after a deterministic delay",
     "world response occurrence and player disposition are replayed history",
     "end of day preserves unresolved needs instead of narratively closing them",
-    "day phase derives from existing time supply rather than adding a second clock"
+    "day phase derives from existing time supply rather than adding a second clock",
+    "new day time does not respawn cash food transport or attention",
+    "Tuesday event ancestry cannot be revised by Wednesday play",
+    "the same resource totals may have different reachable futures because the receipts differ",
+    "Wednesday dinner cannot retroactively fulfill Tuesday dinner"
   ],
   "partyOptions": [
     {
@@ -458,6 +462,33 @@
           "completed local scope != optimal day"
         ]
       }
+    },
+    "play003": {
+      "id": "GRACE-PLAY-003",
+      "seal": "TOMORROW HAS A MEMORY",
+      "start": "explicit Tuesday end-of-day crossing",
+      "timeLaw": "Wednesday receives four new game-time blocks; money/food/transport/attention carry exactly",
+      "source": "frozen Tuesday Day Receipt plus exact event-log comparison",
+      "wednesdayActions": [
+        "make-wednesday-dinner",
+        "housing-follow-up",
+        "shared-table-invitation",
+        "porch-relation",
+        "check-vehicle",
+        "pray-wednesday",
+        "rest-wednesday"
+      ],
+      "memoryConditions": {
+        "sharedTable": "Tuesday share-meal occurrence, not a supply/virtue threshold",
+        "porchRelation": "Tuesday door-learns-morning/open-the-door archaeology visit plus later flashback targeting that exact event; player expresses a relation"
+      },
+      "nonClaims": [
+        "carried demand != automatically fulfilled demand",
+        "invitation offered != accepted invitation",
+        "fictional door != outside-world occurrence",
+        "local replay equality != cryptographic authorship",
+        "a second game day is not a real-world service outcome"
+      ]
     }
   }
 }
