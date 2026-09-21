@@ -7,6 +7,10 @@ import {
   receiptOpportunityCost,
 } from '../../specimens/grace-001/dogramBridge.ts';
 import {
+  requestDogramSuccessorDelta,
+  type DogramSuccessorResult,
+} from '../lib/grace/dogramApi.ts';
+import {
   createDayReceipt,
   decodeDayReceipt,
   encodeDayReceipt,
@@ -52,6 +56,9 @@ export function GraceCampaignPanel() {
   const [session, setSession] = useState<GraceSession>(() => loadSession());
   const [error, setError] = useState<string | null>(null);
   const [selectedAnchorId, setSelectedAnchorId] = useState('be-still');
+  const [dogramDonor, setDogramDonor] = useState<
+    DogramSuccessorResult | {status: 'checking'} | null
+  >(null);
   const dayReceiptInputRef = useRef<HTMLInputElement | null>(null);
   const cardEnvelopeInputRef = useRef<HTMLInputElement | null>(null);
   const replayed = useMemo(() => replaySession(session), [session]);
@@ -73,6 +80,28 @@ export function GraceCampaignPanel() {
   useEffect(() => {
     window.localStorage.setItem(GRACE_SESSION_STORAGE_KEY, encodeSession(session));
   }, [session]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!mechanicsWitness) {
+      setDogramDonor(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setDogramDonor({status: 'checking'});
+    void requestDogramSuccessorDelta(
+      mechanicsWitness.beforeActions,
+      mechanicsWitness.afterActions,
+    ).then((result) => {
+      if (!cancelled) setDogramDonor(result);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mechanicsWitness]);
 
   const commit = (...events: GraceSessionInputEvent[]) => {
     try {
@@ -414,10 +443,27 @@ export function GraceCampaignPanel() {
 
           {mechanicsWitness && (
             <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-800">Dogram-style mechanics witness</p>
-              <p className="mt-1 text-xs text-cyan-950">Experiment: {mechanicsWitness.experiment}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-cyan-800">Dogram mechanics witness</p>
+              <p className="mt-1 text-xs font-semibold text-cyan-950">
+                {dogramDonor?.status === 'live'
+                  ? 'Dogram donor: live'
+                  : dogramDonor?.status === 'checking'
+                    ? 'Dogram donor: checking…'
+                    : dogramDonor?.status === 'error'
+                      ? `Dogram donor: contract/error · ${dogramDonor.code}`
+                      : 'Dogram donor: local mirror fallback'}
+              </p>
               <p className="mt-2 text-xs text-cyan-900">
-                Successors foreclosed: {mechanicsWitness.foreclosed.join(', ') || 'none'}
+                Successors foreclosed:{' '}
+                {dogramDonor?.status === 'live'
+                  ? dogramDonor.value.foreclosed.join(', ') || 'none'
+                  : mechanicsWitness.foreclosed.join(', ') || 'none'}
+              </p>
+              <p className="mt-1 text-xs text-cyan-700">
+                Experiment:{' '}
+                {dogramDonor?.status === 'live'
+                  ? dogramDonor.value.experiment
+                  : mechanicsWitness.experiment}
               </p>
               <p className="mt-1 text-xs text-cyan-700">Authority: none · mechanics delta only</p>
             </div>
