@@ -5,6 +5,10 @@ import {
   remainingDemand,
   type Stocks,
 } from "./culture.ts";
+import type {
+  WorldResponseDisposition,
+  WorldResponseId,
+} from "./kernel.ts";
 import {
   appendEvent,
   replaySession,
@@ -17,6 +21,8 @@ export type PlayActionId =
   | "grocery-run"
   | "pray"
   | "rest";
+
+export type DayPhase = "morning" | "midday" | "evening" | "night";
 
 export interface PlayScene {
   eyebrow: string;
@@ -77,6 +83,31 @@ export interface EncounterOffer {
   nonClaims: string[];
 }
 
+export interface WorldResponseOption {
+  id: WorldResponseDisposition;
+  label: string;
+  note: string;
+}
+
+export interface WorldResponseOffer {
+  id: WorldResponseId;
+  kind: "world";
+  title: string;
+  body: string;
+  options: WorldResponseOption[];
+  nonClaims: string[];
+}
+
+export interface DayAttendance {
+  title: "THE HOUSE TAKES ATTENDANCE";
+  completed: string[];
+  open: string[];
+  practiced: string[];
+  changed: string[];
+  strange: string[];
+  nonClaims: string[];
+}
+
 const actionCatalog: Record<PlayActionId, PlayAction> = {
   "return-client-call": {
     id: "return-client-call",
@@ -129,6 +160,13 @@ const playOrder: PlayActionId[] = [
   "rest",
 ];
 
+const ordinaryEconomyActionIds = new Set([
+  "client-call",
+  "grocery-run",
+  "prayer-block",
+  "rest-block",
+]);
+
 function requiredDemandOpen(session: GraceSession, demandId: string): boolean {
   const replay = replaySession(session);
   const demand = replay.culture.demands.find((candidate) => candidate.id === demandId);
@@ -140,18 +178,30 @@ function isEconomyActionAvailable(session: GraceSession, actionId: string): bool
   return availableActions(replay.culture).some((action) => action.id === actionId);
 }
 
+export function deriveDayPhase(session: GraceSession): DayPhase {
+  const time = replaySession(session).culture.stocks.time;
+  if (time >= 4) return "morning";
+  if (time >= 2) return "midday";
+  if (time >= 1) return "evening";
+  return "night";
+}
+
 export function derivePlayScene(session: GraceSession): PlayScene {
   const replay = replaySession(session);
+  const phase = deriveDayPhase(session);
   const focus = replay.story.threads.find(
     (thread) => thread.id === replay.story.foregroundThreadId,
   );
   const requiredOpen = replay.culture.demands.filter(
     (demand) => demand.required && remainingDemand(demand) > 0,
   );
+  const groceriesMadeItHome = replay.culture.history.some(
+    (receipt) => receipt.actionId === "grocery-run",
+  );
 
   if (replay.story.projectionsHiddenTurns > 0) {
     return {
-      eyebrow: "MADDcl0wn has the meter covers on",
+      eyebrow: `${phase} · MADDcl0wn has the meter covers on`,
       title: "No numbers for this part",
       body:
         "The underlying world still exists, but the next choice has to be made without turning Tuesday into a dashboard.",
@@ -160,9 +210,20 @@ export function derivePlayScene(session: GraceSession): PlayScene {
     };
   }
 
+  if ((phase === "evening" || phase === "night") && groceriesMadeItHome) {
+    return {
+      eyebrow: `Tuesday · ${phase}`,
+      title: "Groceries made it home",
+      body:
+        "There is more food in the house now. The vehicle noise is still unresolved, and whatever was not carried earlier is arriving at the edge of evening.",
+      focus: focus?.label ?? "Choose what still gets carried",
+      resources: {...replay.culture.stocks},
+    };
+  }
+
   if (requiredOpen.length === 0) {
     return {
-      eyebrow: "Tuesday · a little room opened",
+      eyebrow: `Tuesday · ${phase} · a little room opened`,
       title: "Nothing required is screaming right now",
       body:
         "The day is not finished. It has simply stopped demanding that every next move be triage.",
@@ -171,8 +232,46 @@ export function derivePlayScene(session: GraceSession): PlayScene {
     };
   }
 
+  if (phase === "midday") {
+    return {
+      eyebrow: "Tuesday · midday",
+      title:
+        replay.story.external.clientHousing === "attempted"
+          ? "The waiting part"
+          : "Midday is already smaller",
+      body:
+        replay.story.external.clientHousing === "attempted"
+          ? "The housing call is out in the world now. It has not answered yet. Other needs keep spending the same finite day."
+          : "Morning used some of the day. The callback, food, recovery, and the car are still competing for what remains.",
+      focus: focus?.label ?? "One thing now",
+      resources: {...replay.culture.stocks},
+    };
+  }
+
+  if (phase === "evening") {
+    return {
+      eyebrow: "Tuesday · evening",
+      title: "Evening narrows the board",
+      body:
+        "The day has fewer branches now. Anything still open is becoming something Grace may have to carry rather than finish.",
+      focus: focus?.label ?? "What still gets carried?",
+      resources: {...replay.culture.stocks},
+    };
+  }
+
+  if (phase === "night") {
+    return {
+      eyebrow: "Tuesday · night",
+      title: "Tuesday is out of spendable time",
+      body:
+        "Open needs still exist. The difference is that tonight no longer has another ordinary time block to give them.",
+      focus: focus?.label ?? "Carry the remainder honestly",
+      resources: {...replay.culture.stocks},
+    };
+  }
+
   return {
-    eyebrow: "Tuesday · ordinary pressure",
+    eyebrow: "Tuesday · morning · ordinary pressure",
     title: "Morning squeeze",
     body:
       "Heaven needs the morning to keep moving, while the housing callback and the rest of the day are already asking for their share.",
@@ -304,10 +403,139 @@ export function resolvePlayAction(
 }
 
 function completedPlayTurns(session: GraceSession): number {
-  const ids = new Set(["client-call", "grocery-run", "prayer-block", "rest-block"]);
   return session.events.filter(
-    (event) => event.type === "economy_action" && ids.has(event.actionId),
+    (event) => event.type === "economy_action" && ordinaryEconomyActionIds.has(event.actionId),
   ).length;
+}
+
+export function deriveWorldResponseOffer(
+  session: GraceSession,
+): WorldResponseOffer | null {
+  const replay = replaySession(session);
+  if (replay.story.external.clientHousing !== "attempted") return null;
+
+  const alreadyHandled = session.events.some(
+    (event) =>
+      event.type === "world_response" &&
+      event.responseId === "housing-coordinator-callback",
+  );
+  if (alreadyHandled) return null;
+
+  const callIndex = session.events.findIndex(
+    (event) => event.type === "economy_action" && event.actionId === "client-call",
+  );
+  if (callIndex < 0) return null;
+
+  const laterTurns = session.events
+    .slice(callIndex + 1)
+    .filter(
+      (event) =>
+        event.type === "economy_action" &&
+        ordinaryEconomyActionIds.has(event.actionId),
+    ).length;
+
+  if (laterTurns < 2) return null;
+
+  return {
+    id: "housing-coordinator-callback",
+    kind: "world",
+    title: "The phone rings back",
+    body:
+      "The housing coordinator is returning Grace's earlier call. The original attempt did not guarantee this; now the response has actually arrived.",
+    options: [
+      {
+        id: "answer",
+        label: "Answer",
+        note: "Take the call now. An appointment may be offered; housing is not thereby secured.",
+      },
+      {
+        id: "let-ring",
+        label: "Let it ring",
+        note: "The callback still happened. Grace does not answer in this moment.",
+      },
+      {
+        id: "hold-tomorrow",
+        label: "Hold it for tomorrow",
+        note: "Preserve a return address instead of pretending tonight can carry everything.",
+      },
+    ],
+    nonClaims: [
+      "callback arrival != housing secured",
+      "world response != reward for a morally correct prior move",
+    ],
+  };
+}
+
+export function resolveWorldResponse(
+  session: GraceSession,
+  responseId: WorldResponseId,
+  disposition: WorldResponseDisposition,
+): GraceSession {
+  const offer = deriveWorldResponseOffer(session);
+  if (!offer || offer.id !== responseId) {
+    throw new Error(`World response is not currently available: ${responseId}`);
+  }
+  if (!offer.options.some((option) => option.id === disposition)) {
+    throw new Error(`Unknown world response disposition: ${disposition}`);
+  }
+
+  const next = appendEvent(session, {
+    type: "world_response",
+    responseId,
+    disposition,
+  });
+  replaySession(next);
+  return next;
+}
+
+export function deriveDayAttendance(session: GraceSession): DayAttendance | null {
+  const replay = replaySession(session);
+  if (replay.culture.stocks.time > 0) return null;
+
+  const completed = replay.culture.demands
+    .filter((demand) => remainingDemand(demand) === 0)
+    .map((demand) => demand.label);
+  const open = replay.culture.demands
+    .filter((demand) => remainingDemand(demand) > 0)
+    .map((demand) => demand.label);
+  const practiced = Object.entries(replay.culture.traces)
+    .filter(([, amount]) => amount > 0)
+    .map(([trace]) => trace);
+  const changed: string[] = [];
+  const strange: string[] = [];
+
+  if (replay.story.external.clientHousing === "appointment_offered") {
+    changed.push("A housing appointment was offered; eligibility and housing remain unresolved.");
+  } else if (replay.story.external.clientHousing === "attempted") {
+    changed.push("The housing callback attempt is on record; the broader need remains open.");
+  }
+  if (replay.culture.stocks.food > 1) {
+    changed.push(`Food supply ended at ${replay.culture.stocks.food} servings.`);
+  }
+  if (replay.meaning.dreams.length > 0) {
+    strange.push("The Red Door was remembered.");
+  }
+  if (replay.meaning.cards.length > 0) {
+    strange.push(`${replay.meaning.cards.length} remembered card(s) now carry lineage.`);
+  }
+  if (replay.archaeology.visits.length > 0) {
+    strange.push(`${replay.archaeology.visits.length} Storyship archaeology visit(s) entered today's witness.`);
+  }
+
+  return {
+    title: "THE HOUSE TAKES ATTENDANCE",
+    completed,
+    open,
+    practiced,
+    changed,
+    strange,
+    nonClaims: [
+      "end of day != resolution of every open need",
+      "unfinished != failed",
+      "completed local scope != optimal day",
+      "culture trace != human worth",
+    ],
+  };
 }
 
 export function deriveEncounterOffer(session: GraceSession): EncounterOffer | null {
