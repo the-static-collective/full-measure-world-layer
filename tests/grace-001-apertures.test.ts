@@ -31,6 +31,7 @@ test("flashback reflection preserves source event and records only present inter
   let session = emptySession();
   session = appendEvent(session, {type: "economy_action", actionId: "client-call"});
   const sourceBefore = structuredClone(session.events[0]);
+  session = appendEvent(session, {type: "economy_action", actionId: "reflection-block"});
   session = appendEvent(session, {
     type: "flashback_reflection",
     sourceEventId: sourceBefore.id,
@@ -45,6 +46,7 @@ test("flashback reflection preserves source event and records only present inter
 
 test("flashback cannot point to a nonexistent historical event", () => {
   let session = emptySession();
+  session = appendEvent(session, {type: "economy_action", actionId: "reflection-block"});
   session = appendEvent(session, {
     type: "flashback_reflection",
     sourceEventId: "grace-event-9999",
@@ -70,12 +72,14 @@ test("Day Receipt checksum binds party, flashback and possible-world replay stat
   let session = emptySession();
   session = appendEvent(session, {type: "choose_party", members: ["grace", "heaven", "paula"]});
   session = appendEvent(session, {type: "economy_action", actionId: "client-call"});
+  session = appendEvent(session, {type: "economy_action", actionId: "reflection-block"});
   session = appendEvent(session, {
     type: "flashback_reflection",
     sourceEventId: "grace-event-0002",
     presentReflection: "I can see the opportunity cost more clearly now.",
   });
   session = appendEvent(session, {type: "possible_world_toggle", principleId: "food-without-proof"});
+  session = appendEvent(session, {type: "economy_action", actionId: "worldbuilding-block"});
   session = appendEvent(session, {type: "possible_world_return"});
 
   const receipt = createDayReceipt(session);
@@ -102,4 +106,21 @@ test("possible-world tension calculation does not pretend a fantasy abolishes in
   ]);
   assert.ok(tensions.length >= 5);
   assert.ok(tensions.some((item) => item.includes("supply constraints")));
+});
+
+
+test("flashback and possible-world returns cannot bypass their declared time cost", () => {
+  let flashback = emptySession();
+  flashback = appendEvent(flashback, {type: "economy_action", actionId: "client-call"});
+  flashback = appendEvent(flashback, {
+    type: "flashback_reflection",
+    sourceEventId: "grace-event-0001",
+    presentReflection: "free reflection attempt",
+  });
+  assert.throws(() => replaySession(flashback), /reflection-block/);
+
+  let world = emptySession();
+  world = appendEvent(world, {type: "possible_world_toggle", principleId: "community-kitchen"});
+  world = appendEvent(world, {type: "possible_world_return"});
+  assert.throws(() => replaySession(world), /worldbuilding-block/);
 });
