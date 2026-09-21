@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {GraceAperturePanel} from './GraceAperturePanel';
 import {
   availableActions,
   demandPressure,
@@ -484,6 +485,8 @@ export function GraceCampaignPanel() {
           </div>
         </div>
       </div>
+
+      <GraceAperturePanel session={session} commit={commit} />
 
       {error && <div className="border-t border-rose-200 bg-rose-50 px-5 py-3 text-sm text-rose-800">{error}</div>}
     </section>
