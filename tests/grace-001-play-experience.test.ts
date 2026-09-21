@@ -2,11 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  deriveDayAttendance,
+  deriveDayPhase,
   deriveEncounterOffer,
   derivePlayActions,
   derivePlayScene,
+  deriveWorldResponseOffer,
   previewPlayAction,
   resolvePlayAction,
+  resolveWorldResponse,
 } from "../specimens/grace-001/playExperience.ts";
 import {
   appendEvent,
@@ -93,4 +97,113 @@ test("an unaffordable action disappears from the focused action deck rather than
   const ids = derivePlayActions(session).map((action) => action.id);
   assert.ok(!ids.includes("grocery-run"));
   assert.ok(ids.length <= 4);
+});
+
+
+test("day phase derives from existing finite time rather than a second clock resource", () => {
+  let session = emptySession();
+  assert.equal(deriveDayPhase(session), "morning");
+
+  session = resolvePlayAction(session, "return-client-call").session;
+  assert.equal(deriveDayPhase(session), "midday");
+
+  session = resolvePlayAction(session, "pray").session;
+  assert.equal(deriveDayPhase(session), "midday");
+
+  session = resolvePlayAction(session, "pray").session;
+  assert.equal(deriveDayPhase(session), "evening");
+});
+
+test("housing coordinator callback returns deterministically after two later ordinary turns", () => {
+  let session = emptySession();
+  session = resolvePlayAction(session, "return-client-call").session;
+  assert.equal(deriveWorldResponseOffer(session), null);
+
+  session = resolvePlayAction(session, "pray").session;
+  assert.equal(deriveWorldResponseOffer(session), null);
+
+  session = resolvePlayAction(session, "pray").session;
+  const offer = deriveWorldResponseOffer(session);
+  assert.equal(offer?.id, "housing-coordinator-callback");
+  assert.match(offer?.title ?? "", /phone/i);
+  assert.deepEqual(
+    offer?.options.map((option) => option.id),
+    ["answer", "let-ring", "hold-tomorrow"],
+  );
+});
+
+test("answering delayed housing callback records appointment offer without claiming housing secured", () => {
+  let session = emptySession();
+  session = resolvePlayAction(session, "return-client-call").session;
+  session = resolvePlayAction(session, "pray").session;
+  session = resolvePlayAction(session, "pray").session;
+
+  const resolved = resolveWorldResponse(
+    session,
+    "housing-coordinator-callback",
+    "answer",
+  );
+  const replay = replaySession(resolved);
+
+  assert.equal(replay.story.external.clientHousing, "appointment_offered");
+  assert.ok(
+    replay.story.receipts.at(-1)?.nonClaims.includes(
+      "appointment offered != housing secured",
+    ),
+  );
+  assert.equal(deriveWorldResponseOffer(resolved), null);
+});
+
+test("letting the delayed call ring preserves that it happened without inventing fulfillment", () => {
+  let session = emptySession();
+  session = resolvePlayAction(session, "return-client-call").session;
+  session = resolvePlayAction(session, "pray").session;
+  session = resolvePlayAction(session, "pray").session;
+
+  const resolved = resolveWorldResponse(
+    session,
+    "housing-coordinator-callback",
+    "let-ring",
+  );
+  const replay = replaySession(resolved);
+
+  assert.equal(replay.story.external.clientHousing, "attempted");
+  assert.ok(
+    replay.story.receipts.at(-1)?.claims.includes(
+      "housing coordinator callback arrived",
+    ),
+  );
+  assert.ok(
+    replay.story.receipts.at(-1)?.nonClaims.includes(
+      "unanswered callback != refused help",
+    ),
+  );
+});
+
+test("groceries change the later scene without pretending other needs disappeared", () => {
+  let session = emptySession();
+  session = resolvePlayAction(session, "grocery-run").session;
+  session = resolvePlayAction(session, "pray").session;
+
+  const scene = derivePlayScene(session);
+  assert.equal(deriveDayPhase(session), "evening");
+  assert.match(scene.title, /Groceries made it home/);
+  assert.match(scene.body, /vehicle/i);
+});
+
+test("House Takes Attendance appears when time is exhausted and preserves open needs", () => {
+  let session = emptySession();
+  session = resolvePlayAction(session, "grocery-run").session;
+  session = resolvePlayAction(session, "rest").session;
+
+  const attendance = deriveDayAttendance(session);
+  assert.equal(attendance?.title, "THE HOUSE TAKES ATTENDANCE");
+  assert.ok(attendance?.open.includes("Housing-resource callback"));
+  assert.ok(attendance?.open.includes("Vehicle noise investigation"));
+  assert.ok(attendance?.practiced.includes("rest"));
+  assert.ok(
+    attendance?.nonClaims.includes(
+      "end of day != resolution of every open need",
+    ),
+  );
 });
