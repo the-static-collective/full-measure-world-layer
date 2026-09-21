@@ -259,7 +259,15 @@
     "the world may answer a prior act after a deterministic delay",
     "world response occurrence and player disposition are replayed history",
     "end of day preserves unresolved needs instead of narratively closing them",
-    "day phase derives from existing time supply rather than adding a second clock"
+    "day phase derives from existing time supply rather than adding a second clock",
+    "new day time does not respawn cash food transport or attention",
+    "Tuesday event ancestry cannot be revised by Wednesday play",
+    "the same resource totals may have different reachable futures because the receipts differ",
+    "Wednesday dinner cannot retroactively fulfill Tuesday dinner",
+    "puppy arrival is optional and accepting it adds distinct care duties",
+    "puppy-specific meal cannot be exchanged for or counted as human food",
+    "puppy care interruptions cannot be bypassed in replay",
+    "animal care after ordinary time is exhausted leaves explicit future time debt"
   ],
   "partyOptions": [
     {
@@ -458,6 +466,67 @@
           "completed local scope != optimal day"
         ]
       }
+    },
+    "play003": {
+      "id": "GRACE-PLAY-003",
+      "seal": "TOMORROW HAS A MEMORY",
+      "start": "explicit Tuesday end-of-day crossing",
+      "timeLaw": "Wednesday receives four new game-time blocks; money/food/transport/attention carry exactly",
+      "source": "frozen Tuesday Day Receipt plus exact event-log comparison",
+      "wednesdayActions": [
+        "make-wednesday-dinner",
+        "housing-follow-up",
+        "shared-table-invitation",
+        "porch-relation",
+        "check-vehicle",
+        "pray-wednesday",
+        "rest-wednesday"
+      ],
+      "memoryConditions": {
+        "sharedTable": "Tuesday share-meal occurrence, not a supply/virtue threshold",
+        "porchRelation": "Tuesday door-learns-morning/open-the-door archaeology visit plus later flashback targeting that exact event; player expresses a relation"
+      },
+      "nonClaims": [
+        "carried demand != automatically fulfilled demand",
+        "invitation offered != accepted invitation",
+        "fictional door != outside-world occurrence",
+        "local replay equality != cryptographic authorship",
+        "a second game day is not a real-world service outcome"
+      ]
+    },
+    "puppy001": {
+      "id": "GRACE-PUPPY-001",
+      "title": "THE PUPPY HAS OTHER PLANS",
+      "arrival": "optional temporary-care request after the first ordinary Wednesday action",
+      "supplies": "one puppy-specific meal and a leash declared as supplied by the neighbor; no human food credited",
+      "careTrigger": "after one subsequent Wednesday ordinary action if care was accepted",
+      "options": [
+        "decline temporary care",
+        "accept temporary care",
+        "take puppy outside",
+        "take puppy to dog park when transport is available"
+      ],
+      "costs": {
+        "outside": {
+          "time": 1,
+          "puppyKitMeal": 1
+        },
+        "dogPark": {
+          "time": 1,
+          "transport": 1,
+          "puppyKitMeal": 1
+        }
+      },
+      "timeBoundary": "urgent care when ordinary time is exhausted records one future time block owed, not free time or a completed future-day action",
+      "authority": "fictional animal's needs remain particular; candidate dog-park encounter is not an established human relationship",
+      "nonClaims": [
+        "arrival offer != compelled adoption",
+        "temporary care != permanent ownership",
+        "puppy != morale bonus or worker unit",
+        "puppy meal != human food",
+        "care != guaranteed affection",
+        "next-day time debt != settled future action"
+      ]
     }
   }
 }

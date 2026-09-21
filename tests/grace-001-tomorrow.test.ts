@@ -64,7 +64,7 @@ test("Wednesday meal spends carried food, not freshly minted supply",()=>{
   const after=replayWednesday(playWednesdayAction(next,"make-wednesday-dinner"));
   assert.equal(after.stocks.food,before.stocks.food-1);
   assert.equal(after.stocks.time,before.stocks.time-1);
-  assert.ok(!after.openNeeds.some(d=>d.id==="wednesday-dinner"));
+  assert.equal(after.openNeeds.find(d=>d.id==="wednesday-dinner")?.remaining,0);
   assert.ok(after.openNeeds.some(d=>d.id==="client-callback"));
 });
 
@@ -93,6 +93,9 @@ test("cannot inject Wednesday action or edit Tuesday provenance by importing a c
   const tampered=structuredClone(campaign);
   tampered.sourceDayReceipt.session.events[0]={id:"grace-event-0001",type:"economy_action",actionId:"share-meal"};
   assert.throws(()=>replayWednesday(tampered),/Tuesday source receipt mismatch/);
+  const silentChange=structuredClone(campaign);
+  silentChange.sourceDayReceipt.session.events[0].id="silently-renamed-event";
+  assert.throws(()=>replayWednesday(silentChange),/Tuesday source receipt mismatch/);
 });
 
 test("Wednesday has its own finite hand and an end scene that keeps unmet needs",()=>{
