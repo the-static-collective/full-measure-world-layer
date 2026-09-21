@@ -263,7 +263,11 @@
     "new day time does not respawn cash food transport or attention",
     "Tuesday event ancestry cannot be revised by Wednesday play",
     "the same resource totals may have different reachable futures because the receipts differ",
-    "Wednesday dinner cannot retroactively fulfill Tuesday dinner"
+    "Wednesday dinner cannot retroactively fulfill Tuesday dinner",
+    "puppy arrival is optional and accepting it adds distinct care duties",
+    "puppy-specific meal cannot be exchanged for or counted as human food",
+    "puppy care interruptions cannot be bypassed in replay",
+    "animal care after ordinary time is exhausted leaves explicit future time debt"
   ],
   "partyOptions": [
     {
@@ -488,6 +492,40 @@
         "fictional door != outside-world occurrence",
         "local replay equality != cryptographic authorship",
         "a second game day is not a real-world service outcome"
+      ]
+    },
+    "puppy001": {
+      "id": "GRACE-PUPPY-001",
+      "title": "THE PUPPY HAS OTHER PLANS",
+      "arrival": "optional temporary-care request after the first ordinary Wednesday action",
+      "supplies": "one puppy-specific meal and a leash declared as supplied by the neighbor; no human food credited",
+      "careTrigger": "after one subsequent Wednesday ordinary action if care was accepted",
+      "options": [
+        "decline temporary care",
+        "accept temporary care",
+        "take puppy outside",
+        "take puppy to dog park when transport is available"
+      ],
+      "costs": {
+        "outside": {
+          "time": 1,
+          "puppyKitMeal": 1
+        },
+        "dogPark": {
+          "time": 1,
+          "transport": 1,
+          "puppyKitMeal": 1
+        }
+      },
+      "timeBoundary": "urgent care when ordinary time is exhausted records one future time block owed, not free time or a completed future-day action",
+      "authority": "fictional animal's needs remain particular; candidate dog-park encounter is not an established human relationship",
+      "nonClaims": [
+        "arrival offer != compelled adoption",
+        "temporary care != permanent ownership",
+        "puppy != morale bonus or worker unit",
+        "puppy meal != human food",
+        "care != guaranteed affection",
+        "next-day time debt != settled future action"
       ]
     }
   }
