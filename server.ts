@@ -9,6 +9,10 @@ import { createWorldRuntimeServices } from './src/lib/worldRuntime/services.js';
 import { createWorldRuntimeHttpHandlers } from './src/lib/worldRuntime/http.js';
 import { registerWorldRuntimeRoutes } from './src/lib/worldRuntime/routes.js';
 import {
+  createGraceDogramService,
+  type GraceDogramRequest,
+} from './src/lib/grace/dogramAdapter.js';
+import {
   JubileeDataStore,
   Offer,
   Project,
@@ -99,6 +103,8 @@ async function startServer() {
   const worldRuntimeHttp = createWorldRuntimeHttpHandlers(worldRuntimeServices);
   registerWorldRuntimeRoutes(app, worldRuntimeHttp);
 
+  const graceDogram = createGraceDogramService(process.env, process.platform);
+
   // Log requests
   app.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
@@ -112,6 +118,26 @@ async function startServer() {
   // 1. Health check & store overview
   app.get('/api/health', (req: Request, res: Response) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
+  });
+
+  // GRACE-001 optional Dogram mechanics donor.
+  app.get('/api/grace/dogram/availability', (_req: Request, res: Response) => {
+    res.json(graceDogram.availability());
+  });
+
+  app.post('/api/grace/dogram/calculate', async (req: Request, res: Response) => {
+    const result = await graceDogram.calculate(req.body as GraceDogramRequest);
+    if (result.ok) {
+      return res.json(result);
+    }
+
+    const status =
+      result.kind === 'unavailable'
+        ? 503
+        : result.kind === 'donor'
+          ? 422
+          : 502;
+    return res.status(status).json(result);
   });
 
   // 2. Reset database to seed data
