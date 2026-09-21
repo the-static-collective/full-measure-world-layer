@@ -144,6 +144,34 @@ residual  -1/2 :  1/5 : 3/10
 
 These are mechanics calculations with `authority: none`. Successor availability does not mean occurrence, and numerical allocation does not decide the right human choice.
 
+## Portable Day Receipt
+
+The inhabited campaign can now export and import `full-measure.grace-day-receipt.v1`.
+
+The artifact contains the append-only session log plus a deterministic replay checksum. Import replays the event sequence and refuses a receipt whose replay result no longer matches its checksum.
+
+The current checksum is explicitly a corruption/replay witness, not a cryptographic signature and not an authority upgrade.
+
+## Upper Room selection and card lineage
+
+The first dream return no longer forces one seeded passage. The player may choose among declared text anchors:
+
+- Psalm 46:10;
+- Matthew 11:28;
+- James 1:5.
+
+Selection is retained as provenance, not as proof that the selected passage is the one correct interpretation or divine instruction.
+
+A `REMEMBERED WORD` card can now be exported as a `full-measure.portable-card.v1` envelope. Another campaign can receive that envelope and seed a descendant card:
+
+```text
+Generation 1 parent
+      ↓ portable lineage envelope
+Generation 2 descendant
+```
+
+The descendant preserves the parent card id and complete lineage while explicitly refusing to claim physical custody transfer or inherited interpretive authority.
+
 ## Next frontier
 
 Make this *inhabited*:
