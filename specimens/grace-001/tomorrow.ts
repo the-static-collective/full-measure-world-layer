@@ -15,6 +15,7 @@ export interface WednesdayEvent {
 export interface WednesdayCampaign {
   schema: "full-measure.grace-wednesday.v1";
   sourceDayReceipt: GraceDayReceipt;
+  sealedTuesdayEventLog: string;
   events: WednesdayEvent[];
 }
 export interface OpenNeed {
@@ -103,7 +104,8 @@ const copy = <T,>(value:T):T => structuredClone(value);
 function source(campaign:WednesdayCampaign) {
   if(campaign.schema!=="full-measure.grace-wednesday.v1")
     throw new Error("Unsupported Wednesday campaign schema");
-  if(!verifyDayReceipt(campaign.sourceDayReceipt).ok)
+  if(!verifyDayReceipt(campaign.sourceDayReceipt).ok ||
+      JSON.stringify(campaign.sourceDayReceipt.session.events)!==campaign.sealedTuesdayEventLog)
     throw new Error("Tuesday source receipt mismatch");
   const tuesday=replaySession(campaign.sourceDayReceipt.session);
   if(tuesday.culture.stocks.time!==0)
@@ -171,7 +173,8 @@ export function startWednesday(tuesday:GraceSession):WednesdayCampaign {
     throw new Error("Tuesday must reach zero time before Wednesday starts");
   const campaign:WednesdayCampaign={
     schema:"full-measure.grace-wednesday.v1",
-    sourceDayReceipt:createDayReceipt(tuesday),events:[],
+    sourceDayReceipt:createDayReceipt(tuesday),
+    sealedTuesdayEventLog:JSON.stringify(tuesday.events),events:[],
   };
   replayWednesday(campaign);
   return campaign;
