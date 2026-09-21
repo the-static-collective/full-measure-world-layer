@@ -42,6 +42,38 @@
       {"motif": "light kept on", "roles": ["continuity", "care", "rest"]}
     ]
   },
+  "economy": {
+    "initialSupply": {
+      "time": 4,
+      "cash": 18,
+      "food": 1,
+      "transport": 1,
+      "attention": 3
+    },
+    "liveDemand": [
+      {"id": "home-dinner", "required": true},
+      {"id": "client-callback", "required": true},
+      {"id": "vehicle-check", "required": false},
+      {"id": "rest", "required": false},
+      {"id": "neighbor-meal", "required": false}
+    ],
+    "cultureTraces": [
+      "hospitality",
+      "stewardship",
+      "discipleship",
+      "rest",
+      "mutual_aid"
+    ],
+    "design": [
+      "resources are finite and concrete",
+      "every spend may foreclose other actions",
+      "opportunity cost is receipted explicitly",
+      "meeting one demand does not erase residual demand",
+      "people are not fungible resource units",
+      "discipleship is formation/apprenticeship, not ownership of labor",
+      "culture emerges from repeated attributable choices rather than a morality score"
+    ]
+  },
   "decks": {
     "pressure": ["The Morning Is Late", "Client Needs Housing", "Pickup Clock", "Vehicle Noise", "Quiet House"],
     "practice": ["Pray", "Drink Water", "Rest"],
@@ -54,6 +86,9 @@
     "attempt != delivery_reported != receipt_confirmed != outcome_observed",
     "interruption preserves a return address",
     "same meters != same lived path",
+    "scarcity is real: a choice may make another lawful choice temporarily unavailable",
+    "opportunity cost must remain inspectable",
+    "culture trace != human worth",
     "wildcard may alter declared grammar but may not silently alter provenance",
     "dice choose proposals; witnessed reality determines the record",
     "the player inhabits the choice; Dogram calculates declared mechanics"
