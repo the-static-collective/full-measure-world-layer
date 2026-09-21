@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {GraceAperturePanel} from './GraceAperturePanel';
+import {GracePlaySurface} from './GracePlaySurface';
 import {
   availableActions,
   demandPressure,
@@ -57,6 +58,7 @@ export function GraceCampaignPanel() {
   const [session, setSession] = useState<GraceSession>(() => loadSession());
   const [error, setError] = useState<string | null>(null);
   const [selectedAnchorId, setSelectedAnchorId] = useState('be-still');
+  const [showInspector, setShowInspector] = useState(false);
   const [dogramDonor, setDogramDonor] = useState<
     DogramSuccessorResult | {status: 'checking'} | null
   >(null);
@@ -182,6 +184,21 @@ export function GraceCampaignPanel() {
 
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-amber-200 bg-white/85 shadow-sm">
+      <GracePlaySurface session={session} commit={commit} />
+
+      <div className="border-t border-amber-100 bg-white px-4 py-3 sm:px-6">
+        <button
+          type="button"
+          onClick={() => setShowInspector((current) => !current)}
+          aria-expanded={showInspector}
+          className="min-h-11 rounded-full border border-stone-300 bg-stone-50 px-4 py-2 text-xs font-semibold text-stone-700 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-700"
+        >
+          {showInspector ? 'Close world inspector' : 'Inspect world'}
+        </button>
+      </div>
+
+      {showInspector && (
+        <>
       <div className="border-b border-amber-100 bg-amber-50/80 px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -487,6 +504,8 @@ export function GraceCampaignPanel() {
       </div>
 
       <GraceAperturePanel session={session} commit={commit} />
+        </>
+      )}
 
       {error && <div className="border-t border-rose-200 bg-rose-50 px-5 py-3 text-sm text-rose-800">{error}</div>}
     </section>
