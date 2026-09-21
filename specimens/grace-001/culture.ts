@@ -1,5 +1,5 @@
 export type Resource = "time" | "cash" | "food" | "transport" | "attention";
-export type CultureTrace = "hospitality" | "stewardship" | "discipleship" | "rest" | "mutual_aid";
+export type CultureTrace = "hospitality" | "stewardship" | "discipleship" | "prayer" | "rest" | "mutual_aid";
 
 export interface Stocks {
   time: number;
@@ -87,6 +87,14 @@ export const economyActions: Record<string, EconomyAction> = {
     traces: { stewardship: 1 },
     note: "Spend time, money and the available trip to investigate the unresolved noise."
   },
+  "prayer-block": {
+    id: "prayer-block",
+    label: "Take a Prayer Block",
+    costs: { time: 1 },
+    produces: { attention: 1 },
+    traces: { prayer: 1 },
+    note: "Spend real time in prayer; restore attention without changing external facts."
+  },
   "rest-block": {
     id: "rest-block",
     label: "Take a Rest Block",
@@ -119,6 +127,7 @@ export function initialCultureState(): CultureState {
       hospitality: 0,
       stewardship: 0,
       discipleship: 0,
+      prayer: 0,
       rest: 0,
       mutual_aid: 0
     },
@@ -217,6 +226,7 @@ export function cultureUnlocks(state: CultureState): string[] {
   const unlocks: string[] = [];
   if (state.traces.hospitality >= 3) unlocks.push("shared-table-pattern");
   if (state.traces.discipleship >= 3) unlocks.push("apprenticeship-pattern");
+  if (state.traces.prayer >= 3) unlocks.push("prayer-rhythm-pattern");
   if (state.traces.rest >= 3) unlocks.push("rest-is-normal-pattern");
   if (state.traces.mutual_aid >= 3) unlocks.push("mutual-aid-pattern");
   if (state.traces.stewardship >= 3) unlocks.push("stewardship-pattern");
