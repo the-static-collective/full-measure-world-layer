@@ -1,3 +1,13 @@
+import {
+  chooseParty,
+  initialApertureState,
+  recordFlashbackReflection,
+  returnFromPossibleWorld,
+  togglePossibleWorldPrinciple,
+  type ApertureState,
+  type PartyMemberId,
+  type PossibleWorldPrincipleId,
+} from "./apertures.ts";
 import {applyEconomyAction, initialCultureState, type CultureState} from "./culture.ts";
 import {
   chooseFocus,
@@ -24,7 +34,11 @@ export type GraceSessionInputEvent =
   | {type: "dream_red_door"}
   | {type: "upper_room_return"; dreamId: string; playerNote?: string; anchorId?: string}
   | {type: "remembered_word"; returnId: string}
-  | {type: "seed_card_envelope"; envelope: PortableCardEnvelope};
+  | {type: "seed_card_envelope"; envelope: PortableCardEnvelope}
+  | {type: "choose_party"; members: PartyMemberId[]}
+  | {type: "flashback_reflection"; sourceEventId: string; presentReflection: string}
+  | {type: "possible_world_toggle"; principleId: PossibleWorldPrincipleId}
+  | {type: "possible_world_return"};
 
 export type GraceSessionEvent = GraceSessionInputEvent & {id: string};
 
@@ -37,6 +51,7 @@ export interface ReplayedGraceSession {
   story: GraceState;
   culture: CultureState;
   meaning: MeaningState;
+  apertures: ApertureState;
   lastProposal: ReturnType<typeof drawQuestProposal> | null;
 }
 
@@ -68,6 +83,7 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
   let story = initialState();
   let culture = initialCultureState();
   let meaning = initialMeaningState();
+  let apertures = initialApertureState();
   let lastProposal: ReturnType<typeof drawQuestProposal> | null = null;
 
   for (const event of session.events) {
@@ -96,10 +112,30 @@ export function replaySession(session: GraceSession): ReplayedGraceSession {
       case "seed_card_envelope":
         meaning = seedDescendantFromEnvelope(meaning, event.envelope);
         break;
+      case "choose_party":
+        apertures = chooseParty(apertures, event.members);
+        break;
+      case "flashback_reflection": {
+        if (!session.events.some((candidate) => candidate.id === event.sourceEventId && candidate.id !== event.id)) {
+          throw new Error(`Unknown flashback source event: ${event.sourceEventId}`);
+        }
+        apertures = recordFlashbackReflection(
+          apertures,
+          event.sourceEventId,
+          event.presentReflection,
+        );
+        break;
+      }
+      case "possible_world_toggle":
+        apertures = togglePossibleWorldPrinciple(apertures, event.principleId);
+        break;
+      case "possible_world_return":
+        apertures = returnFromPossibleWorld(apertures);
+        break;
     }
   }
 
-  return {story, culture, meaning, lastProposal};
+  return {story, culture, meaning, apertures, lastProposal};
 }
 
 export function encodeSession(session: GraceSession): string {
