@@ -137,6 +137,49 @@ Returning from the possible world costs `1 time + 1 attention` and receipts both
 
 The aperture therefore allows fantasy/utopia to become **design material without becoming fake present-world supply**.
 
+## Bandcamp archaeology / Novelist material seeds
+
+The first content-archaeology layer follows Novelist's material discipline:
+
+```text
+artistic source
+  ↓
+status: seed
+canonical: false
+  ↓
+paid Storyship visit
+  ↓
+campaign witness
+  ↓
+candidate relations
+```
+
+A visit costs:
+
+```text
+1 time
+1 attention
+```
+
+and is valid in replay only when immediately preceded by `storyship-block`.
+
+The first three sites are:
+
+1. **After the Feast, Seeds in the Dirt** — sourced from *Forty-Two Lemon Seeds*. Porch cleanup, residue, cables, lemon seeds, roots and the future stranger become candidate material.
+2. **The Witness Seat Leaves the Porch** — sourced from *Static Knows the Road*. Road, static, fence wire, power lines and portable witness become candidate material.
+3. **The Room After the Spark** — sourced from *The Door Learns the Morning*. Chair, table, lemon, open E, ordinary morning labor, aftermath and rest become candidate material.
+
+Party composition changes the questions exposed by a visit while the source facts remain identical.
+
+The witness explicitly refuses:
+
+- source lyric == campaign history;
+- candidate relation == admitted world fact;
+- artistic resemblance == external occurrence;
+- party prompt == interpretive authority.
+
+Day Receipt replay/checksum includes archaeology visits.
+
 ## Live Dogram donor
 
 Full Measure can now use Dogram itself as an optional local mechanics donor.
