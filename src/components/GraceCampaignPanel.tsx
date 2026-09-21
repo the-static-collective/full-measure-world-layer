@@ -229,7 +229,7 @@ export function GraceCampaignPanel() {
         >
           {showInspector ? 'Close world inspector' : 'Inspect world'}
         </button>
-      </div>
+      </div>}
 
       {!wednesday && showInspector && (
         <>
