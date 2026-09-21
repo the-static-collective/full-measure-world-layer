@@ -39,7 +39,7 @@ export interface OpenNeed {
 }
 export interface WednesdayReceipt {
   id: string;
-  actionId: WednesdayActionId;
+  actionId: WednesdayActionId | "puppy-arrival" | "puppy-care";
   claims: string[];
   nonClaims: string[];
   sourceTuesdayEventIds: string[];
