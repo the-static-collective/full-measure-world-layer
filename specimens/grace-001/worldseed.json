@@ -248,6 +248,90 @@
     "culture trace != human worth",
     "wildcard may alter declared grammar but may not silently alter provenance",
     "dice choose proposals; witnessed reality determines the record",
-    "the player inhabits the choice; Dogram calculates declared mechanics"
-  ]
+    "the player inhabits the choice; Dogram calculates declared mechanics",
+    "party members contribute lenses, not fungible labor units or stat buffs",
+    "flashback reflection cannot rewrite an earlier event",
+    "possible-world exploration must preserve supply and maintenance tensions",
+    "meaning work consumes declared present time and attention"
+  ],
+  "partyOptions": [
+    {
+      "id": "grace",
+      "default": true,
+      "required": true,
+      "role": "player-character",
+      "lenses": [
+        "current responsibility",
+        "scarcity",
+        "faith practice",
+        "building"
+      ]
+    },
+    {
+      "id": "heaven",
+      "default": true,
+      "required": false,
+      "role": "party-member",
+      "lenses": [
+        "play",
+        "child perspective",
+        "surprise",
+        "belonging"
+      ],
+      "nonClaims": [
+        "not a morale bonus",
+        "not a player-owned resource"
+      ]
+    },
+    {
+      "id": "paula",
+      "default": false,
+      "required": false,
+      "role": "party-member",
+      "lenses": [
+        "witness",
+        "community",
+        "story-building",
+        "mutual aid"
+      ],
+      "nonClaims": [
+        "campaign role does not assert biography beyond the declared game seed",
+        "party membership does not imply agreement with every player interpretation"
+      ]
+    }
+  ],
+  "apertures": {
+    "flashback": {
+      "source": "earlier append-only campaign event",
+      "cost": {
+        "time": 1,
+        "attention": 1
+      },
+      "law": [
+        "later reflection may change present meaning",
+        "later reflection may not edit the source event",
+        "future events cannot be used as flashback sources"
+      ]
+    },
+    "possibleWorld": {
+      "id": "possible-world.grace-house",
+      "costOnReturn": {
+        "time": 1,
+        "attention": 1
+      },
+      "principles": [
+        "food-without-proof",
+        "heaven-art-room",
+        "porch-around-house",
+        "community-kitchen",
+        "garden-everywhere"
+      ],
+      "law": [
+        "possible world != present-world fact",
+        "utopian desirability != feasibility proof",
+        "return retains tensions and party prompts",
+        "imagination does not create external supply"
+      ]
+    }
+  }
 }
