@@ -70,7 +70,11 @@ function loadSession(): GraceSession {
   }
 }
 
-export function GraceCampaignPanel() {
+interface GraceCampaignPanelProps {
+  immersive?: boolean;
+}
+
+export function GraceCampaignPanel({immersive = false}: GraceCampaignPanelProps = {}) {
   const [session, setSession] = useState<GraceSession>(() => loadSession());
   const [wednesday, setWednesday] = useState<WednesdayCampaign | null>(() => loadWednesday(loadSession()));
   const [error, setError] = useState<string | null>(null);
@@ -207,10 +211,16 @@ export function GraceCampaignPanel() {
   const latestRememberedWord = meaning.cards.at(-1);
 
   return (
-    <section className="mb-6 overflow-hidden rounded-3xl border border-amber-200 bg-white/85 shadow-sm">
+    <section
+      className={
+        immersive
+          ? 'grace-campaign grace-campaign--immersive'
+          : 'grace-campaign mb-6 overflow-hidden rounded-3xl border border-amber-200 bg-white/85 shadow-sm'
+      }
+    >
       {wednesday
         ? <GraceTomorrowSurface campaign={wednesday} onChange={setWednesday} onExportTuesday={exportDayReceipt} />
-        : <GracePlaySurface session={session} commit={commit} onBeginWednesday={() => {
+        : <GracePlaySurface session={session} commit={commit} immersive={immersive} onBeginWednesday={() => {
             try {
               setError(null);
               setWednesday(startWednesday(session));
@@ -220,7 +230,7 @@ export function GraceCampaignPanel() {
             }
           }} />}
 
-      {!wednesday && <div className="border-t border-amber-100 bg-white px-4 py-3 sm:px-6">
+      {!immersive && !wednesday && <div className="border-t border-amber-100 bg-white px-4 py-3 sm:px-6">
         <button
           type="button"
           onClick={() => setShowInspector((current) => !current)}
@@ -231,7 +241,7 @@ export function GraceCampaignPanel() {
         </button>
       </div>}
 
-      {!wednesday && showInspector && (
+      {!immersive && !wednesday && showInspector && (
         <>
       <div className="border-b border-amber-100 bg-amber-50/80 px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-3">

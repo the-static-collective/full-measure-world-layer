@@ -1,0 +1,641 @@
+.grace-living-room {
+  --grace-forest: #0d3428;
+  --grace-forest-deep: #09271e;
+  --grace-cream: #f7f0df;
+  --grace-gold: #dcc48d;
+  --grace-ink: #18241f;
+  width: 100%;
+  color: var(--grace-cream);
+  background: var(--grace-forest-deep);
+  outline: none;
+}
+
+.grace-living-room:focus-visible {
+  box-shadow: inset 0 0 0 4px #f6d38d;
+}
+
+.grace-living-room__scene {
+  position: relative;
+  min-height: min(1024px, 100svh);
+  overflow: hidden;
+  isolation: isolate;
+  background: #10291f;
+}
+
+.grace-living-room__picture {
+  position: absolute;
+  inset: 0 0 92px;
+}
+
+.grace-living-room__picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.96) contrast(1.02);
+}
+
+.grace-living-room--midday .grace-living-room__picture img {
+  filter: saturate(0.98) contrast(1.03) brightness(1.04);
+}
+
+.grace-living-room--evening .grace-living-room__picture img {
+  filter: saturate(0.9) contrast(1.04) brightness(0.84);
+}
+
+.grace-living-room--night .grace-living-room__picture img {
+  filter: saturate(0.72) contrast(1.08) brightness(0.58);
+}
+
+.grace-living-room__shade {
+  position: absolute;
+  inset: 0 0 92px;
+  pointer-events: none;
+  background: rgba(4, 17, 13, 0.12);
+  box-shadow:
+    inset 0 150px 110px -92px rgba(2, 12, 9, 0.88),
+    inset 0 -130px 110px -95px rgba(2, 12, 9, 0.74);
+}
+
+.grace-living-room__title {
+  position: absolute;
+  z-index: 3;
+  top: clamp(22px, 3vw, 42px);
+  left: clamp(22px, 4.5vw, 68px);
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  color: #fff4d9;
+  text-shadow: 0 2px 18px rgba(4, 18, 13, 0.72);
+}
+
+.grace-living-room__sprig {
+  flex: none;
+  margin-top: 7px;
+  color: #ddc372;
+}
+
+.grace-living-room__title h1 {
+  margin: 0;
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
+  font-size: clamp(2rem, 3.7vw, 3.6rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+}
+
+.grace-living-room__title p {
+  margin: 0.65rem 0 0;
+  font-size: clamp(0.8rem, 1.45vw, 1.15rem);
+  letter-spacing: 0.05em;
+  color: #f3e5c7;
+}
+
+.grace-living-room__story {
+  position: absolute;
+  z-index: 3;
+  top: clamp(128px, 13.5vw, 180px);
+  left: clamp(24px, 5vw, 76px);
+  max-width: 320px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(226, 196, 132, 0.76);
+  color: #fff5df;
+  text-shadow: 0 2px 12px rgba(2, 12, 9, 0.86);
+}
+
+.grace-living-room__story span,
+.grace-living-room__story strong {
+  display: block;
+}
+
+.grace-living-room__story span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.grace-living-room__story strong {
+  margin-top: 0.28rem;
+  max-width: 24ch;
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.grace-living-room__station {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0.55rem 0.72rem;
+  border: 1px solid rgba(244, 226, 191, 0.52);
+  border-radius: 999px;
+  color: #fff8e9;
+  background: rgba(12, 48, 37, 0.82);
+  box-shadow: 0 7px 22px rgba(5, 21, 16, 0.38);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  opacity: 0.16;
+  transform: translate(-50%, -50%) scale(0.86);
+  transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.grace-living-room__station:hover,
+.grace-living-room__station:focus-visible,
+.grace-living-room__station.is-nearby {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.grace-living-room__station:focus-visible {
+  outline: 3px solid #ffe4a8;
+  outline-offset: 4px;
+}
+
+.grace-living-room__station.is-nearby {
+  box-shadow:
+    0 0 0 12px rgba(66, 189, 130, 0.28),
+    0 0 34px 18px rgba(44, 171, 113, 0.3),
+    0 7px 22px rgba(5, 21, 16, 0.45);
+}
+
+.grace-living-room__station--phone { left: 62.5%; top: 28.5%; }
+.grace-living-room__station--bag { left: 29%; top: 44%; }
+.grace-living-room__station--prayer { left: 91%; top: 48%; }
+.grace-living-room__station--chair { left: 72%; top: 77%; }
+
+.grace-living-room__choice {
+  position: absolute;
+  z-index: 5;
+  top: clamp(205px, 28vw, 320px);
+  left: 58%;
+  width: min(292px, 31vw);
+  padding: 1.05rem 1.08rem 0.95rem;
+  border: 1px solid rgba(81, 70, 50, 0.22);
+  border-radius: 15px;
+  color: var(--grace-ink);
+  background: rgba(252, 247, 234, 0.97);
+  box-shadow: 0 18px 42px rgba(11, 28, 22, 0.36);
+  backdrop-filter: blur(10px);
+}
+
+.grace-living-room__choice-place {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.grace-living-room__choice-rule {
+  height: 1px;
+  margin: 0.72rem 0 0.78rem;
+  background: rgba(64, 62, 50, 0.25);
+}
+
+.grace-living-room__choice h2 {
+  margin: 0;
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
+  font-size: clamp(1.15rem, 1.6vw, 1.48rem);
+  line-height: 1.18;
+  font-weight: 700;
+}
+
+.grace-living-room__cost {
+  margin: 0.38rem 0 0.85rem;
+  font-size: 0.88rem;
+}
+
+.grace-living-room__preview-note {
+  margin: -0.25rem 0 0.8rem;
+  font-size: 0.72rem;
+  line-height: 1.42;
+  color: #6d6251;
+}
+
+.grace-living-room__primary,
+.grace-living-room__secondary {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 9px;
+  font-size: 0.91rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.grace-living-room__primary {
+  border: 1px solid #0a392b;
+  color: #fff9e9;
+  background: #0d432f;
+}
+
+.grace-living-room__primary:hover {
+  background: #15553e;
+}
+
+.grace-living-room__secondary {
+  margin-top: 0.5rem;
+  border: 1px solid rgba(47, 47, 40, 0.5);
+  color: #2e332f;
+  background: transparent;
+}
+
+.grace-living-room__secondary:hover {
+  background: #eee6d5;
+}
+
+.grace-living-room__primary:focus-visible,
+.grace-living-room__secondary:focus-visible {
+  outline: 3px solid #2a7357;
+  outline-offset: 2px;
+}
+
+.grace-living-room__boundary {
+  margin: 0.7rem 0 0;
+  text-align: center;
+  font-family: Georgia, Cambria, 'Times New Roman', serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: #7a705f;
+}
+
+.grace-living-room__dock {
+  position: absolute;
+  z-index: 6;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  color: #fff5dd;
+  background: rgba(9, 44, 33, 0.97);
+  border-top: 1px solid rgba(230, 210, 165, 0.22);
+}
+
+.grace-living-room__resources {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(84px, 1fr));
+  align-items: center;
+}
+
+.grace-living-room__resource {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas: 'icon label' 'icon value';
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.7rem;
+  padding: 0.8rem 0.75rem;
+}
+
+.grace-living-room__resource svg {
+  grid-area: icon;
+  color: #efdfb7;
+}
+
+.grace-living-room__resource span {
+  grid-area: label;
+  font-size: 0.66rem;
+  color: #d9ceb4;
+}
+
+.grace-living-room__resource strong {
+  grid-area: value;
+  font-size: 1.18rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.grace-living-room__movement {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.15rem;
+  border-left: 1px solid rgba(230, 210, 165, 0.28);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.grace-living-room__movement button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(244, 226, 191, 0.5);
+  border-radius: 9px;
+  color: #fff5dd;
+  background: #123b2f;
+  cursor: pointer;
+}
+
+.grace-living-room__movement button:hover {
+  background: #1e5543;
+}
+
+.grace-living-room__movement button:focus-visible {
+  outline: 3px solid #f6d38d;
+  outline-offset: 2px;
+}
+
+.grace-living-room__keys {
+  padding: 0.38rem 0.46rem;
+  border: 1px solid rgba(244, 226, 191, 0.42);
+  border-radius: 5px;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 900px) {
+  .grace-living-room__scene {
+    min-height: 820px;
+  }
+
+  .grace-living-room__picture,
+  .grace-living-room__shade {
+    bottom: 164px;
+  }
+
+  .grace-living-room__dock {
+    min-height: 164px;
+    grid-template-columns: 1fr;
+  }
+
+  .grace-living-room__movement {
+    justify-content: center;
+    border-top: 1px solid rgba(230, 210, 165, 0.2);
+    border-left: 0;
+    padding: 0.55rem 1rem;
+  }
+
+  .grace-living-room__resource {
+    padding: 0.72rem 0.4rem;
+    column-gap: 0.45rem;
+  }
+
+  .grace-living-room__resource svg {
+    width: 21px;
+  }
+}
+
+@media (max-width: 680px) {
+  .grace-living-room__scene {
+    min-height: 100svh;
+  }
+
+  .grace-living-room__picture,
+  .grace-living-room__shade {
+    bottom: 180px;
+  }
+
+  .grace-living-room__picture img {
+    object-position: center 35%;
+  }
+
+  .grace-living-room__shade {
+    background: rgba(4, 17, 13, 0.08);
+    box-shadow:
+      inset 0 120px 95px -72px rgba(2, 12, 9, 0.9),
+      inset 0 -155px 125px -105px rgba(2, 12, 9, 0.76);
+  }
+
+  .grace-living-room__title {
+    top: 18px;
+    left: 18px;
+    gap: 10px;
+  }
+
+  .grace-living-room__sprig {
+    width: 22px;
+    margin-top: 3px;
+  }
+
+  .grace-living-room__title h1 {
+    max-width: 290px;
+    font-size: clamp(1.55rem, 7.2vw, 2rem);
+  }
+
+  .grace-living-room__title p {
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+  }
+
+  .grace-living-room__story {
+    top: 96px;
+    left: 20px;
+    max-width: 230px;
+  }
+
+  .grace-living-room__story span {
+    font-size: 0.61rem;
+  }
+
+  .grace-living-room__story strong {
+    font-size: 0.9rem;
+  }
+
+  .grace-living-room__station {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .grace-living-room__station.is-nearby {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .grace-living-room__station--phone { left: 62%; top: 21%; }
+  .grace-living-room__station--bag { left: 31%; top: 39%; }
+  .grace-living-room__station--prayer { left: 87%; top: 46%; }
+  .grace-living-room__station--chair { left: 74%; top: 72%; }
+
+  .grace-living-room__station.is-nearby span {
+    display: none;
+  }
+
+  .grace-living-room__choice {
+    top: auto;
+    right: 15px;
+    bottom: 196px;
+    left: 15px;
+    width: auto;
+    padding: 0.85rem 0.9rem 0.75rem;
+  }
+
+  .grace-living-room__choice h2 {
+    font-size: 1.08rem;
+  }
+
+  .grace-living-room__cost {
+    margin-bottom: 0.65rem;
+    font-size: 0.82rem;
+  }
+
+  .grace-living-room__primary,
+  .grace-living-room__secondary {
+    min-height: 44px;
+  }
+
+  .grace-living-room__boundary {
+    margin-top: 0.5rem;
+  }
+
+  .grace-living-room__dock {
+    min-height: 180px;
+  }
+
+  .grace-living-room__resources {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .grace-living-room__resource {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.14rem;
+    padding: 0.65rem 0.05rem 0.5rem;
+  }
+
+  .grace-living-room__resource svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .grace-living-room__resource span {
+    max-width: 62px;
+    overflow: hidden;
+    font-size: 0.52rem;
+    text-overflow: ellipsis;
+  }
+
+  .grace-living-room__resource strong {
+    font-size: 0.94rem;
+  }
+
+  .grace-living-room__movement {
+    padding: 0.45rem 0.7rem 0.6rem;
+  }
+
+  .grace-living-room__movement > span:first-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grace-living-room__station {
+    transition: none;
+  }
+}
+
+.grace-choice-shelf {
+  color: #f8efdc;
+  background: #0a261d;
+  border-top: 1px solid rgba(231, 209, 164, 0.2);
+}
+
+.grace-choice-shelf summary {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1rem;
+  color: #e8d9b7;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.grace-choice-shelf summary:focus-visible {
+  outline: 3px solid #f6d38d;
+  outline-offset: -4px;
+}
+
+.grace-choice-shelf__body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem 1.35rem;
+}
+
+.grace-choice-shelf__body > p {
+  max-width: 64ch;
+  margin: 0 auto 1rem;
+  text-align: center;
+  color: #cfc1a2;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.grace-choice-shelf__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.grace-choice-shelf__action {
+  min-height: 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(236, 218, 180, 0.28);
+  border-radius: 10px;
+  color: #fff7e6;
+  background: #12372b;
+  text-align: left;
+  cursor: pointer;
+}
+
+.grace-choice-shelf__action:hover,
+.grace-choice-shelf__action.is-active {
+  border-color: #efcc83;
+  background: #1d503d;
+}
+
+.grace-choice-shelf__action:focus-visible {
+  outline: 3px solid #f6d38d;
+  outline-offset: 2px;
+}
+
+.grace-choice-shelf__action strong {
+  font-size: 0.78rem;
+}
+
+.grace-choice-shelf__action span {
+  color: #d4c7aa;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 680px) {
+  .grace-choice-shelf__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.grace-play-shell {
+  width: 100%;
+  padding: 0;
+  background: #0b2a20;
+}
+
+.grace-standalone,
+.grace-campaign--immersive {
+  min-height: 100svh;
+  margin: 0;
+  background: #0b2a20;
+}
+
+.grace-campaign--immersive {
+  overflow: hidden;
+}

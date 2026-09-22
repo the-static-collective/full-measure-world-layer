@@ -27,7 +27,17 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 3000;
+function commandValue(flag: string): string | undefined {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+const requestedPort = commandValue('--port') ?? process.env.PORT ?? '3000';
+const PORT = Number.parseInt(requestedPort, 10);
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+  throw new Error(`Invalid server port: ${requestedPort}`);
+}
+const HOST = commandValue('--host') ?? process.env.HOST ?? '0.0.0.0';
 const DB_FILE = path.join(process.cwd(), 'data', 'jubilee_db.json');
 
 // Ensure data directory exists
@@ -965,7 +975,10 @@ async function startServer() {
   // Mount Vite Middleware or Serve Production Build
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        allowedHosts: ['terminal.local'],
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -977,8 +990,8 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Jubilee Campfire server running on http://0.0.0.0:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Jubilee Campfire server running on http://${HOST}:${PORT}`);
   });
 }
 
