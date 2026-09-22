@@ -361,14 +361,14 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
   const projectionsHidden = replayed.story.projectionsHiddenTurns > 0;
 
   return (
-    <div className="bg-gradient-to-b from-amber-50 via-orange-50/60 to-stone-50 px-4 py-6 sm:px-7 sm:py-8">
+    <div className="grace-play-shell bg-gradient-to-b from-amber-50 via-orange-50/60 to-stone-50 px-4 py-6 sm:px-7 sm:py-8">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="grace-viewbar mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">Tuesday / Your room</p>
           <button type="button" aria-pressed={exploringRoom}
             onClick={() => setExploringRoom(current => !current)}
-            className="min-h-11 rounded-full border border-stone-400 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-sm hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
-          >{exploringRoom ? 'Return to illustrated room' : 'Explore room in 3D'}</button>
+            className="grace-view-toggle min-h-11 rounded-full border border-stone-400 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-sm hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+          >{exploringRoom ? 'Return to storybook view' : 'Walk the room'}</button>
         </div>
         {exploringRoom
           ? <GraceWalkableRoom phase={deriveDayPhase(session)} actions={actions}
@@ -379,7 +379,7 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
               onSelectAction={(id) => setSelectedActionId((current) => current===id ? null : id)}
               projectionsHidden={projectionsHidden} />}
 
-        <div className="mt-5">
+        <div className="grace-hand mt-5">
           <p className="px-1 text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500">
             What do you put in your hand?
           </p>
@@ -395,8 +395,8 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
                   aria-expanded={active}
                   className={
                     active
-                      ? 'min-h-16 rounded-2xl border-2 border-amber-500 bg-white px-4 py-3 text-left shadow-md transition'
-                      : 'min-h-16 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600'
+                      ? 'grace-hand__card grace-hand__card--active min-h-16 rounded-2xl border-2 border-amber-500 bg-white px-4 py-3 text-left shadow-md transition'
+                      : 'grace-hand__card min-h-16 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600'
                   }
                 >
                   <span className="flex items-start justify-between gap-3">
@@ -417,7 +417,7 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
         </div>
 
         {selected && selectedPreview && (
-          <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4">
+          <div className="grace-commit-card mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-orange-700">
               Before you commit
             </p>

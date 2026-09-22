@@ -60,9 +60,12 @@ test('room controls are accessible alternatives; object selection does not commi
  assert.match(html,/Explore Grace&#x27;s Tuesday room/);
  assert.match(html,/Move forward/);
  assert.match(html,/Turn left/);
- assert.match(html,/Origin admission: not established/);
- assert.match(html,/Object selection previews only/);
- assert.doesNotMatch(html,/Do it/);
+ assert.match(html,/Screen door · closed/);
+ assert.match(html,/Nothing happens until you choose/);
+ assert.match(html,/morning light/);
+ assert.doesNotMatch(html,/Origin admission: not established/);
+ assert.doesNotMatch(html,/X 0\.0 · Z 2\.2/);
+ assert.doesNotMatch(html,/>Do it<\/button>/);
  assert.match(html,/aria-label="3D room/);
 });
 
@@ -74,7 +77,7 @@ test('selected action pauses movement; focused campaign retains ordinary action 
  const campaign=renderToStaticMarkup(React.createElement(GracePlaySurface,{
   session:emptySession(),commit:()=>{},
  }));
- assert.match(campaign,/Explore room in 3D/);
+ assert.match(campaign,/Walk the room/);
  assert.match(campaign,/What do you put in your hand/);
  assert.match(campaign,/Grace&#x27;s Tuesday room/);
 });
