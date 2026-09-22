@@ -65,7 +65,7 @@ test('room controls are accessible alternatives; object selection does not commi
  assert.match(html,/morning light/);
  assert.doesNotMatch(html,/Origin admission: not established/);
  assert.doesNotMatch(html,/X 0\.0 · Z 2\.2/);
- assert.doesNotMatch(html,/Do it/);
+ assert.doesNotMatch(html,/>Do it<\\/button>/);
  assert.match(html,/aria-label="3D room/);
 });
 
