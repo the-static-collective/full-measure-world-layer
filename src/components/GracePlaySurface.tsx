@@ -14,8 +14,7 @@ import {
   type PlayActionId,
 } from '../../specimens/grace-001/playExperience.ts';
 import type {WorldResponseDisposition} from '../../specimens/grace-001/kernel.ts';
-import {GraceRoomStage} from './GraceRoomStage.tsx';
-import {GraceWalkableRoom} from './GraceWalkableRoom.tsx';
+import {GraceLivingRoom} from './GraceLivingRoom.tsx';
 import {
   replaySession,
   type GraceSession,
@@ -26,6 +25,7 @@ interface GracePlaySurfaceProps {
   session: GraceSession;
   commit: (...events: GraceSessionInputEvent[]) => void;
   onBeginWednesday?: () => void;
+  immersive?: boolean;
 }
 
 interface WorldResponseBeat {
@@ -72,9 +72,13 @@ function beatForWorldResponse(disposition: WorldResponseDisposition): WorldRespo
   }
 }
 
-export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlaySurfaceProps) {
+export function GracePlaySurface({
+  session,
+  commit,
+  onBeginWednesday,
+  immersive = false,
+}: GracePlaySurfaceProps) {
   const [selectedActionId, setSelectedActionId] = useState<PlayActionId | null>(null);
-  const [exploringRoom,setExploringRoom] = useState(false);
   const [beat, setBeat] = useState<ConsequenceBeat | null>(null);
   const [worldBeat, setWorldBeat] = useState<WorldResponseBeat | null>(null);
   const [dismissedEncounter, setDismissedEncounter] = useState<{
@@ -107,13 +111,6 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
       ),
     [actions, session],
   );
-
-  const selected =
-    selectedActionId === null
-      ? null
-      : actions.find((action) => action.id === selectedActionId) ?? null;
-  const selectedPreview =
-    selectedActionId === null ? null : previews.get(selectedActionId) ?? null;
 
   const perform = (actionId: PlayActionId) => {
     const action = actions.find((candidate) => candidate.id === actionId);
@@ -361,88 +358,47 @@ export function GracePlaySurface({session, commit, onBeginWednesday}: GracePlayS
   const projectionsHidden = replayed.story.projectionsHiddenTurns > 0;
 
   return (
-    <div className="grace-play-shell bg-gradient-to-b from-amber-50 via-orange-50/60 to-stone-50 px-4 py-6 sm:px-7 sm:py-8">
-      <div className="mx-auto max-w-2xl">
-        <div className="grace-viewbar mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">Tuesday / Your room</p>
-          <button type="button" aria-pressed={exploringRoom}
-            onClick={() => setExploringRoom(current => !current)}
-            className="grace-view-toggle min-h-11 rounded-full border border-stone-400 bg-white px-4 py-2 text-sm font-semibold text-stone-800 shadow-sm hover:bg-amber-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
-          >{exploringRoom ? 'Return to storybook view' : 'Walk the room'}</button>
-        </div>
-        {exploringRoom
-          ? <GraceWalkableRoom phase={deriveDayPhase(session)} actions={actions}
-              selectedActionId={selectedActionId}
-              onSelectAction={(id) => setSelectedActionId((current) => current===id ? null : id)} />
-          : <GraceRoomStage scene={scene} phase={deriveDayPhase(session)}
-              actions={actions} selectedActionId={selectedActionId}
-              onSelectAction={(id) => setSelectedActionId((current) => current===id ? null : id)}
-              projectionsHidden={projectionsHidden} />}
+    <div className="grace-play-shell">
+      <GraceLivingRoom
+        scene={scene}
+        phase={deriveDayPhase(session)}
+        actions={actions}
+        previews={previews}
+        selectedActionId={selectedActionId}
+        projectionsHidden={projectionsHidden}
+        onSelectAction={(id) => setSelectedActionId((current) => current === id ? null : id)}
+        onCommit={perform}
+      />
 
-        <div className="grace-hand mt-5">
-          <p className="px-1 text-[11px] font-bold uppercase tracking-[0.2em] text-stone-500">
-            What do you put in your hand?
-          </p>
-          <div className="mt-2 grid gap-2.5">
-            {actions.map((action) => {
-              const preview = previews.get(action.id);
-              const active = selectedActionId === action.id;
-              return (
-                <button
-                  key={action.id}
-                  type="button"
-                  onClick={() => setSelectedActionId(active ? null : action.id)}
-                  aria-expanded={active}
-                  className={
-                    active
-                      ? 'grace-hand__card grace-hand__card--active min-h-16 rounded-2xl border-2 border-amber-500 bg-white px-4 py-3 text-left shadow-md transition'
-                      : 'grace-hand__card min-h-16 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600'
-                  }
-                >
-                  <span className="flex items-start justify-between gap-3">
-                    <span>
-                      <span className="block text-sm font-bold text-stone-950">{action.label}</span>
-                      <span className="mt-1 block text-xs text-stone-500">
-                        {preview ? costText(preview.cost) : ''}
-                      </span>
-                    </span>
-                    <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-stone-500">
-                      {action.tone}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
+      {!immersive && (
+        <details className="grace-choice-shelf">
+          <summary>Walk the room · What do you put in your hand?</summary>
+          <div className="grace-choice-shelf__body">
+            <p>
+              Every object below opens the same bounded preview as its place in the room.
+              Looking is not doing.
+            </p>
+            <div className="grace-choice-shelf__grid">
+              {actions.map((action) => {
+                const preview = previews.get(action.id);
+                const active = selectedActionId === action.id;
+                return (
+                  <button
+                    key={action.id}
+                    type="button"
+                    onClick={() => setSelectedActionId(active ? null : action.id)}
+                    aria-expanded={active}
+                    className={active ? 'grace-choice-shelf__action is-active' : 'grace-choice-shelf__action'}
+                  >
+                    <strong>{action.label}</strong>
+                    <span>{preview ? costText(preview.cost) : ''}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
-
-        {selected && selectedPreview && (
-          <div className="grace-commit-card mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-orange-700">
-              Before you commit
-            </p>
-            <h3 className="mt-1 text-base font-bold text-stone-950">{selected.label}</h3>
-            <p className="mt-2 text-sm text-stone-700">
-              Spend {costText(selectedPreview.cost)}.
-            </p>
-            <p className="mt-2 text-sm text-stone-700">
-              {selectedPreview.foreclosed.length > 0
-                ? `This makes unavailable for now: ${selectedPreview.foreclosed.join(', ')}.`
-                : 'No previously affordable move is foreclosed immediately.'}
-            </p>
-            <p className="mt-2 text-xs text-stone-500">
-              This is mechanics visibility, not a recommendation.
-            </p>
-            <button
-              type="button"
-              onClick={() => perform(selected.id)}
-              className="mt-4 min-h-12 w-full rounded-xl bg-stone-950 px-4 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
-            >
-              Do it
-            </button>
-          </div>
-        )}
-      </div>
+        </details>
+      )}
     </div>
   );
 }

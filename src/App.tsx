@@ -137,6 +137,14 @@ export default function App() {
     });
   };
 
+  if (typeof window !== 'undefined' && window.location.pathname === '/grace') {
+    return (
+      <main className="grace-standalone">
+        <GraceCampaignPanel immersive />
+      </main>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#fbf8f3] text-[#2c2825] flex flex-col font-sans selection:bg-amber-200">
       {/* Navigation Header & Bottom Mobile Bar */}

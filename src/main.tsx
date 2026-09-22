@@ -4,6 +4,7 @@ import App from './App.tsx';
 import './index.css';
 import './grace-room-stage.css';
 import './grace-walkable-room.css';
+import './grace-living-room.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
