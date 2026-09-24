@@ -1,0 +1,34 @@
+name: Living Deck → Full Measure local quest
+
+on:
+  push:
+    branches:
+      - experiment/living-deck-quest-001
+  pull_request:
+    paths:
+      - 'experiments/living-deck-quest-001/**'
+      - '.github/workflows/living-deck-quest-001.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quest-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/static-field
+          ref: experiment/postemahhn-living-deck-001
+          path: .test-support/static-field
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test isolated quest reducer and real Static Field producer
+        env:
+          STATIC_FIELD_DECK_DIR: ${{ github.workspace }}/.test-support/static-field
+        run: node --test experiments/living-deck-quest-001/tests/*.test.mjs
