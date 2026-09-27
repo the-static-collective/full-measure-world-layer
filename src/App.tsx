@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navbar, NavTab } from './components/Navbar';
 import { FullMeasureView } from './components/FullMeasureView';
 import { HumanTerminalPanel } from './components/HumanTerminalPanel';
+import { GraceCampaignPanel } from './components/GraceCampaignPanel';
 import { WorldEncounterPanel } from './components/WorldEncounterPanel';
 import { BasketView } from './components/BasketView';
 import { ProjectsView } from './components/ProjectsView';
@@ -162,6 +163,7 @@ export default function App() {
           <>
             {activeTab === 'campfire' && (
               <>
+                <GraceCampaignPanel />
                 <HumanTerminalPanel
                   lastResidueRef={lastWorldResidue?.residueRef}
                   onBeginCrossing={handleBeginWorldCrossing}

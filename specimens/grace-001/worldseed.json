@@ -1,0 +1,532 @@
+{
+  "schema": "full-measure.grace-worldseed.v0",
+  "id": "GRACE-001",
+  "title": "An Ordinary Tuesday",
+  "status": "experimental-specimen",
+  "authority": "proposal-only until admitted by Full Measure-local rules",
+  "premise": "One mother, one daughter, one ordinary day with many live threads and only one foreground aperture at a time.",
+  "party": [
+    {
+      "id": "grace",
+      "role": "player-character",
+      "irreducible": true,
+      "notes": [
+        "single mother",
+        "case manager",
+        "builder",
+        "faith practice"
+      ]
+    },
+    {
+      "id": "heaven",
+      "role": "party-member",
+      "irreducible": true,
+      "notes": [
+        "daughter",
+        "has her own wants, fatigue, humor, refusal, initiative and surprises"
+      ],
+      "nonClaims": [
+        "not a morale bonus",
+        "not a player-owned resource"
+      ]
+    }
+  ],
+  "locations": [
+    {
+      "id": "house.kitchen",
+      "title": "Kitchen",
+      "seedMotifs": [
+        "lemon",
+        "table",
+        "dishes",
+        "light"
+      ]
+    },
+    {
+      "id": "house.porch",
+      "title": "Porch",
+      "seedMotifs": [
+        "chair",
+        "weather",
+        "screen door",
+        "open E"
+      ]
+    },
+    {
+      "id": "road.school",
+      "title": "School Road",
+      "seedMotifs": [
+        "gravel",
+        "car",
+        "clock",
+        "static"
+      ]
+    },
+    {
+      "id": "work.community-desk",
+      "title": "Community Desk",
+      "seedMotifs": [
+        "phone",
+        "declared need",
+        "referral",
+        "receipt"
+      ]
+    },
+    {
+      "id": "upper-room",
+      "title": "Upper Room",
+      "seedMotifs": [
+        "Scripture",
+        "prayer",
+        "branch",
+        "return"
+      ]
+    },
+    {
+      "id": "dream.red-door",
+      "title": "Red Door Dream",
+      "seedMotifs": [
+        "door",
+        "water",
+        "three keys",
+        "unresolved woman"
+      ]
+    },
+    {
+      "id": "possible-world.grace-house",
+      "title": "Grace's Possible House",
+      "seedMotifs": [
+        "food without proof",
+        "art room",
+        "porch",
+        "community kitchen",
+        "garden"
+      ]
+    }
+  ],
+  "bandcampSeed": {
+    "source": "The Static Collective Bandcamp corpus, supplied export",
+    "method": "motif admission only; lyric occurrence does not automatically establish fictional canon",
+    "motifs": [
+      {
+        "motif": "open E",
+        "roles": [
+          "return-tone",
+          "threshold-memory"
+        ]
+      },
+      {
+        "motif": "lemon",
+        "roles": [
+          "Grace-marker",
+          "ordinary-particular",
+          "crooked-grin"
+        ]
+      },
+      {
+        "motif": "table",
+        "roles": [
+          "gathering",
+          "world-expansion",
+          "care"
+        ]
+      },
+      {
+        "motif": "seed/root/fruit",
+        "roles": [
+          "formation",
+          "inheritance",
+          "slow consequence"
+        ]
+      },
+      {
+        "motif": "porch/room/door",
+        "roles": [
+          "home",
+          "aperture",
+          "departure",
+          "return"
+        ]
+      },
+      {
+        "motif": "weather/static/road",
+        "roles": [
+          "movement",
+          "uncertainty",
+          "carrier"
+        ]
+      },
+      {
+        "motif": "light kept on",
+        "roles": [
+          "continuity",
+          "care",
+          "rest"
+        ]
+      }
+    ]
+  },
+  "economy": {
+    "initialSupply": {
+      "time": 4,
+      "cash": 18,
+      "food": 1,
+      "transport": 1,
+      "attention": 3
+    },
+    "liveDemand": [
+      {
+        "id": "home-dinner",
+        "required": true
+      },
+      {
+        "id": "client-callback",
+        "required": true
+      },
+      {
+        "id": "vehicle-check",
+        "required": false
+      },
+      {
+        "id": "rest",
+        "required": false
+      },
+      {
+        "id": "neighbor-meal",
+        "required": false
+      }
+    ],
+    "cultureTraces": [
+      "hospitality",
+      "stewardship",
+      "discipleship",
+      "prayer",
+      "rest",
+      "mutual_aid"
+    ],
+    "design": [
+      "resources are finite and concrete",
+      "every spend may foreclose other actions",
+      "opportunity cost is receipted explicitly",
+      "meeting one demand does not erase residual demand",
+      "people are not fungible resource units",
+      "discipleship is formation/apprenticeship, not ownership of labor",
+      "culture emerges from repeated attributable choices rather than a morality score",
+      "prayer and rest recharge by spending finite time"
+    ]
+  },
+  "decks": {
+    "pressure": [
+      "The Morning Is Late",
+      "Client Needs Housing",
+      "Pickup Clock",
+      "Vehicle Noise",
+      "Quiet House"
+    ],
+    "practice": [
+      "Pray",
+      "Drink Water",
+      "Rest"
+    ],
+    "relation": [
+      "Make the Call",
+      "Ask for Help"
+    ],
+    "wild": [
+      "YOU MAY NOT OPTIMIZE THIS",
+      "THE WRONG DOOR OPENS"
+    ]
+  },
+  "laws": [
+    "focus is not the total case",
+    "practice may change posture without rewriting external facts",
+    "attempt != delivery_reported != receipt_confirmed != outcome_observed",
+    "interruption preserves a return address",
+    "same meters != same lived path",
+    "scarcity is real: a choice may make another lawful choice temporarily unavailable",
+    "opportunity cost must remain inspectable",
+    "culture trace != human worth",
+    "wildcard may alter declared grammar but may not silently alter provenance",
+    "dice choose proposals; witnessed reality determines the record",
+    "the player inhabits the choice; Dogram calculates declared mechanics",
+    "party members contribute lenses, not fungible labor units or stat buffs",
+    "flashback reflection cannot rewrite an earlier event",
+    "possible-world exploration must preserve supply and maintenance tensions",
+    "meaning work consumes declared present time and attention",
+    "Bandcamp scene seed != historical fact",
+    "story archaeology consumes present time and attention",
+    "party lens may change prompts without changing source provenance",
+    "the world may answer a prior act after a deterministic delay",
+    "world response occurrence and player disposition are replayed history",
+    "end of day preserves unresolved needs instead of narratively closing them",
+    "day phase derives from existing time supply rather than adding a second clock",
+    "new day time does not respawn cash food transport or attention",
+    "Tuesday event ancestry cannot be revised by Wednesday play",
+    "the same resource totals may have different reachable futures because the receipts differ",
+    "Wednesday dinner cannot retroactively fulfill Tuesday dinner",
+    "puppy arrival is optional and accepting it adds distinct care duties",
+    "puppy-specific meal cannot be exchanged for or counted as human food",
+    "puppy care interruptions cannot be bypassed in replay",
+    "animal care after ordinary time is exhausted leaves explicit future time debt"
+  ],
+  "partyOptions": [
+    {
+      "id": "grace",
+      "default": true,
+      "required": true,
+      "role": "player-character",
+      "lenses": [
+        "current responsibility",
+        "scarcity",
+        "faith practice",
+        "building"
+      ]
+    },
+    {
+      "id": "heaven",
+      "default": true,
+      "required": false,
+      "role": "party-member",
+      "lenses": [
+        "play",
+        "child perspective",
+        "surprise",
+        "belonging"
+      ],
+      "nonClaims": [
+        "not a morale bonus",
+        "not a player-owned resource"
+      ]
+    },
+    {
+      "id": "paula",
+      "default": false,
+      "required": false,
+      "role": "party-member",
+      "lenses": [
+        "witness",
+        "community",
+        "story-building",
+        "mutual aid"
+      ],
+      "nonClaims": [
+        "campaign role does not assert biography beyond the declared game seed",
+        "party membership does not imply agreement with every player interpretation"
+      ]
+    }
+  ],
+  "apertures": {
+    "flashback": {
+      "source": "earlier append-only campaign event",
+      "cost": {
+        "time": 1,
+        "attention": 1
+      },
+      "law": [
+        "later reflection may change present meaning",
+        "later reflection may not edit the source event",
+        "future events cannot be used as flashback sources"
+      ]
+    },
+    "possibleWorld": {
+      "id": "possible-world.grace-house",
+      "costOnReturn": {
+        "time": 1,
+        "attention": 1
+      },
+      "principles": [
+        "food-without-proof",
+        "heaven-art-room",
+        "porch-around-house",
+        "community-kitchen",
+        "garden-everywhere"
+      ],
+      "law": [
+        "possible world != present-world fact",
+        "utopian desirability != feasibility proof",
+        "return retains tensions and party prompts",
+        "imagination does not create external supply"
+      ]
+    }
+  },
+  "archaeology": {
+    "method": "Novelist material-seed discipline: artistic source -> non-canonical scene seed -> paid campaign visit -> attributable witness",
+    "visitCost": {
+      "time": 1,
+      "attention": 1
+    },
+    "scenes": [
+      {
+        "id": "porch-lemon-seeds",
+        "sourceTitle": "Forty-Two Lemon Seeds",
+        "sourceRef": "BandCamp (4)(1).txt:998-1057",
+        "status": "seed",
+        "canonical": false,
+        "location": "house.porch",
+        "motifs": [
+          "lemon seeds",
+          "porch",
+          "cleanup",
+          "cable",
+          "roots",
+          "open E",
+          "future stranger"
+        ]
+      },
+      {
+        "id": "portable-witness-road",
+        "sourceTitle": "Static Knows the Road",
+        "sourceRef": "BandCamp (4)(1).txt:1197-1246",
+        "status": "seed",
+        "canonical": false,
+        "location": "road.school",
+        "motifs": [
+          "road",
+          "portable witness",
+          "static",
+          "fence wire",
+          "power line",
+          "cracked phone",
+          "weather"
+        ]
+      },
+      {
+        "id": "door-learns-morning",
+        "sourceTitle": "The Door Learns the Morning",
+        "sourceRef": "BandCamp (4)(1).txt:5342-5396",
+        "status": "seed",
+        "canonical": false,
+        "location": "house.kitchen",
+        "motifs": [
+          "morning",
+          "door",
+          "chair",
+          "table",
+          "lemon",
+          "open E",
+          "aftermath",
+          "rest"
+        ]
+      }
+    ],
+    "law": [
+      "artistic source material != automatic campaign history",
+      "scene visit requires storyship-block opportunity cost",
+      "party changes questions, not source facts",
+      "selected relation remains candidate until separately admitted",
+      "Day Receipt replay binds the visit witness"
+    ]
+  },
+  "playExperience": {
+    "play002": {
+      "id": "GRACE-PLAY-002",
+      "seal": "THE DAY MOVES WITHOUT YOU",
+      "dayPhase": {
+        "source": "remaining existing time supply",
+        "mapping": {
+          "morning": "time >= 4",
+          "midday": "time 2-3",
+          "evening": "time = 1",
+          "night": "time = 0"
+        },
+        "nonClaims": [
+          "day phase does not introduce a second clock resource"
+        ]
+      },
+      "delayedResponses": [
+        {
+          "id": "housing-coordinator-callback",
+          "trigger": "two later ordinary turns after client-call",
+          "dispositions": [
+            "answer",
+            "let-ring",
+            "hold-tomorrow"
+          ],
+          "law": [
+            "callback occurrence is recorded even when unanswered",
+            "appointment offered != housing secured",
+            "unanswered callback != refused help",
+            "replay refuses premature injection"
+          ]
+        }
+      ],
+      "endOfDay": {
+        "title": "THE HOUSE TAKES ATTENDANCE",
+        "trigger": "time = 0 after higher-priority incoming/uncanny encounters are handled or dismissed",
+        "includes": [
+          "completed local demands",
+          "open demands",
+          "culture practiced",
+          "declared changes",
+          "strange retained witnesses"
+        ],
+        "nonClaims": [
+          "end of day != resolution of every open need",
+          "unfinished != failed",
+          "completed local scope != optimal day"
+        ]
+      }
+    },
+    "play003": {
+      "id": "GRACE-PLAY-003",
+      "seal": "TOMORROW HAS A MEMORY",
+      "start": "explicit Tuesday end-of-day crossing",
+      "timeLaw": "Wednesday receives four new game-time blocks; money/food/transport/attention carry exactly",
+      "source": "frozen Tuesday Day Receipt plus exact event-log comparison",
+      "wednesdayActions": [
+        "make-wednesday-dinner",
+        "housing-follow-up",
+        "shared-table-invitation",
+        "porch-relation",
+        "check-vehicle",
+        "pray-wednesday",
+        "rest-wednesday"
+      ],
+      "memoryConditions": {
+        "sharedTable": "Tuesday share-meal occurrence, not a supply/virtue threshold",
+        "porchRelation": "Tuesday door-learns-morning/open-the-door archaeology visit plus later flashback targeting that exact event; player expresses a relation"
+      },
+      "nonClaims": [
+        "carried demand != automatically fulfilled demand",
+        "invitation offered != accepted invitation",
+        "fictional door != outside-world occurrence",
+        "local replay equality != cryptographic authorship",
+        "a second game day is not a real-world service outcome"
+      ]
+    },
+    "puppy001": {
+      "id": "GRACE-PUPPY-001",
+      "title": "THE PUPPY HAS OTHER PLANS",
+      "arrival": "optional temporary-care request after the first ordinary Wednesday action",
+      "supplies": "one puppy-specific meal and a leash declared as supplied by the neighbor; no human food credited",
+      "careTrigger": "after one subsequent Wednesday ordinary action if care was accepted",
+      "options": [
+        "decline temporary care",
+        "accept temporary care",
+        "take puppy outside",
+        "take puppy to dog park when transport is available"
+      ],
+      "costs": {
+        "outside": {
+          "time": 1,
+          "puppyKitMeal": 1
+        },
+        "dogPark": {
+          "time": 1,
+          "transport": 1,
+          "puppyKitMeal": 1
+        }
+      },
+      "timeBoundary": "urgent care when ordinary time is exhausted records one future time block owed, not free time or a completed future-day action",
+      "authority": "fictional animal's needs remain particular; candidate dog-park encounter is not an established human relationship",
+      "nonClaims": [
+        "arrival offer != compelled adoption",
+        "temporary care != permanent ownership",
+        "puppy != morale bonus or worker unit",
+        "puppy meal != human food",
+        "care != guaranteed affection",
+        "next-day time debt != settled future action"
+      ]
+    }
+  }
+}
