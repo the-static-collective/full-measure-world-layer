@@ -1,5 +1,7 @@
 # Full Measure — World Layer
 
+> **Static Collective compass:** [Front Room](https://github.com/the-static-collective/What-is-the-static-collective-) · [Living Git Map](https://github.com/the-static-collective/What-is-the-static-collective-/tree/main/atlas)
+
 Full Measure is the D&D-style life layer for real participation: a world people can inhabit, play through, and help shape without turning human worth into points.
 
 The original Garden vertical still places evidence-derived participation over Jubilee Campfire's causal loop:
