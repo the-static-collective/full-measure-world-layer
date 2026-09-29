@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Full Measure · Living Deck quest preview</title>
+<style>
+:root{font:16px/1.5 system-ui,sans-serif;color:#f6edda;background:#17201e}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#35584e,#17201e 72%)}
+main{max-width:790px;margin:auto;padding:35px 18px 75px}h1{font:600 clamp(2.1rem,7vw,4rem)/1.05 Georgia,serif;margin:25px 0 8px}h2{font:600 1.5rem Georgia,serif}
+.card{padding:20px;border:1px solid #91ac92;border-radius:16px;margin:20px 0;background:#20332e}
+small{color:#d7c99e}.muted{color:#c8d3c3}button{border:1px solid #d9bd89;border-radius:10px;padding:11px 15px;font:600 1rem system-ui;background:#e6d2a5;color:#242822;cursor:pointer}button.secondary{background:#264238;color:#f5e4c2}button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible{outline:3px solid white;outline-offset:3px}
+input[type=file]{width:100%;padding:12px;border:1px dashed #d7c389;border-radius:9px}
+.controls{display:flex;flex-wrap:wrap;gap:10px}#history p{border-left:2px solid #e2ca95;padding-left:12px}
+@media(max-width:580px){.controls button{width:100%}}
+</style></head><body><main>
+<small>FULL MEASURE / LOCAL QUEST 001 / EXPERIMENT</small>
+<h1>A Quest Arrives on the Porch</h1>
+<p class="muted">A card composition may become a quest without automatically becoming a real shared project. Receive a proposal, try it, and optionally carry its local trace into a playable ROroomOM guest room.</p>
+<section class="card"><h2>Receive the proposal</h2>
+<p>Export the Full Measure × ROroomOM proposal from the Static Field Fellowship Table, then choose that JSON file. Nothing is uploaded.</p>
+<input type="file" id="file" accept=".json,application/json" aria-label="Choose portable card handoff">
+<p id="status" role="status" aria-live="polite">No proposal loaded.</p></section>
+<section class="card" id="quest" hidden><small id="source"></small><h2 id="title"></h2>
+<p id="story"></p><p id="need"></p><p id="phase" role="status" aria-live="polite"></p>
+<div class="controls">
+<button class="secondary" data-act="INSPECT">Inspect</button><button class="secondary" data-act="JOIN">Join locally</button>
+<button class="secondary" data-act="ATTEMPT">Attempt</button><button class="secondary" data-act="REPORT">Report locally</button>
+<button class="secondary" data-act="HOLD">Hold</button><button class="secondary" data-act="RETURN">Return</button>
+<button class="secondary" data-act="REFUSE">Refuse</button>
+</div><div id="history"></div>
+<div class="controls"><button id="export">Export quest preview receipt</button>
+<button id="room-export" class="secondary">Carry quest to ROroomOM</button></div>
+</section>
+<section class="card"><h2>Where authority stops</h2>
+<p class="muted">This isolated quest reducer is not the Full Measure production project store. Joining does not pledge work to another person; reporting does not confirm a deed. The upstream card and sticker remain unverified local fixtures, and no action creates or publishes an official project.</p></section>
+</main><script type="module">
+import {openQuestHandoff,takeQuestAction,exportQuestPreview,createRoomRequest} from "./quest.mjs";
+const $=id=>document.getElementById(id);let q=null;
+function draw(){
+ if(!q?.ok)return;
+ $("quest").hidden=false;$("source").textContent=q.compositionId+" · unverified source · local only";
+ $("title").textContent=q.title;$("story").textContent=q.story;$("need").textContent="Proposed need: "+q.need;
+ $("phase").textContent=`Local state: ${q.phase}. No shared project or confirmed deed exists.`;
+ $("history").replaceChildren();q.localTrace.forEach((a,i)=>{const p=document.createElement("p");p.textContent=`Local step ${i+1}: ${a}`;$("history").append(p)});
+ for(const b of document.querySelectorAll("[data-act]")){
+  const a=b.dataset.act,p=q.phase;
+  b.disabled=p==="refused"||p==="held"&&!["RETURN","REFUSE"].includes(a)||
+  a==="INSPECT"&&p!=="offered"||a==="JOIN"&&p!=="inspected"||
+  a==="ATTEMPT"&&p!=="joined"||a==="REPORT"&&p!=="attempted"||
+  a==="RETURN"&&p!=="held"||a==="HOLD"&&p==="held";
+ }
+}
+$("file").addEventListener("change",async e=>{
+ const file=e.target.files?.[0];e.target.value="";if(!file)return;
+ if(!file.size||file.size>65536){$("status").textContent="Choose a nonempty JSON file up to 64 KiB.";return}
+ try{const next=openQuestHandoff(await file.text());
+ if(!next.ok){q=null;$("quest").hidden=true;$("status").textContent=`Proposal refused: ${next.description}`;return}
+ q=next;$("status").textContent="Proposal held for a local quest preview; no external admission granted.";draw();
+ }catch{q=null;$("quest").hidden=true;$("status").textContent="Unable to read that JSON file."}
+});
+document.querySelectorAll("[data-act]").forEach(b=>b.addEventListener("click",()=>{
+ const next=takeQuestAction(q,b.dataset.act);
+ if(!next.ok){$("status").textContent=next.description;return}
+ q=next;$("status").textContent=`Local action: ${b.dataset.act}`;draw();
+}));
+function download(name,object){
+ const blob=new Blob([JSON.stringify(object,null,2)+"\n"],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+$("export").addEventListener("click",()=>{if(!q?.ok)return;download("full-measure-living-deck-quest-preview.json",exportQuestPreview(q));$("status").textContent="Local preview receipt downloaded. No deed was confirmed."});
+$("room-export").addEventListener("click",()=>{if(!q?.ok)return;download("living-deck-full-measure-to-roroomom.json",createRoomRequest(q));$("status").textContent="Room request downloaded for separate ROroomOM validation. No external effect occurred."});
+</script></body></html>
