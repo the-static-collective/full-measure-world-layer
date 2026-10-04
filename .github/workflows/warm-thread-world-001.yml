@@ -1,0 +1,34 @@
+name: GHoT Warm Thread → Full Measure world
+
+on:
+  push:
+    branches:
+      - experiment/warm-thread-world-001
+  pull_request:
+    paths:
+      - 'experiments/warm-thread-world-001/**'
+      - '.github/workflows/warm-thread-world-001.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  warm-thread-world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/GHoT
+          ref: warm-thread-039
+          path: .test-support/ghot
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify real GHoT producer against Full Measure receiver
+        env:
+          GHOT_WARM_THREAD_DIR: ${{ github.workspace }}/.test-support/ghot
+        run: node --test experiments/warm-thread-world-001/tests/*.test.mjs
