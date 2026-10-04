@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE ALCHEMATRIX · Haunted Telescope</title>
+<style>
+:root{color-scheme:dark;--ink:#e9f4e9;--muted:#abc1b8;--bg:#09151b;--panel:#14242c;--edge:#46756f;--aqua:#89e9c2;--amber:#f1c98a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 55% 0,#24423e,#09151b 62%);font:16px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--ink)}
+main{max-width:1120px;margin:0 auto;padding:clamp(14px,3vw,35px)}header{padding:20px 0 24px}h1{font-size:clamp(30px,5vw,54px);line-height:1.05;letter-spacing:-2px;margin:8px 0;color:var(--aqua)}h2{font-size:17px;letter-spacing:.11em;margin:0 0 12px;color:var(--amber)}p{margin:6px 0 12px}.kicker,.minor{color:var(--muted);font-size:12px;letter-spacing:.09em}.lead{max-width:70ch;color:#d9e5d9}
+.grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:15px}.panel{background:linear-gradient(155deg,#1a3038,var(--panel));border:2px solid #3a5c5b;box-shadow:inset 0 0 0 2px #07151b,5px 6px 0 #071012;padding:18px;margin-bottom:15px}.room{min-height:220px;position:relative;overflow:hidden;background:linear-gradient(155deg,#17363b,#10252d);display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:center;padding:16px;border:3px solid #53736b}.room:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 33px,#ffffff08 34px 36px);pointer-events:none}.sprite{z-index:1;text-align:center;background:#09161ba6;border:2px solid #51706d;min-height:140px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:6px;gap:8px}.glyph{font-size:clamp(32px,5vw,62px);line-height:1;filter:drop-shadow(3px 4px 0 #03151d)}.caption{font-size:12px;color:var(--muted)}.door-open{border-color:var(--aqua);background:#164939}.signal{color:var(--aqua);font-size:12px;overflow-wrap:anywhere;min-height:35px}
+button{cursor:pointer;background:#22423f;color:var(--ink);border:2px solid #679286;box-shadow:3px 4px 0 #07131b;border-radius:0;font:inherit;font-size:13px;padding:9px 10px;text-align:left;min-height:42px}button:hover,button:focus-visible{background:#376d5d;outline:2px solid var(--aqua);outline-offset:2px}button:active{transform:translate(2px,2px);box-shadow:1px 2px 0 #07131b}.buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.buttons.single{grid-template-columns:1fr}.inventory{display:flex;gap:8px;flex-wrap:wrap}.chip{font-size:13px;background:#0c1c22;border:1px solid var(--edge);padding:4px 8px}.msg{border-left:3px solid var(--amber);padding:8px 11px;background:#1d302f;min-height:60px;margin-top:10px}.msg.error{border-color:#ec917f;background:#382a2b}.receipt{font-size:11px;border-bottom:1px solid #35504e;padding:8px 0;overflow-wrap:anywhere}.receipt strong{color:var(--aqua)}.scroll{max-height:265px;overflow:auto}.wide{grid-column:1/-1}.footer{font-size:12px;color:var(--muted);margin:24px 0}.step{color:var(--aqua);font-size:13px;font-weight:bold}kbd{border:1px solid var(--edge);padding:1px 4px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.room{min-height:170px}.sprite{min-height:115px}.panel{padding:13px}.buttons{grid-template-columns:1fr 1fr}button{font-size:12px}.glyph{font-size:36px}}
+@media(max-width:370px){.buttons{grid-template-columns:1fr}.room{gap:4px;padding:5px}.sprite{padding:2px}}
+</style></head>
+<body><main><header><div class="kicker">STATIC COLLECTIVE / EXPERIMENT / FICTIONAL LOCAL WORLD</div><h1>THE ALCHEMATRIX</h1><p class="lead">Mine the ore. Craft the instrument. Observe a difference. Install the instrument into the workbench. Make something the original bench could not make.</p><div class="minor">ALCHEMATRIX-001 · THE HAUNTED TELESCOPE · NO ACCOUNTS · NO NETWORK · NO CANON PROMOTION</div></header>
+<div class="grid"><section><div class="panel"><h2>01 / THE OBSERVATORY</h2><div class="room"><div class="sprite"><span class="glyph" aria-hidden="true">◈</span><strong>PRISM A</strong><span class="signal" id="sigA">unknown</span></div><div class="sprite"><span class="glyph" aria-hidden="true">⚙</span><strong id="lensLabel">EMPTY MOUNT</strong><span class="caption" id="lensDetail">No telescope crafted</span></div><div class="sprite"><span class="glyph" aria-hidden="true">◈</span><strong>PRISM B</strong><span class="signal" id="sigB">unknown</span></div></div><p class="minor">The prisms look identical without an instrument. An observation is not automatically a memory.</p><div class="buttons"><button data-action="observe" data-target="prismA">Look at prism A</button><button data-action="observe" data-target="prismB">Look at prism B</button></div><div class="msg" id="message" role="status" aria-live="polite">The observatory is quiet. The two prisms look the same.</div></div>
+<div class="panel"><h2>02 / MINE THE MATERIALS</h2><div class="inventory" id="inventory"></div><p class="minor">Local fictional ore; no external items or account data are used.</p><div class="buttons"><button data-action="mine" data-item="quartz">◆ Mine quartz</button><button data-action="mine" data-item="copper">▤ Mine copper</button><button data-action="mine" data-item="echo">◌ Find echo shard</button></div></div>
+<div class="panel"><h2>03 / CRAFT THE TELESCOPE</h2><div class="buttons"><button data-action="craft-telescope">Craft telescope · 1 quartz + 1 copper</button><button data-action="install-probe">Install probe · 1 quartz + 1 copper</button><button data-action="install-memory">Install memory · 1 echo shard</button></div><p class="minor" id="telescopeStatus">No instrument yet.</p></div></section>
+<section><div class="panel"><h2>04 / COMPOSE THE COMPOSER</h2><p>The bench starts with <strong>no probe or memory capability.</strong> After you retain distinct observations of both prisms, socket your telescope into it.</p><div class="buttons single"><button data-action="socket-telescope">↳ Socket telescope into workbench</button><button data-action="craft-question-key">✧ Craft a Question Key</button><button data-action="open-door">▣ Open the next door</button></div><p class="minor" id="benchStatus">BENCH CAPABILITIES: none</p><p class="minor" id="artifactStatus">ARTIFACT: none</p><div class="sprite" style="min-height:90px" id="doorSprite"><span class="glyph">▣</span><strong id="doorLabel">SEALED DOOR</strong><span class="caption" id="doorDetail">A new question lies behind it.</span></div></div>
+<div class="panel"><h2>05 / LOCAL EVENT RECEIPTS</h2><p class="minor">Every accepted action receives its own local identity. This is a simulated world log, not a cryptographic witness or an authoritative external record.</p><div class="scroll" id="receipts" aria-live="polite"><div class="minor">No occurrences yet.</div></div><div class="buttons" style="margin-top:14px"><button id="export">↓ Export JSON receipt</button><button id="reset">↺ Reset world</button></div></div></section></div>
+<div class="footer">Design experiment: ingredients ≠ composer ≠ recipe ≠ occurrence. Source world remains fixed; newly crafted artifacts gain separately declared capabilities. Open locally or host as static files. No external dependencies.</div>
+</main><script>
+// ALCHEMATRIX-001: isolated fictional, deterministic crafting specimen.
+// No project-owned source repo is imported; no real-world authority is claimed.
+const WORLD = Object.freeze({
+  prismA: Object.freeze({ id: 'prismA', frequency: 3 }),
+  prismB: Object.freeze({ id: 'prismB', frequency: 7 }),
+});
+const initialState = () => ({
+  inventory: { quartz: 0, copper: 0, echo: 0 },
+  telescope: null, bench: { instruments: [] },
+  observations: {}, artifact: null, doorOpen: false,
+  events: [], last: 'The observatory is quiet. The two prisms look the same.'
+});
+function requireThat(predicate, message) { if (!predicate) throw new Error(message); }
+const COSTS = Object.freeze({telescope: {quartz: 1, copper: 1}, probe: {quartz: 1, copper: 1}, memory: {echo: 1}});
+function pay(s, cost) {
+  for (const [item, amount] of Object.entries(cost)) requireThat(s.inventory[item] >= amount, `Need ${amount} ${item}.`);
+  for (const [item, amount] of Object.entries(cost)) s.inventory[item] -= amount;
+}
+function benchCapabilities(s) {
+  // Only the transferred, separately constituted instrument grants bench functions.
+  return [...new Set(s.bench.instruments.flatMap(i => i.capabilities))].sort();
+}
+function step(state, action) {
+  const s = structuredClone(state);
+  const {type, item, target} = action;
+  let note, evidence = 'fictional-local';
+  switch(type) {
+    case 'mine':
+      requireThat(['quartz', 'copper', 'echo'].includes(item), 'Unknown ore.');
+      s.inventory[item] += 1; note = `Collected one ${item}.`; break;
+    case 'craft-telescope':
+      requireThat(!s.telescope, 'The telescope already exists.');
+      pay(s, COSTS.telescope);
+      s.telescope = {id: 'telescope-001', capabilities: ['sight'], version: 1};
+      note = 'Crafted a basic telescope. It cannot yet separate the prisms.'; break;
+    case 'install-probe':
+      requireThat(s.telescope, 'Craft a telescope first.');
+      requireThat(!s.telescope.capabilities.includes('frequency-probe'), 'Probe is already installed.');
+      pay(s, COSTS.probe); s.telescope.capabilities.push('frequency-probe'); s.telescope.version++;
+      note = 'Installed the frequency probe. The telescope now distinguishes the two prisms.'; break;
+    case 'install-memory':
+      requireThat(s.telescope, 'Craft a telescope first.');
+      requireThat(!s.telescope.capabilities.includes('memory-receipt'), 'Memory is already installed.');
+      pay(s, COSTS.memory); s.telescope.capabilities.push('memory-receipt'); s.telescope.version++;
+      note = 'Installed the memory vessel. Future observations can retain local receipts.'; break;
+    case 'observe': {
+      requireThat(s.telescope, 'You need a telescope to observe.');
+      requireThat(Object.hasOwn(WORLD, target), 'Unknown target.');
+      const probe = s.telescope.capabilities.includes('frequency-probe');
+      const memory = s.telescope.capabilities.includes('memory-receipt');
+      const signature = probe ? `frequency:${WORLD[target].frequency}` : 'indistinguishable';
+      evidence = probe ? 'simulated-probe' : 'unseparated-visual';
+      note = `${target}: ${signature}${memory ? ' (retained as an observer-local receipt)' : ' (no memory vessel installed)'}.`;
+      if (probe && memory) s.observations[target] = {target, signature, instrument: s.telescope.id,
+        instrumentVersion: s.telescope.version, receiptId: `local-${s.events.length + 1}`};
+      break;
+    }
+    case 'socket-telescope': {
+      requireThat(s.telescope, 'No telescope available.');
+      requireThat(s.telescope.capabilities.includes('frequency-probe') && s.telescope.capabilities.includes('memory-receipt'), 'Install probe and memory first.');
+      requireThat(Object.keys(s.observations).length === 2, 'Retain observations of both prisms first.');
+      requireThat(s.observations.prismA.signature !== s.observations.prismB.signature, 'Observations must distinguish the prisms.');
+      s.bench.instruments.push(structuredClone(s.telescope));
+      s.telescope = null;
+      note = 'Socketed the observed telescope into the bench. Its bounded capabilities are now bench inputs.'; break;
+    }
+    case 'craft-question-key': {
+      const caps = benchCapabilities(s);
+      requireThat(!s.artifact, 'The key already exists.');
+      requireThat(caps.includes('frequency-probe') && caps.includes('memory-receipt'), 'The bench lacks the required instrument capabilities.');
+      requireThat(s.observations.prismA?.signature !== s.observations.prismB?.signature && !!s.observations.prismA && !!s.observations.prismB, 'Two distinct retained observations are required.');
+      s.artifact = {id:'question-key-001', constructor:'workbench+socketed-telescope',
+        dependsOn: ['telescope-001',s.observations.prismA.receiptId,s.observations.prismB.receiptId]};
+      note = 'The upgraded bench crafted a Question Key from an instrument and two distinct witnessed signals.'; break;
+    }
+    case 'open-door':
+      requireThat(s.artifact, 'A Question Key is required.');
+      requireThat(!s.doorOpen, 'The door is already open.');
+      s.doorOpen = true;
+      note = 'The door opens. A second observatory asks: who taught its instruments to remember?'; break;
+    default: throw new Error(`Unknown action: ${type}`);
+  }
+  s.last = note;
+  s.events.push({id: `local-${s.events.length + 1}`, action: structuredClone(action),
+    evidenceClass: evidence, result:note, nonClaims:['not a physical-world witness','not imported into project canon']});
+  return s;
+}
+
+let state=initialState();
+const el=id=>document.getElementById(id);
+const escapeHTML=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(isError=false){
+ el('inventory').innerHTML=Object.entries(state.inventory).map(([k,v])=>`<span class="chip">${escapeHTML(k)} × ${v}</span>`).join('');
+ el('message').textContent=state.last;el('message').classList.toggle('error',isError);
+ el('lensLabel').textContent=state.telescope?'TELESCOPE':'EMPTY MOUNT';
+ el('lensDetail').textContent=state.telescope?state.telescope.capabilities.join(' · '):'No telescope crafted';
+ el('telescopeStatus').textContent=state.telescope?`Instrument ${state.telescope.id} v${state.telescope.version}: ${state.telescope.capabilities.join(', ')}`:state.bench.instruments.length?'Telescope transferred to the bench.':'No instrument yet.';
+ el('sigA').textContent=state.observations.prismA?.signature||'unknown / not retained';
+ el('sigB').textContent=state.observations.prismB?.signature||'unknown / not retained';
+ el('benchStatus').textContent='BENCH CAPABILITIES: '+(benchCapabilities(state).join(' · ')||'none');
+ el('artifactStatus').textContent='ARTIFACT: '+(state.artifact?`${state.artifact.id} / sourced from ${state.artifact.dependsOn.join(', ')}`:'none');
+ el('doorSprite').classList.toggle('door-open',state.doorOpen);
+ el('doorLabel').textContent=state.doorOpen?'DOOR OPEN':'SEALED DOOR';
+ el('doorDetail').textContent=state.doorOpen?'Who taught its instruments to remember?':'A new question lies behind it.';
+ el('receipts').innerHTML=state.events.length?state.events.map(e=>`<div class="receipt"><strong>${escapeHTML(e.id)}</strong> / ${escapeHTML(e.action.type)} / ${escapeHTML(e.evidenceClass)}<br>${escapeHTML(e.result)}</div>`).reverse().join(''):'<div class="minor">No occurrences yet.</div>';
+}
+document.querySelectorAll('button[data-action]').forEach(button=>button.addEventListener('click',()=>{
+ const action={type:button.dataset.action};if(button.dataset.item)action.item=button.dataset.item;if(button.dataset.target)action.target=button.dataset.target;
+ try{state=step(state,action);render(false);}catch(err){state.last=`HELD: ${err.message}`;render(true);}
+}));
+el('reset').addEventListener('click',()=>{state=initialState();render();});
+el('export').addEventListener('click',()=>{
+ const json=JSON.stringify({schema:'alchematrix-001/local-fictional-receipt',sourceWorld:'fixed-two-prism-specimen',...state},null,2);
+ const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='alchematrix-001-receipt.json';a.click();URL.revokeObjectURL(url);
+});
+render();
+
+</script></body></html>
