@@ -1,0 +1,45 @@
+name: Tenet ARPG 001
+
+on:
+  push:
+    branches:
+      - experiment/tenet-arpg-001
+  pull_request:
+    paths:
+      - 'experiments/tenet-arpg-001/**'
+      - 'experiments/warm-thread-world-001/**'
+      - '.github/workflows/tenet-arpg-001.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tenet-arpg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/GHoT
+          ref: tenetgram-040
+          path: .test-support/ghot
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check playable shell
+        run: |
+          node --check experiments/tenet-arpg-001/game.mjs
+          node --check experiments/tenet-arpg-001/specimen.mjs
+          node --check experiments/tenet-arpg-001/ui.mjs
+      - name: Play deterministic success and refusal loops
+        env:
+          GHOT_TENETGRAM_DIR: ${{ github.workspace }}/.test-support/ghot
+        run: node --test experiments/tenet-arpg-001/tests/*.test.mjs
+      - name: Assert anti-score laws remain visible
+        run: |
+          grep -q 'WORLD CHANGE ≠ XP' experiments/tenet-arpg-001/ui.mjs
+          grep -q 'REFUSAL != DEFECT' experiments/tenet-arpg-001/game.mjs
+          grep -q 'RESIDUE != SCORE' experiments/tenet-arpg-001/game.mjs
