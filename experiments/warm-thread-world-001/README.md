@@ -103,10 +103,11 @@ RESIDUE != SCORE
 WORLD CONSEQUENCE != ECONOMIC VALUATION
 ~~~
 
-## Next aperture
+## Closed loop
 
-Return the Full Measure residue to GHoT and prove recomposition from the exact
-remaining world state:
+The paired GHoT branch now consumes this experiment's exported residue directly.
+
+The frozen refusal case returns:
 
 ~~~text
 cut firewood at source
@@ -114,11 +115,26 @@ cut firewood at source
 + Cara declined
       |
       v
-new WANT: haul-firewood
+unresolved relation: haul-firewood
       |
       v
-new candidate door
+fresh Erin haul candidate
+      |
+      v
+new proposal preserves completed release + cut
 ~~~
 
-Only after that loop closes should Twilio become an ordinary-human door for
-HAVE / NEED / CAN messages.
+No completed step is rerun and no refusal becomes reputation.
+
+## Next aperture
+
+Move the same proposal/residue through the actual signed reLATTE carriage path,
+then place an ordinary-human messaging door in front of HAVE / NEED / CAN.
+
+The world layer should remain downstream of explicit local admission:
+
+~~~text
+MESSAGE != TRUTH
+CROSSING != ADMISSION
+ADMISSION != OBLIGATION
+~~~
