@@ -78,6 +78,7 @@ export function openWarmThread(source) {
     },
     need: {
       kind: 'home-heat',
+      actor: source.steps.find(step => step.step_id === 'accept-delivery').actor,
       status: 'open',
       urgency: 'tonight',
       exactAddress: 'withheld-from-shared-state',
