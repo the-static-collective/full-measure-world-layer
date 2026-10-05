@@ -307,6 +307,7 @@ export function createFrontierState({
     version: FRONTIER_VERSION,
     mode: "frontier",
     fieldId,
+    player: { x: 50, y: 92 },
     selectedNodeId: null,
     warmThread,
     nodes: [
@@ -431,4 +432,64 @@ export function returnToFrontier(state) {
   }
 
   return next;
+}
+
+
+const FRONTIER_DIRECTIONS = {
+  up: [0, -1],
+  down: [0, 1],
+  left: [-1, 0],
+  right: [1, 0],
+};
+
+function frontierDistance(player, node) {
+  const dx = player.x - node.x;
+  const dy = player.y - node.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function moveFrontierPlayer(state, direction, amount = 5) {
+  if (!state?.ok || state.format !== FRONTIER_FORMAT || state.mode !== "frontier") {
+    return fail("wrong-mode", "Return to the frontier before moving through it.");
+  }
+  if (!(direction in FRONTIER_DIRECTIONS)) {
+    return fail("bad-direction", "Direction must be up/down/left/right.");
+  }
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 20) {
+    return fail("bad-distance", "Movement amount must be between 0 and 20.");
+  }
+  const [dx, dy] = FRONTIER_DIRECTIONS[direction];
+  const next = clone(state);
+  next.player.x = Math.max(2, Math.min(98, next.player.x + dx * amount));
+  next.player.y = Math.max(2, Math.min(98, next.player.y + dy * amount));
+  return next;
+}
+
+export function nearbyFrontierNode(state, radius = 12) {
+  if (!state?.ok || state.format !== FRONTIER_FORMAT || state.mode !== "frontier") return null;
+  return allFrontierNodes(state)
+    .map(node => ({ node, distance: frontierDistance(state.player, node) }))
+    .filter(item => item.distance <= radius)
+    .sort((a, b) => a.distance - b.distance)[0]?.node ?? null;
+}
+
+export function frontierCommands(state, nodeId) {
+  if (!state?.ok || state.format !== FRONTIER_FORMAT || state.mode !== "frontier") return [];
+  const node = allFrontierNodes(state).find(item => item.id === nodeId);
+  if (!node) return [];
+  if (frontierDistance(state.player, node) > 13) return [];
+  return [...(node.commands ?? [])];
+}
+
+export function useFrontierCommand(state, nodeId, command) {
+  if (!frontierCommands(state, nodeId).includes(command)) {
+    return fail("command-unavailable", "Move close enough and use a command this terrain actually exposes.");
+  }
+  if (command === "ENTER" && nodeId === "living-quest:warm-thread") {
+    return enterWarmThreadRegion(state);
+  }
+  if (command === "INSPECT") {
+    return inspectFrontierNode(state, nodeId);
+  }
+  return fail("command-unavailable", "This terrain does not expose that command.");
 }
