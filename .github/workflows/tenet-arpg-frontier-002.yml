@@ -1,0 +1,104 @@
+name: Tenet ARPG Frontier 002
+
+on:
+  push:
+    branches:
+      - experiment/tenet-arpg-frontier-002
+  pull_request:
+    paths:
+      - 'experiments/tenet-arpg-frontier-002/**'
+      - 'experiments/tenet-arpg-001/**'
+      - 'experiments/warm-thread-world-001/**'
+      - '.github/workflows/tenet-arpg-frontier-002.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Checkout PLANZ SENSE-001
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/planZ
+          ref: feat/census-senses-mutation-002
+          path: .test-support/planz
+          persist-credentials: false
+
+      - name: Checkout GrO Mineral + TENET-012 stack
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/GrO
+          ref: mineral/world-seed-001
+          path: .test-support/gro
+          persist-credentials: false
+
+      - name: Checkout reLATTE proof dependency
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/reLATTE
+          ref: 87006f3265103a8abe387d81597c58aeb39b0beb
+          path: .test-support/relatte
+          persist-credentials: false
+
+      - name: Checkout GHoT Mineral bridge
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/GHoT
+          ref: gro-mineral-bridge-001
+          path: .test-support/ghot
+          persist-credentials: false
+
+      - name: Checkout Dogram verifier
+        uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/Dogram
+          ref: impl/sparse-ice-probe-001
+          path: .test-support/dogram
+          persist-credentials: false
+
+      - name: Install reLATTE dependencies
+        run: npm install --prefix .test-support/relatte --no-audit --no-fund
+
+      - name: Syntax check Frontier shell
+        run: |
+          node --check experiments/tenet-arpg-frontier-002/frontier.mjs
+          node --check experiments/tenet-arpg-frontier-002/specimen.mjs
+          node --check experiments/tenet-arpg-frontier-002/ui.mjs
+          node --check experiments/tenet-arpg-frontier-002/verify-witnesses.mjs
+
+      - name: Play frozen frontier and consequence-return tests
+        run: node --test experiments/tenet-arpg-frontier-002/tests/*.test.mjs
+
+      - name: Generate live PLANZ terrain source
+        run: |
+          node .test-support/planz/002/bin/sense-census.mjs             .test-support/planz/registry/seed-plan-records.jsonl             > /tmp/planz-senses.json
+
+      - name: Generate live GrO graph-frontier source
+        run: |
+          node --experimental-strip-types             .test-support/gro/examples/tenet-012-graph-frontier.mjs             .test-support/relatte             > /tmp/gro-frontier.json
+
+      - name: Generate live Mineral World-Seed source
+        run: |
+          node --experimental-strip-types             .test-support/gro/examples/mineral-world-seed-001.mjs             .test-support/relatte             .test-support/ghot             .test-support/dogram             > /tmp/gro-mineral.json
+
+      - name: Project live sources as non-authoritative Frontier terrain
+        run: |
+          node experiments/tenet-arpg-frontier-002/verify-witnesses.mjs             /tmp/planz-senses.json             /tmp/gro-frontier.json             /tmp/gro-mineral.json             > /tmp/tenet-frontier-live-witness.json
+          cat /tmp/tenet-frontier-live-witness.json
+
+      - name: Freeze authority boundaries
+        run: |
+          grep -q 'RUIN != QUEST' experiments/tenet-arpg-frontier-002/frontier.mjs
+          grep -q 'VERIFIED MINERAL != LOCAL VALUE' experiments/tenet-arpg-frontier-002/frontier.mjs
+          grep -q 'RECOMBINATION != CANON' experiments/tenet-arpg-frontier-002/frontier.mjs
+          grep -q 'canonicalTenetGramEmissionOwner: "GHoT"' experiments/tenet-arpg-frontier-002/frontier.mjs
