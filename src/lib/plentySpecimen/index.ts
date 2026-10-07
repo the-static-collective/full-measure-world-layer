@@ -25,7 +25,22 @@ function unique(values: readonly string[]): string[] {
   return [...new Set(values)];
 }
 
-function validate(input: PlentyEvaluationInput): Map<string, PlentyCapabilityClaim> {
+function canonicalPath(path: PlentyCandidatePath): string {
+  return JSON.stringify({
+    needRef: path.needRef,
+    capabilityRefs: unique(path.capabilityRefs).sort(),
+    dependencyRefs: unique(path.dependencyRefs).sort(),
+    satisfiesCapabilityRequirement: path.satisfiesCapabilityRequirement,
+    constraintResults: [...path.constraintResults]
+      .map((result) => ({ ...result }))
+      .sort((left, right) => left.constraintRef.localeCompare(right.constraintRef)),
+  });
+}
+
+function validate(input: PlentyEvaluationInput): {
+  capabilities: Map<string, PlentyCapabilityClaim>;
+  candidatePaths: PlentyCandidatePath[];
+} {
   const particulars = new Map<string, PlentyEvaluationInput['particulars'][number]>();
   for (const item of input.particulars) {
     const existing = particulars.get(item.particularRef);
@@ -62,6 +77,8 @@ function validate(input: PlentyEvaluationInput): Map<string, PlentyCapabilityCla
     capabilities.set(claim.capabilityRef, claim);
   }
 
+  const candidatePaths: PlentyCandidatePath[] = [];
+  const pathIdentity = new Map<string, string>();
   for (const path of input.candidatePaths) {
     if (path.needRef !== input.need.needRef) {
       throw new PlentySpecimenError(
@@ -77,9 +94,28 @@ function validate(input: PlentyEvaluationInput): Map<string, PlentyCapabilityCla
         );
       }
     }
+
+    const canonical = canonicalPath(path);
+    const existing = pathIdentity.get(path.pathRef);
+    if (existing !== undefined) {
+      if (existing !== canonical) {
+        throw new PlentySpecimenError(
+          'PLENTY_PATH_CONFLICT',
+          `Conflicting path identity: ${path.pathRef}`,
+        );
+      }
+      continue;
+    }
+    pathIdentity.set(path.pathRef, canonical);
+    candidatePaths.push({
+      ...path,
+      capabilityRefs: unique(path.capabilityRefs),
+      dependencyRefs: unique(path.dependencyRefs),
+      constraintResults: path.constraintResults.map((result) => ({ ...result })),
+    });
   }
 
-  return capabilities;
+  return { capabilities, candidatePaths };
 }
 
 function deriveStructuralState(
@@ -200,29 +236,144 @@ function pathReceipt(
   };
 }
 
+function pathFingerprint(
+  path: PlentyCandidatePath,
+  dependencyRefs: readonly string[],
+): string {
+  return JSON.stringify({
+    capabilityRefs: unique(path.capabilityRefs).sort(),
+    dependencyRefs: [...dependencyRefs].sort(),
+  });
+}
+
+function lexicographicallyBefore(left: readonly string[], right: readonly string[]): boolean {
+  const a = [...left].sort();
+  const b = [...right].sort();
+  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {
+    const comparison = a[index].localeCompare(b[index]);
+    if (comparison < 0) return true;
+    if (comparison > 0) return false;
+  }
+  return a.length < b.length;
+}
+
+function chooseIndependentPathRefs(
+  viable: Array<{
+    path: PlentyCandidatePath;
+    receipt: PlentyPathReceipt;
+  }>,
+): string[] {
+  const representatives = new Map<string, {
+    pathRef: string;
+    dependencies: Set<string>;
+  }>();
+
+  for (const entry of viable) {
+    const fingerprint = pathFingerprint(entry.path, entry.receipt.dependencyRefs);
+    const existing = representatives.get(fingerprint);
+    if (!existing || entry.path.pathRef.localeCompare(existing.pathRef) < 0) {
+      representatives.set(fingerprint, {
+        pathRef: entry.path.pathRef,
+        dependencies: new Set(entry.receipt.dependencyRefs),
+      });
+    }
+  }
+
+  const choices = [...representatives.values()]
+    .sort((left, right) => left.pathRef.localeCompare(right.pathRef));
+
+  let best: string[] = [];
+
+  const visit = (
+    index: number,
+    selected: string[],
+    usedDependencies: Set<string>,
+  ): void => {
+    if (selected.length + (choices.length - index) < best.length) return;
+    if (index === choices.length) {
+      const candidate = [...selected].sort();
+      if (
+        candidate.length > best.length
+        || (candidate.length === best.length && lexicographicallyBefore(candidate, best))
+      ) {
+        best = candidate;
+      }
+      return;
+    }
+
+    const choice = choices[index];
+    const conflicts = [...choice.dependencies].some((dep) => usedDependencies.has(dep));
+    if (!conflicts) {
+      const nextDependencies = new Set(usedDependencies);
+      for (const dependency of choice.dependencies) nextDependencies.add(dependency);
+      visit(index + 1, [...selected, choice.pathRef], nextDependencies);
+    }
+
+    visit(index + 1, selected, usedDependencies);
+  };
+
+  visit(0, [], new Set());
+  return best;
+}
+
 export function evaluatePlenty(input: PlentyEvaluationInput): PlentyReceipt {
-  const capabilities = validate(input);
-  const pathReceipts = input.candidatePaths.map((path) => pathReceipt(input, capabilities, path));
+  const validated = validate(input);
+  const capabilities = validated.capabilities;
+  const candidatePaths = validated.candidatePaths;
+  const evaluated = candidatePaths.map((path) => ({
+    path,
+    receipt: pathReceipt(input, capabilities, path),
+  }));
+  const pathReceipts = evaluated.map((entry) => entry.receipt);
   const structurallyCompletePathCount = pathReceipts.filter(
     (path) => path.structuralState === 'complete',
   ).length;
-  const viablePathCount = pathReceipts.filter((path) => path.viabilityState === 'viable').length;
+  const viableEntries = evaluated.filter((entry) => entry.receipt.viabilityState === 'viable');
+  const viablePathCount = viableEntries.length;
+  const independentPathRefs = chooseIndependentPathRefs(viableEntries);
+  const independentPathCount = independentPathRefs.length;
+
+  const dependencyUseCounts = new Map<string, number>();
+  for (const { receipt } of viableEntries) {
+    for (const dependency of receipt.dependencyRefs) {
+      dependencyUseCounts.set(dependency, (dependencyUseCounts.get(dependency) ?? 0) + 1);
+    }
+  }
+  const fragileDependencyRefs = [...dependencyUseCounts.entries()]
+    .filter(([, count]) => count >= 2)
+    .map(([dependency]) => dependency)
+    .sort();
+
+  const blockingDependencyRefs = unique(
+    evaluated
+      .filter((entry) => entry.receipt.viabilityState === 'blocked')
+      .filter((entry) => entry.receipt.blockingRefs.some((ref) => capabilities.has(ref)))
+      .flatMap((entry) => entry.receipt.dependencyRefs),
+  ).sort();
+
+  const disposition =
+    structurallyCompletePathCount === 0
+      ? 'NO_KNOWN_PATH'
+      : viablePathCount === 0
+        ? 'POSSIBILITIES_ONLY'
+        : independentPathCount <= 1
+          ? 'VIABLE_BUT_FRAGILE'
+          : fragileDependencyRefs.length > 0
+            ? 'MULTIPATH'
+            : 'RESILIENT_MULTIPATH';
 
   return {
     needRef: input.need.needRef,
-    candidatePathCount: input.candidatePaths.length,
+    candidatePathCount: candidatePaths.length,
     structurallyCompletePathCount,
     viablePathCount,
-    independentPathCount: viablePathCount > 0 ? 1 : 0,
-    independentPathRefs:
-      viablePathCount > 0
-        ? [pathReceipts.find((path) => path.viabilityState === 'viable')!.pathRef]
-        : [],
-    blockingDependencyRefs: [],
-    fragileDependencyRefs: [],
+    independentPathCount,
+    independentPathRefs,
+    blockingDependencyRefs,
+    fragileDependencyRefs,
     unusedCapabilityRefs: input.capabilities
       .filter((claim) =>
-        !input.candidatePaths.some((path) => path.capabilityRefs.includes(claim.capabilityRef))
+        !candidatePaths.some((path) => path.capabilityRefs.includes(claim.capabilityRef))
       )
       .map((claim) => claim.capabilityRef)
       .sort(),
@@ -236,12 +387,7 @@ export function evaluatePlenty(input: PlentyEvaluationInput): PlentyReceipt {
       .map((claim) => claim.capabilityRef)
       .sort(),
     pathReceipts,
-    disposition:
-      structurallyCompletePathCount === 0
-        ? 'NO_KNOWN_PATH'
-        : viablePathCount === 0
-          ? 'POSSIBILITIES_ONLY'
-          : 'VIABLE_BUT_FRAGILE',
+    disposition,
   };
 }
 
