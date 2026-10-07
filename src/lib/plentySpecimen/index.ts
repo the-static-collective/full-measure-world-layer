@@ -74,6 +74,17 @@ function validate(input: PlentyEvaluationInput): {
         `Provenance cannot establish witnessed evidence: ${claim.provenanceKind}`,
       );
     }
+    if (
+      claim.authority === 'authorized'
+      && claim.authoritySourceRefs
+      && claim.authoritySourceRefs.length > 0
+      && claim.authoritySourceRefs.every((ref) => ref.startsWith('plenty-receipt:'))
+    ) {
+      throw new PlentySpecimenError(
+        'PLENTY_RECURSIVE_AUTHORITY',
+        `PLENTY receipt cannot be sole authority source: ${claim.capabilityRef}`,
+      );
+    }
     capabilities.set(claim.capabilityRef, claim);
   }
 
@@ -239,9 +250,19 @@ function pathReceipt(
 function pathFingerprint(
   path: PlentyCandidatePath,
   dependencyRefs: readonly string[],
+  capabilities: Map<string, PlentyCapabilityClaim>,
 ): string {
+  const capabilityIdentities = unique(path.capabilityRefs)
+    .map((ref) => capabilities.get(ref)!)
+    .map((claim) => JSON.stringify({
+      particularRef: claim.particularRef,
+      capability: claim.capability,
+      dependencyRefs: unique(claim.dependencyRefs).sort(),
+    }))
+    .sort();
+
   return JSON.stringify({
-    capabilityRefs: unique(path.capabilityRefs).sort(),
+    capabilityIdentities,
     dependencyRefs: [...dependencyRefs].sort(),
   });
 }
@@ -262,6 +283,7 @@ function chooseIndependentPathRefs(
     path: PlentyCandidatePath;
     receipt: PlentyPathReceipt;
   }>,
+  capabilities: Map<string, PlentyCapabilityClaim>,
 ): string[] {
   const representatives = new Map<string, {
     pathRef: string;
@@ -269,7 +291,11 @@ function chooseIndependentPathRefs(
   }>();
 
   for (const entry of viable) {
-    const fingerprint = pathFingerprint(entry.path, entry.receipt.dependencyRefs);
+    const fingerprint = pathFingerprint(
+      entry.path,
+      entry.receipt.dependencyRefs,
+      capabilities,
+    );
     const existing = representatives.get(fingerprint);
     if (!existing || entry.path.pathRef.localeCompare(existing.pathRef) < 0) {
       representatives.set(fingerprint, {
@@ -330,7 +356,7 @@ export function evaluatePlenty(input: PlentyEvaluationInput): PlentyReceipt {
   ).length;
   const viableEntries = evaluated.filter((entry) => entry.receipt.viabilityState === 'viable');
   const viablePathCount = viableEntries.length;
-  const independentPathRefs = chooseIndependentPathRefs(viableEntries);
+  const independentPathRefs = chooseIndependentPathRefs(viableEntries, capabilities);
   const independentPathCount = independentPathRefs.length;
 
   const dependencyUseCounts = new Map<string, number>();

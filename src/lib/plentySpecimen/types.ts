@@ -48,6 +48,7 @@ export interface PlentyCapabilityClaim {
   dependencyRefs: string[];
   requiresCapabilityRefs: string[];
   sourceRefs: string[];
+  authoritySourceRefs?: string[];
   reproductiveEvidenceRefs?: string[];
 }
 
