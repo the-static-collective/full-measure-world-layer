@@ -318,3 +318,177 @@ test('satisfied hard constraints permit present viability', () => {
   const receipt = evaluatePlenty(input);
   assert.equal(receipt.pathReceipts[0].viabilityState, 'viable');
 });
+
+
+function manyPathInput(entries: Array<{
+  pathRef: string;
+  capabilityRef: string;
+  dependencyRefs?: string[];
+  particularRef?: string;
+}>): PlentyEvaluationInput {
+  const particulars = entries.map((entry, index) =>
+    particular(entry.particularRef ?? `particular:${index}`, [`source:${index}`])
+  );
+  const capabilities = entries.map((entry, index) =>
+    capability({
+      capabilityRef: entry.capabilityRef,
+      particularRef: particulars[index].particularRef,
+      capability: 'communicate-100-miles',
+      dependencyRefs: entry.dependencyRefs ?? [],
+    })
+  );
+  return {
+    need: {
+      needRef: 'need:communicate',
+      capabilityRequirement: 'communicate-100-miles',
+    },
+    particulars,
+    capabilities,
+    candidatePaths: entries.map((entry) => ({
+      pathRef: entry.pathRef,
+      needRef: 'need:communicate',
+      capabilityRefs: [entry.capabilityRef],
+      dependencyRefs: [],
+      satisfiesCapabilityRequirement: true,
+      constraintResults: [],
+    })),
+  };
+}
+
+test('deduplicates byte-equivalent duplicate path identity', () => {
+  const input = validInput();
+  input.candidatePaths.push({ ...input.candidatePaths[0] });
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.candidatePathCount, 1);
+  assert.equal(receipt.viablePathCount, 1);
+  assert.equal(receipt.independentPathCount, 1);
+});
+
+test('rejects contradictory duplicate path identity', () => {
+  const input = validInput();
+  input.capabilities.push(capability({
+    capabilityRef: 'capability:other',
+  }));
+  input.candidatePaths.push({
+    ...input.candidatePaths[0],
+    capabilityRefs: ['capability:other'],
+  });
+
+  expectPlentyError(() => evaluatePlenty(input), 'PLENTY_PATH_CONFLICT');
+});
+
+test('shared dependency aliases do not create independent paths', () => {
+  const input = manyPathInput([
+    { pathRef: 'path:email', capabilityRef: 'capability:email', dependencyRefs: ['dependency:power:grid-a'] },
+    { pathRef: 'path:signal', capabilityRef: 'capability:signal', dependencyRefs: ['dependency:power:grid-a'] },
+    { pathRef: 'path:matrix', capabilityRef: 'capability:matrix', dependencyRefs: ['dependency:power:grid-a'] },
+  ]);
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.viablePathCount, 3);
+  assert.equal(receipt.independentPathCount, 1);
+  assert.deepEqual(receipt.fragileDependencyRefs, ['dependency:power:grid-a']);
+});
+
+test('ten viable routes through one car remain one independent path', () => {
+  const input = manyPathInput(Array.from({ length: 10 }, (_, index) => ({
+    pathRef: `path:${String(index).padStart(2, '0')}`,
+    capabilityRef: `capability:${index}`,
+    dependencyRefs: ['dependency:car:1'],
+  })));
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.viablePathCount, 10);
+  assert.equal(receipt.independentPathCount, 1);
+  assert.equal(receipt.disposition, 'VIABLE_BUT_FRAGILE');
+});
+
+test('providers sharing one upstream provider remain correlated', () => {
+  const input = manyPathInput([
+    { pathRef: 'path:a', capabilityRef: 'capability:a', dependencyRefs: ['dependency:upstream:x'] },
+    { pathRef: 'path:b', capabilityRef: 'capability:b', dependencyRefs: ['dependency:upstream:x'] },
+    { pathRef: 'path:c', capabilityRef: 'capability:c', dependencyRefs: ['dependency:upstream:x'] },
+  ]);
+
+  assert.equal(evaluatePlenty(input).independentPathCount, 1);
+});
+
+test('many routes requiring one human remain one fragile family', () => {
+  const input = manyPathInput(Array.from({ length: 40 }, (_, index) => ({
+    pathRef: `path:human:${index}`,
+    capabilityRef: `capability:human:${index}`,
+    dependencyRefs: ['dependency:person:sam'],
+  })));
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.independentPathCount, 1);
+  assert.deepEqual(receipt.fragileDependencyRefs, ['dependency:person:sam']);
+});
+
+test('chooses the lexicographically first maximum disjoint viable path set', () => {
+  const input = manyPathInput([
+    { pathRef: 'path:a', capabilityRef: 'capability:a', dependencyRefs: ['dependency:power:grid'] },
+    { pathRef: 'path:b', capabilityRef: 'capability:b', dependencyRefs: ['dependency:power:solar'] },
+    { pathRef: 'path:c', capabilityRef: 'capability:c', dependencyRefs: ['dependency:power:grid', 'dependency:person:sam'] },
+  ]);
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.independentPathCount, 2);
+  assert.deepEqual(receipt.independentPathRefs, ['path:a', 'path:b']);
+  assert.equal(receipt.disposition, 'MULTIPATH');
+});
+
+test('two distinct dependency-free capability chains can be independently viable', () => {
+  const input = manyPathInput([
+    { pathRef: 'path:a', capabilityRef: 'capability:a' },
+    { pathRef: 'path:b', capabilityRef: 'capability:b' },
+  ]);
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.independentPathCount, 2);
+  assert.equal(receipt.disposition, 'RESILIENT_MULTIPATH');
+});
+
+test('duplicate dependency-free surfaces over the same capability chain do not inflate independence', () => {
+  const input = validInput();
+  input.candidatePaths.push({
+    ...input.candidatePaths[0],
+    pathRef: 'path:radio-alias',
+  });
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.viablePathCount, 2);
+  assert.equal(receipt.independentPathCount, 1);
+});
+
+test('ten thousand syntactic variants around one dependency family remain one independent path', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({ dependencyRefs: ['dependency:power:one'] });
+  input.candidatePaths = Array.from({ length: 10_000 }, (_, index) => ({
+    ...input.candidatePaths[0],
+    pathRef: `path:variant:${index}`,
+  }));
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.viablePathCount, 10_000);
+  assert.equal(receipt.independentPathCount, 1);
+});
+
+test('destroying one route leaves unrelated viable paths intact', () => {
+  const input = manyPathInput([
+    { pathRef: 'path:grid', capabilityRef: 'capability:grid', dependencyRefs: ['dependency:grid'] },
+    { pathRef: 'path:solar', capabilityRef: 'capability:solar', dependencyRefs: ['dependency:solar'] },
+  ]);
+  const baseline = evaluatePlenty(input);
+  assert.equal(baseline.independentPathCount, 2);
+
+  input.capabilities[0] = {
+    ...input.capabilities[0],
+    availability: 'unavailable',
+  };
+  const after = evaluatePlenty(input);
+  assert.equal(after.viablePathCount, 1);
+  assert.equal(after.independentPathCount, 1);
+  assert.deepEqual(after.independentPathRefs, ['path:solar']);
+});
