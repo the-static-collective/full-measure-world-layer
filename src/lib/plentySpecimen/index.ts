@@ -1,5 +1,6 @@
 import type {
   PlentyCapabilityClaim,
+  PlentyCandidatePath,
   PlentyEvaluationInput,
   PlentyPathReceipt,
   PlentyReceipt,
@@ -81,43 +82,121 @@ function validate(input: PlentyEvaluationInput): Map<string, PlentyCapabilityCla
   return capabilities;
 }
 
+function deriveStructuralState(
+  needRequirement: string,
+  path: PlentyCandidatePath,
+  capabilities: Map<string, PlentyCapabilityClaim>,
+): 'complete' | 'incomplete' {
+  if (!path.satisfiesCapabilityRequirement) return 'incomplete';
+
+  const pathRefs = new Set(unique(path.capabilityRefs));
+  const targetRefs = [...pathRefs].filter(
+    (ref) => capabilities.get(ref)?.capability === needRequirement,
+  );
+  if (targetRefs.length === 0) return 'incomplete';
+
+  const resolves = (ref: string, visiting: Set<string>): boolean => {
+    if (!pathRefs.has(ref)) return false;
+    if (visiting.has(ref)) return false;
+    const claim = capabilities.get(ref);
+    if (!claim) return false;
+    const next = new Set(visiting);
+    next.add(ref);
+    return claim.requiresCapabilityRefs.every((requiredRef) => resolves(requiredRef, next));
+  };
+
+  return targetRefs.some((ref) => resolves(ref, new Set())) ? 'complete' : 'incomplete';
+}
+
+function deriveViabilityState(
+  input: PlentyEvaluationInput,
+  path: PlentyCandidatePath,
+  claims: PlentyCapabilityClaim[],
+  structuralState: 'complete' | 'incomplete',
+): {
+  state: 'viable' | 'blocked' | 'unresolved';
+  blockingRefs: string[];
+  unresolvedRefs: string[];
+} {
+  if (structuralState === 'incomplete') {
+    return { state: 'blocked', blockingRefs: ['structure'], unresolvedRefs: [] };
+  }
+
+  const blockingRefs: string[] = [];
+  const unresolvedRefs: string[] = [];
+
+  for (const claim of claims) {
+    if (
+      claim.currentness === 'stale'
+      || claim.availability === 'unavailable'
+      || claim.access === 'inaccessible'
+      || claim.authority === 'unauthorized'
+    ) {
+      blockingRefs.push(claim.capabilityRef);
+      continue;
+    }
+    if (
+      claim.currentness === 'unknown'
+      || claim.availability === 'unknown'
+      || claim.access === 'unknown'
+      || claim.authority === 'unknown'
+    ) {
+      unresolvedRefs.push(claim.capabilityRef);
+    }
+  }
+
+  const results = new Map(path.constraintResults.map((result) => [result.constraintRef, result]));
+  for (const constraint of input.need.constraints ?? []) {
+    if (!constraint.hard) continue;
+    const result = results.get(constraint.constraintRef);
+    if (!result || result.result === 'unknown') {
+      unresolvedRefs.push(constraint.constraintRef);
+    } else if (result.result === 'failed') {
+      blockingRefs.push(constraint.constraintRef);
+    }
+  }
+
+  if (blockingRefs.length > 0) {
+    return {
+      state: 'blocked',
+      blockingRefs: unique(blockingRefs).sort(),
+      unresolvedRefs: unique(unresolvedRefs).sort(),
+    };
+  }
+  if (unresolvedRefs.length > 0) {
+    return {
+      state: 'unresolved',
+      blockingRefs: [],
+      unresolvedRefs: unique(unresolvedRefs).sort(),
+    };
+  }
+  return { state: 'viable', blockingRefs: [], unresolvedRefs: [] };
+}
+
 function pathReceipt(
   input: PlentyEvaluationInput,
   capabilities: Map<string, PlentyCapabilityClaim>,
-  path: PlentyEvaluationInput['candidatePaths'][number],
+  path: PlentyCandidatePath,
 ): PlentyPathReceipt {
   const claims = unique(path.capabilityRefs).map((ref) => capabilities.get(ref)!);
   const dependencyRefs = unique([
     ...path.dependencyRefs,
     ...claims.flatMap((claim) => claim.dependencyRefs),
   ]).sort();
-  const structuralState = path.satisfiesCapabilityRequirement ? 'complete' : 'incomplete';
-  const hasUnknown = claims.some((claim) =>
-    claim.currentness === 'unknown'
-    || claim.availability === 'unknown'
-    || claim.access === 'unknown'
-    || claim.authority === 'unknown'
+  const structuralState = deriveStructuralState(
+    input.need.capabilityRequirement,
+    path,
+    capabilities,
   );
-  const hasBlock = claims.some((claim) =>
-    claim.currentness === 'stale'
-    || claim.availability === 'unavailable'
-    || claim.access === 'inaccessible'
-    || claim.authority === 'unauthorized'
-  );
-  const viabilityState =
-    structuralState === 'incomplete' || hasBlock
-      ? 'blocked'
-      : hasUnknown
-        ? 'unresolved'
-        : 'viable';
+  const viability = deriveViabilityState(input, path, claims, structuralState);
 
   return {
     pathRef: path.pathRef,
     structuralState,
-    viabilityState,
+    viabilityState: viability.state,
     dependencyRefs,
-    blockingRefs: [],
-    unresolvedRefs: [],
+    blockingRefs: viability.blockingRefs,
+    unresolvedRefs: viability.unresolvedRefs,
   };
 }
 
