@@ -163,3 +163,158 @@ test('deduplicates repeated capability references inside one path receipt', () =
   assert.equal(receipt.pathReceipts.length, 1);
   assert.deepEqual(receipt.pathReceipts[0].dependencyRefs, []);
 });
+
+
+test('does not treat a superficially related capability as satisfying the need', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({ capability: 'heat-material' });
+  input.candidatePaths[0] = {
+    ...input.candidatePaths[0],
+    satisfiesCapabilityRequirement: false,
+  };
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].structuralState, 'incomplete');
+  assert.equal(receipt.disposition, 'NO_KNOWN_PATH');
+});
+
+test('marks an unresolved capability requirement cycle structurally incomplete', () => {
+  const input = validInput();
+  input.capabilities = [
+    capability({
+      capabilityRef: 'capability:a',
+      capability: 'communicate-100-miles',
+      requiresCapabilityRefs: ['capability:b'],
+    }),
+    capability({
+      capabilityRef: 'capability:b',
+      requiresCapabilityRefs: ['capability:c'],
+    }),
+    capability({
+      capabilityRef: 'capability:c',
+      requiresCapabilityRefs: ['capability:a'],
+    }),
+  ];
+  input.candidatePaths[0] = {
+    ...input.candidatePaths[0],
+    capabilityRefs: ['capability:a', 'capability:b', 'capability:c'],
+  };
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].structuralState, 'incomplete');
+  assert.equal(receipt.viablePathCount, 0);
+});
+
+test('becomes structurally complete when the requirement chain reaches a leaf', () => {
+  const input = validInput();
+  input.capabilities = [
+    capability({
+      capabilityRef: 'capability:a',
+      capability: 'communicate-100-miles',
+      requiresCapabilityRefs: ['capability:b'],
+    }),
+    capability({
+      capabilityRef: 'capability:b',
+      requiresCapabilityRefs: ['capability:c'],
+    }),
+    capability({
+      capabilityRef: 'capability:c',
+      requiresCapabilityRefs: [],
+    }),
+  ];
+  input.candidatePaths[0] = {
+    ...input.candidatePaths[0],
+    capabilityRefs: ['capability:a', 'capability:b', 'capability:c'],
+  };
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].structuralState, 'complete');
+  assert.equal(receipt.pathReceipts[0].viabilityState, 'viable');
+});
+
+for (const [field, value] of [
+  ['availability', 'unavailable'],
+  ['access', 'inaccessible'],
+  ['authority', 'unauthorized'],
+  ['currentness', 'stale'],
+] as const) {
+  test(`${field} ${value} blocks present viability`, () => {
+    const input = validInput();
+    input.capabilities[0] = capability({ [field]: value });
+
+    const receipt = evaluatePlenty(input);
+    assert.equal(receipt.pathReceipts[0].viabilityState, 'blocked');
+    assert.equal(receipt.viablePathCount, 0);
+  });
+}
+
+for (const field of ['availability', 'access', 'authority', 'currentness'] as const) {
+  test(`unknown ${field} remains unresolved rather than false`, () => {
+    const input = validInput();
+    input.capabilities[0] = capability({ [field]: 'unknown' });
+
+    const receipt = evaluatePlenty(input);
+    assert.equal(receipt.pathReceipts[0].viabilityState, 'unresolved');
+    assert.equal(receipt.viablePathCount, 0);
+    assert.deepEqual(receipt.unresolvedClaimRefs, ['capability:communicate']);
+  });
+}
+
+test('failed hard resource constraint blocks viability', () => {
+  const input = validInput();
+  input.need.constraints = [{ constraintRef: 'constraint:money', kind: 'resource', hard: true }];
+  input.candidatePaths[0].constraintResults = [{
+    constraintRef: 'constraint:money',
+    result: 'failed',
+  }];
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].viabilityState, 'blocked');
+});
+
+test('failed hard time constraint blocks viability', () => {
+  const input = validInput();
+  input.need.constraints = [{ constraintRef: 'constraint:deadline', kind: 'time', hard: true }];
+  input.candidatePaths[0].constraintResults = [{
+    constraintRef: 'constraint:deadline',
+    result: 'failed',
+  }];
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].viabilityState, 'blocked');
+});
+
+test('unknown hard constraint remains unresolved', () => {
+  const input = validInput();
+  input.need.constraints = [{ constraintRef: 'constraint:money', kind: 'resource', hard: true }];
+  input.candidatePaths[0].constraintResults = [{
+    constraintRef: 'constraint:money',
+    result: 'unknown',
+  }];
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].viabilityState, 'unresolved');
+});
+
+test('omitted hard need constraint remains unresolved', () => {
+  const input = validInput();
+  input.need.constraints = [{ constraintRef: 'constraint:money', kind: 'resource', hard: true }];
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].viabilityState, 'unresolved');
+});
+
+test('satisfied hard constraints permit present viability', () => {
+  const input = validInput();
+  input.need.constraints = [
+    { constraintRef: 'constraint:money', kind: 'resource', hard: true },
+    { constraintRef: 'constraint:deadline', kind: 'time', hard: true },
+  ];
+  input.candidatePaths[0].constraintResults = [
+    { constraintRef: 'constraint:money', result: 'satisfied' },
+    { constraintRef: 'constraint:deadline', result: 'satisfied' },
+  ];
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.pathReceipts[0].viabilityState, 'viable');
+});
