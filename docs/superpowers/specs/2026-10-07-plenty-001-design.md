@@ -133,6 +133,14 @@ type PlentyCapabilityClaim = {
   particularRef: string;
   capability: string;
   evidenceClass: "declared" | "observed" | "witnessed";
+  provenanceKind:
+    | "self-report"
+    | "human-witness"
+    | "system-observation"
+    | "model-output"
+    | "plenty-receipt"
+    | "external-claim";
+  currentness: "current" | "stale" | "unknown";
   availability: "available" | "unavailable" | "unknown";
   access: "accessible" | "inaccessible" | "unknown";
   authority: "authorized" | "unauthorized" | "unknown";
@@ -142,6 +150,8 @@ type PlentyCapabilityClaim = {
 ```
 
 The specimen may reason over declared and observed claims, but only the supplied evidence class may be reported. PLENTY never upgrades evidence class.
+
+Provenance and evidence class must agree. In particular, `model-output`, `plenty-receipt`, and `self-report` provenance cannot enter as `witnessed`; such contradictory input fails closed. A stale or unknown-currentness claim may remain visible to reasoning, but it cannot establish present viability.
 
 ### Candidate path
 
@@ -195,7 +205,9 @@ Aliases may not create independence. Multiple paths that rely on the same normal
 
 ### 4. Independent path calculation
 
-Independent path count is the count of presently viable paths after collapsing paths that share a declared critical dependency whose failure would disable all members of that set.
+Independent path count is the size of the largest set of presently viable paths whose normalized critical dependency sets are pairwise disjoint. This prevents transitive or surface-level aliasing from inflating independence.
+
+If more than one maximum set exists, 001 chooses deterministically by lexicographic `pathRef` order so fixed fixtures always yield the same receipt.
 
 001 does not need a generalized reliability probability model. It only needs deterministic dependency-family separation.
 
@@ -306,9 +318,9 @@ An accessible resource without authority cannot contribute to present viability.
 
 ### Stale availability
 
-A stale or explicitly non-current claim cannot be silently promoted to present availability.
+A capability claim with `currentness: "stale"` cannot contribute to present viability. `currentness: "unknown"` remains unresolved.
 
-001 may represent this with an unresolved claim rather than adding a clock service.
+001 does not add a clock service or infer freshness from wall-clock time; currentness is supplied as evidence and preserved.
 
 ### Circular composition
 
