@@ -583,3 +583,62 @@ test('canonical power cut leaves seven possibilities but zero viable communicati
   assert.equal(receipt.disposition, 'POSSIBILITIES_ONLY');
   assert.deepEqual(receipt.blockingDependencyRefs, ['dependency:power:primary']);
 });
+
+
+test('two routes sharing one underlying particular are not independent', () => {
+  const input = validInput();
+  input.capabilities.push(capability({
+    capabilityRef: 'capability:communicate-second-mode',
+    capability: 'communicate-100-miles',
+    particularRef: 'particular:radio',
+  }));
+  input.candidatePaths.push({
+    ...input.candidatePaths[0],
+    pathRef: 'path:radio-second-mode',
+    capabilityRefs: ['capability:communicate-second-mode'],
+  });
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.viablePathCount, 2);
+  assert.equal(receipt.independentPathCount, 1);
+});
+
+test('duplicate particular identity treats source refs as an order-insensitive set', () => {
+  const input = validInput();
+  input.particulars = [
+    particular('particular:radio', ['source:a', 'source:b']),
+    particular('particular:radio', ['source:b', 'source:a']),
+  ];
+
+  assert.doesNotThrow(() => evaluatePlenty(input));
+});
+
+test('contradictory duplicate capability identity fails closed', () => {
+  const input = validInput();
+  input.capabilities = [
+    capability({ availability: 'available' }),
+    capability({ availability: 'unavailable' }),
+  ];
+
+  expectPlentyError(() => evaluatePlenty(input), 'PLENTY_CAPABILITY_CONFLICT');
+});
+
+test('contradictory duplicate hard-constraint results fail closed', () => {
+  const input = validInput();
+  input.need.constraints = [{ constraintRef: 'constraint:money', kind: 'resource', hard: true }];
+  input.candidatePaths[0].constraintResults = [
+    { constraintRef: 'constraint:money', result: 'satisfied' },
+    { constraintRef: 'constraint:money', result: 'failed' },
+  ];
+
+  expectPlentyError(() => evaluatePlenty(input), 'PLENTY_CONSTRAINT_CONFLICT');
+});
+
+test('a capability requirement pointing to an unknown capability fails closed', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({
+    requiresCapabilityRefs: ['capability:missing-requirement'],
+  });
+
+  expectPlentyError(() => evaluatePlenty(input), 'PLENTY_UNKNOWN_REQUIREMENT');
+});
