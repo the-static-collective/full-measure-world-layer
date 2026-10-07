@@ -5,6 +5,7 @@ import {
   evaluatePlenty,
   PlentySpecimenError,
 } from '../src/lib/plentySpecimen/index.js';
+import { createPowerCutSpecimen } from '../src/lib/plentySpecimen/fixtures.js';
 import type {
   PlentyCapabilityClaim,
   PlentyEvaluationInput,
@@ -491,4 +492,94 @@ test('destroying one route leaves unrelated viable paths intact', () => {
   assert.equal(after.viablePathCount, 1);
   assert.equal(after.independentPathCount, 1);
   assert.deepEqual(after.independentPathRefs, ['path:solar']);
+});
+
+
+test('refuses a PLENTY receipt as the sole source of authority', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({
+    provenanceKind: 'external-claim',
+    authority: 'authorized',
+    authoritySourceRefs: ['plenty-receipt:prior'],
+  });
+
+  expectPlentyError(() => evaluatePlenty(input), 'PLENTY_RECURSIVE_AUTHORITY');
+});
+
+test('permits a prior PLENTY receipt as provenance when it is not the authority source', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({
+    provenanceKind: 'external-claim',
+    evidenceClass: 'observed',
+    sourceRefs: ['plenty-receipt:prior', 'source:independent-observation'],
+    authoritySourceRefs: ['source:human-permission'],
+  });
+
+  assert.doesNotThrow(() => evaluatePlenty(input));
+});
+
+test('an output without reproductive evidence does not manufacture a reusable child capability', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({ reproductiveEvidenceRefs: [] });
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.candidatePathCount, 1);
+  assert.equal(receipt.pathReceipts.length, 1);
+  assert.deepEqual(receipt.unusedCapabilityRefs, []);
+});
+
+test('reconstruction evidence is preserved as input evidence but creates no extra path', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({
+    reproductiveEvidenceRefs: ['recipe:radio-rebuild', 'lineage:radio-v1'],
+  });
+  const before = JSON.stringify(input);
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.candidatePathCount, 1);
+  assert.equal(JSON.stringify(input), before);
+});
+
+test('duplicate capability descriptions on the same particular do not mint independence', () => {
+  const input = validInput();
+  input.capabilities.push(capability({
+    capabilityRef: 'capability:communicate-alias',
+    capability: 'communicate-100-miles',
+    particularRef: 'particular:radio',
+  }));
+  input.candidatePaths.push({
+    ...input.candidatePaths[0],
+    pathRef: 'path:radio-alias-two',
+    capabilityRefs: ['capability:communicate-alias'],
+  });
+
+  const receipt = evaluatePlenty(input);
+  assert.equal(receipt.viablePathCount, 2);
+  assert.equal(receipt.independentPathCount, 1);
+});
+
+test('evaluation preserves the entire nested source graph byte-for-byte', () => {
+  const input = validInput();
+  input.capabilities[0] = capability({
+    dependencyRefs: ['dependency:a', 'dependency:b'],
+    reproductiveEvidenceRefs: ['recipe:one'],
+    authoritySourceRefs: ['source:permission'],
+  });
+  const before = JSON.stringify(input);
+
+  evaluatePlenty(input);
+
+  assert.equal(JSON.stringify(input), before);
+});
+
+test('canonical power cut leaves seven possibilities but zero viable communication paths', () => {
+  const input = createPowerCutSpecimen();
+  const receipt = evaluatePlenty(input);
+
+  assert.equal(receipt.candidatePathCount, 7);
+  assert.equal(receipt.structurallyCompletePathCount, 7);
+  assert.equal(receipt.viablePathCount, 0);
+  assert.equal(receipt.independentPathCount, 0);
+  assert.equal(receipt.disposition, 'POSSIBILITIES_ONLY');
+  assert.deepEqual(receipt.blockingDependencyRefs, ['dependency:power:primary']);
 });
