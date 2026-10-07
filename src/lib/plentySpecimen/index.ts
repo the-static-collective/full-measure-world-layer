@@ -17,12 +17,51 @@ export class PlentySpecimenError extends Error {
 }
 
 function sameRefs(left: readonly string[], right: readonly string[]): boolean {
-  if (left.length !== right.length) return false;
-  return left.every((value, index) => value === right[index]);
+  const a = unique(left).sort();
+  const b = unique(right).sort();
+  if (a.length !== b.length) return false;
+  return a.every((value, index) => value === b[index]);
 }
 
 function unique(values: readonly string[]): string[] {
   return [...new Set(values)];
+}
+
+function canonicalCapability(claim: PlentyCapabilityClaim): string {
+  return JSON.stringify({
+    particularRef: claim.particularRef,
+    capability: claim.capability,
+    evidenceClass: claim.evidenceClass,
+    provenanceKind: claim.provenanceKind,
+    currentness: claim.currentness,
+    availability: claim.availability,
+    access: claim.access,
+    authority: claim.authority,
+    dependencyRefs: unique(claim.dependencyRefs).sort(),
+    requiresCapabilityRefs: unique(claim.requiresCapabilityRefs).sort(),
+    sourceRefs: unique(claim.sourceRefs).sort(),
+    authoritySourceRefs: unique(claim.authoritySourceRefs ?? []).sort(),
+    reproductiveEvidenceRefs: unique(claim.reproductiveEvidenceRefs ?? []).sort(),
+  });
+}
+
+function normalizeConstraintResults(
+  results: PlentyCandidatePath['constraintResults'],
+): PlentyCandidatePath['constraintResults'] {
+  const byRef = new Map<string, PlentyCandidatePath['constraintResults'][number]>();
+  for (const result of results) {
+    const existing = byRef.get(result.constraintRef);
+    if (existing && existing.result !== result.result) {
+      throw new PlentySpecimenError(
+        'PLENTY_CONSTRAINT_CONFLICT',
+        `Conflicting constraint result: ${result.constraintRef}`,
+      );
+    }
+    if (!existing) byRef.set(result.constraintRef, { ...result });
+  }
+  return [...byRef.values()].sort((left, right) =>
+    left.constraintRef.localeCompare(right.constraintRef)
+  );
 }
 
 function canonicalPath(path: PlentyCandidatePath): string {
@@ -31,9 +70,7 @@ function canonicalPath(path: PlentyCandidatePath): string {
     capabilityRefs: unique(path.capabilityRefs).sort(),
     dependencyRefs: unique(path.dependencyRefs).sort(),
     satisfiesCapabilityRequirement: path.satisfiesCapabilityRequirement,
-    constraintResults: [...path.constraintResults]
-      .map((result) => ({ ...result }))
-      .sort((left, right) => left.constraintRef.localeCompare(right.constraintRef)),
+    constraintResults: normalizeConstraintResults(path.constraintResults),
   });
 }
 
@@ -54,6 +91,7 @@ function validate(input: PlentyEvaluationInput): {
   }
 
   const capabilities = new Map<string, PlentyCapabilityClaim>();
+  const capabilityIdentity = new Map<string, string>();
   for (const claim of input.capabilities) {
     if (!particulars.has(claim.particularRef)) {
       throw new PlentySpecimenError(
@@ -85,7 +123,30 @@ function validate(input: PlentyEvaluationInput): {
         `PLENTY receipt cannot be sole authority source: ${claim.capabilityRef}`,
       );
     }
+    const canonical = canonicalCapability(claim);
+    const existing = capabilityIdentity.get(claim.capabilityRef);
+    if (existing !== undefined) {
+      if (existing !== canonical) {
+        throw new PlentySpecimenError(
+          'PLENTY_CAPABILITY_CONFLICT',
+          `Conflicting capability identity: ${claim.capabilityRef}`,
+        );
+      }
+      continue;
+    }
+    capabilityIdentity.set(claim.capabilityRef, canonical);
     capabilities.set(claim.capabilityRef, claim);
+  }
+
+  for (const claim of capabilities.values()) {
+    for (const requiredRef of unique(claim.requiresCapabilityRefs)) {
+      if (!capabilities.has(requiredRef)) {
+        throw new PlentySpecimenError(
+          'PLENTY_UNKNOWN_REQUIREMENT',
+          `Unknown required capability: ${requiredRef}`,
+        );
+      }
+    }
   }
 
   const candidatePaths: PlentyCandidatePath[] = [];
@@ -106,7 +167,14 @@ function validate(input: PlentyEvaluationInput): {
       }
     }
 
-    const canonical = canonicalPath(path);
+    const normalizedConstraintResults = normalizeConstraintResults(path.constraintResults);
+    const normalizedPath = {
+      ...path,
+      capabilityRefs: unique(path.capabilityRefs),
+      dependencyRefs: unique(path.dependencyRefs),
+      constraintResults: normalizedConstraintResults,
+    };
+    const canonical = canonicalPath(normalizedPath);
     const existing = pathIdentity.get(path.pathRef);
     if (existing !== undefined) {
       if (existing !== canonical) {
@@ -118,12 +186,7 @@ function validate(input: PlentyEvaluationInput): {
       continue;
     }
     pathIdentity.set(path.pathRef, canonical);
-    candidatePaths.push({
-      ...path,
-      capabilityRefs: unique(path.capabilityRefs),
-      dependencyRefs: unique(path.dependencyRefs),
-      constraintResults: path.constraintResults.map((result) => ({ ...result })),
-    });
+    candidatePaths.push(normalizedPath);
   }
 
   return { capabilities, candidatePaths };
