@@ -1,0 +1,58 @@
+name: Full Measure POSTAL-CORPS-001 source-native receiver
+
+on:
+  pull_request:
+    paths:
+      - 'src/lib/postalCorpsQuest.ts'
+      - 'tests/postal-corps-quest.test.ts'
+      - '.github/workflows/postal-corps-quest-001.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postal-quest-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: fm
+      - uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/GHoT
+          ref: b8f80f840b6054bbf37ca9c9be9f70187248d6e5
+          path: ghot
+      - uses: actions/checkout@v4
+        with:
+          repository: the-static-collective/lemonPRESS
+          ref: 62a20ebf1e5b65ed8ff1ad3559e2b8779e4656be
+          path: lemon
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: fm/package-lock.json
+      - name: Check exact independent producer pins
+        run: |
+          test "$(git -C ghot rev-parse HEAD)" = 'b8f80f840b6054bbf37ca9c9be9f70187248d6e5'
+          test "$(git -C lemon rev-parse HEAD)" = '62a20ebf1e5b65ed8ff1ad3559e2b8779e4656be'
+          openssl version
+      - name: Run source-native LemonPRESS -> GHoT ten signed handoff producer
+        run: |
+          python3 ghot/test/postal_corps_native_lemon.py \
+            --lemon lemon --out "$RUNNER_TEMP/postal-corps-real-producer.json"
+      - name: Install Full Measure dependencies
+        working-directory: fm
+        run: npm ci
+      - name: Verify Full Measure's independent import and explicit HOLD doors
+        working-directory: fm
+        env:
+          POSTAL_CORPS_NATIVE_PROPOSAL: ${{ runner.temp }}/postal-corps-real-producer.json
+        run: |
+          node --import tsx --test tests/postal-corps-quest.test.ts
+          npm run lint
