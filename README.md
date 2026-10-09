@@ -28,6 +28,10 @@ This repository is **not** the song-to-video renderer. That tool is [The Haunted
 
 > Full Measure is the world you play inside. The Haunted Toaster is the machine that turns a song into a witnessed video.
 
+## Physical Test Inbox — FIELD QUEST ENGINE 001
+
+Full Measure now has a source-pinned **Physical Test Inbox** prototype in the Full Measure view. Real unfinished experiments such as SKYMIRROR-002 can propose a quest, with Hold/Rest/Leave Open as first-class options. Selecting a card only drafts a possible Garden project; it **cannot** award a Deed, assert field success or publish a GrO tenet. [Implementation, provenance and manual intake rules](docs/FIELD-QUEST-ENGINE-001.md) · [GrO companion draft](https://github.com/the-static-collective/GrO/pull/22).
+
 ## What works now
 
 ### Garden participation
