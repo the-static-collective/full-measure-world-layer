@@ -126,3 +126,7 @@ npm run dev
 - [Inherent Dungeon Master contract](docs/DUNGEON_MASTER.md)
 
 Full Measure integrates other systems by reference and adapter. It does not silently replace their distinct authority, meaning, privacy, or lineage contracts.
+
+## Commons Return Lens 001 — reLATTE / planZ
+
+The [Commons Return Lens](docs/COMMONS-RETURN-LENS-001.md) is a **read-only review-only adapter** for unverified JAR;VIS/planZ method packets and reLATTE transport outcomes. Even signed receiver ADMIT receives zero Deed/Harvest/Capacity credit; only Full Measure's existing owner-governed human-witness process can change actual participation measures. Includes adversarial tests and no production API or cross-project account privileges.
